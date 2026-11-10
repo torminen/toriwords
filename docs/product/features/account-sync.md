@@ -1,7 +1,7 @@
 # Account and sync
 
 - **Priority:** P0.
-- **Status:** optional sign-in with Apple or Google for backup and sync is confirmed (owner input 5). Sign-out and account deletion are pending [PD-9](../proposed-decisions.md#pd-9-sign-out-and-account-deletion), several sign-in methods [PD-10](../proposed-decisions.md#pd-10-apple-and-google-on-one-account), delete-vs-edit [PD-17](../proposed-decisions.md#pd-17-edit-on-one-device-vs-delete-on-another).
+- **Status:** optional sign-in with Apple or Google for backup and sync is confirmed (owner input 5). Sign-out and account deletion: [PD-9](../proposed-decisions.md#pd-9-sign-out-and-account-deletion), one sign-in method per account: [PD-10](../proposed-decisions.md#pd-10-apple-and-google-on-one-account), delete wins: [PD-17](../proposed-decisions.md#pd-17-edit-on-one-device-vs-delete-on-another).
 - **Analysis:** A4, A12, I7, X1, X3, §8.6.
 - **Domain:** [User and Device](../domain-model.md#user-and-device), [Duplicates](../domain-model.md#duplicates), [Sync requirements](../domain-model.md#sync-requirements). Mechanism: [sync.md](../../architecture/sync.md), [auth.md](../../architecture/auth.md).
 

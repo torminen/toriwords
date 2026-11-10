@@ -1,15 +1,15 @@
 # Duplicates
 
 - **Priority:** P0.
-- **Status:** proposed.
+- **Status:** confirmed.
 - **Analysis:** A2, I7.
 - **Domain:** [Duplicates](../domain-model.md#duplicates). Normalisation fixtures: [parity-testing.md](../../architecture/parity-testing.md).
 
 ## Behaviour
 
 - The vocabulary never contains the same word or phrase twice. "Same" means equal after normalisation: case, surrounding punctuation, extra spaces and typographic apostrophes, quotes and dashes are ignored. "Mortgage", "mortgage." and " mortgage " are the same. "Don't" and "don’t" are the same.
-- Inflections and spelling variants are different words: "run" and "ran", "colour" and "color". (Base-form suggestion at capture is pending PD-14.)
-- Russian translations are compared the same way, and `ё` = `е` (pending PD-18), so "ёлка" and "елка" are one meaning.
+- Inflections and spelling variants are different words: "run" and "ran", "colour" and "color". (Base-form suggestion at capture: PD-14.)
+- Russian translations are compared the same way, and `ё` = `е` (PD-18), so "ёлка" and "елка" are one meaning.
 - Sentences: the same sentence captured again (ignoring spaces and quote styles) from the same source is not added twice.
 - **Repeat capture or repeat add** of an existing word:
   - the user is told "Already in your vocabulary" before saving, with the existing meanings shown;

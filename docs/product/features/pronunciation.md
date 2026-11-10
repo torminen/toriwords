@@ -1,7 +1,7 @@
 # Pronunciation
 
 - **Priority:** P1.
-- **Status:** pending [PD-5](../proposed-decisions.md#pd-5-pronunciation). The behaviour below follows the recommendation: OS text-to-speech plus IPA, no recorded audio.
+- **Status:** confirmed ([PD-5](../proposed-decisions.md#pd-5-pronunciation)): OS text-to-speech plus IPA, no recorded audio.
 - **Analysis:** §8.4, §11 Q8.
 
 ## Behaviour

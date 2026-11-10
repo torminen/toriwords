@@ -1,7 +1,7 @@
 # Stats
 
 - **Priority:** P1.
-- **Status:** pending [PD-8](../proposed-decisions.md#pd-8-stats). The behaviour below follows the recommendation: one minimal screen, no gamification.
+- **Status:** confirmed ([PD-8](../proposed-decisions.md#pd-8-stats)): one minimal screen, no gamification.
 - **Analysis:** I6, X4, §6.4.
 
 ## Behaviour

@@ -1,7 +1,7 @@
 # First run and empty states
 
 - **Priority:** P0.
-- **Status:** proposed.
+- **Status:** confirmed.
 - **Analysis:** X1, X6, §6.4.
 
 ## Behaviour

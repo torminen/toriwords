@@ -175,7 +175,7 @@ Both apps share this table; a CI check compares the two configuration files agai
 
 ### L6. Consent default and privacy labels
 
-**Default: on (opt-out) or off (opt-in)?** This is former option O1.
+**Default: on (opt-out) or off (opt-in)?** This is option L-O1 (§L7).
 
 | | Opt-out (on by default, disclosed on first run and in Settings) | Opt-in (off until the user turns it on) |
 |---|---|---|

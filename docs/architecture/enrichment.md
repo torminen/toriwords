@@ -1,6 +1,6 @@
 # Enrichment (runtime)
 
-Status: **Proposed**. Pending owner confirmation in step 5. Nothing here is a `decision` yet.
+Status: **Confirmed** (owner, 2026-11-10). Confirmed: dictionary first, on-device MT as fallback and suggestion, no LLMs, OS text-to-speech plus IPA.
 
 How the app turns typed or captured text into suggested translations, definitions, IPA and pronunciation, offline and for free. The owner has confirmed the sources: on-device translation (Apple Translation / ML Kit) and Wiktionary; per-OS differences in suggestions are acceptable.
 
@@ -81,6 +81,6 @@ Audio is generated on demand and never stored or synced. Voices differ by platfo
 
 ## 7. Open questions
 
-- **Q-E1 → [PD-19](../product/proposed-decisions.md#pd-19-capture-time-help)(1):** automatic fill of pending captures, flagged "Check translation".
-- **Q-E2 → PD-19(2):** sentence MT as context help.
-- **Q-E3 → [PD-5](../product/proposed-decisions.md#pd-5-pronunciation):** US vs UK pronunciation default.
+- **Q-E1: closed.** Pending captures are filled automatically and flagged "Check translation" ([PD-19](../product/proposed-decisions.md#pd-19-capture-time-help)(1), confirmed).
+- **Q-E2: closed.** Sentence MT is shown as context help (PD-19(2), confirmed).
+- **Q-E3: closed.** US English by default, with a per-device UK setting ([PD-5](../product/proposed-decisions.md#pd-5-pronunciation), confirmed).

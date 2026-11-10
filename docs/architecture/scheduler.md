@@ -1,6 +1,6 @@
 # Scheduler
 
-Status: **Proposed**. Pending owner confirmation in step 5. Nothing here is a `decision` yet.
+Status: **Confirmed** (owner, 2026-11-10). Confirmed: FSRS-6 with default parameters, desired retention 0.90 hidden from the user, own implementation per platform, whole-day intervals with a 04:00 rollover, the sibling rule (PD-1) and the daily queue (PD-4). Open: Q-S3 (per-user optimiser, after v1). The default `w` values must still be checked against the pinned reference (§5.6).
 
 The scheduler decides when each Card is next due. Both apps implement it natively ([native apps](memory://7)), so it is specified here precisely enough for two independent implementations to give **bit-for-bit identical due days** for the same review history. Cross-platform fixtures live in [parity-testing.md](parity-testing.md).
 
@@ -28,11 +28,11 @@ Inputs: the Card and ReviewLog concepts in [domain-model.md](../product/domain-m
 
 ## 3. Grading → FSRS rating
 
-FSRS ratings: `Again = 1`, `Hard = 2`, `Good = 3`, `Easy = 4`. The product grading scheme is pending (PD-2). Mapping per candidate:
+FSRS ratings: `Again = 1`, `Hard = 2`, `Good = 3`, `Easy = 4`. The product grading scheme is two buttons (PD-2, confirmed). Mapping, including the alternatives kept for reference and import:
 
 | Product scheme | Mapping |
 |---|---|
-| Two buttons (PD-2 recommendation): "Forgot" / "Remembered" | Again / Good. Hard and Easy are never produced; FSRS-6 works without them. |
+| **Two buttons (v1, PD-2):** "Forgot" / "Remembered" | Again / Good. Hard and Easy are never produced; FSRS-6 works without them. |
 | Four buttons (Anki-style) | One to one. |
 | Inferred from a typed answer (if a typing exercise is adopted) | Exact match → Good; accepted with a typo tolerance or after a hint → Hard; wrong or "show answer" → Again. The typo rule must itself be in the fixtures. |
 
@@ -243,7 +243,7 @@ quota   = catchUp ? normalLoad + ceil((load − normalLoad) / 3) : ∞
 **Today's queue:**
 1. **Reviews:** `waiting` Cards in order: retrievability `R(T − lastReviewDay, S)` ascending, then `dueDay` ascending, then Card id. Take the first `max(0, quota − |reviewedToday|)` of them.
 2. **New Cards:** `0` in catch-up mode. Otherwise `max(0, newLimit − |introducedToday|)` New Cards, ordered by Entry creation time, then direction (`recognition` before `recall` before `cloze`), then Card id.
-3. **Siblings** (adopted in the product spec, pending [PD-1](../product/proposed-decisions.md#pd-1-card-directions-and-exercise-types)): walking the combined list (reviews first, then new), skip a Card if another Card of the same Entry has a rated log on day `T` or was already taken earlier in the walk. Skipped Cards stay due and come first by order on a later day.
+3. **Siblings** ([PD-1](../product/proposed-decisions.md#pd-1-card-directions-and-exercise-types), confirmed): walking the combined list (reviews first, then new), skip a Card if another Card of the same Entry has a rated log on day `T` or was already taken earlier in the walk. Skipped Cards stay due and come first by order on a later day.
 4. **Same-day re-shows:** Cards answered Forgot today have `dueDay = T` and are re-shown within the session (§5.5). They are in `reviewedToday` and are not limited by the quota.
 
 **Numbers shown:**
@@ -256,7 +256,7 @@ All of the above goes into the queue fixtures ([parity-testing.md](parity-testin
 
 ## 12. Open questions
 
-- **Q-S1 (product, PD-2):** two-button grading assumed as the default mapping. Four buttons are also supported without changes here.
-- **Q-S2 (product):** is desired retention user-visible? Recommendation: no. It is still a synced setting (PD-16), so a later UI can expose it.
-- **Q-S3 (owner):** after v1, should a signed-in user get per-user parameters from a backend optimiser (§6 option b)?
-- **Q-S4 (product, PD-16):** the review-day start is a **constant 04:00** here and in [sync.md](sync.md). The domain model and PD-16 list a synced "review-day start hour" setting. Recommendation: drop the setting in v1.
+- **Q-S1: closed.** Two-button grading (PD-2, confirmed). Four buttons would need no change here.
+- **Q-S2: closed.** Desired retention 0.90 is hidden in v1. It is still a synced setting (PD-16), so a later UI can expose it.
+- **Q-S3 (owner): open, after v1.** Should a signed-in user get per-user parameters from a backend optimiser (§6 option b)?
+- **Q-S4: closed.** The review-day start is a constant 04:00 and not a setting (PD-16, confirmed).

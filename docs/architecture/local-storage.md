@@ -1,6 +1,6 @@
 # Local storage
 
-Status: **Proposed**. Pending owner confirmation in step 5. Nothing here is a `decision` yet.
+Status: **Confirmed** (owner, 2026-11-10). Confirmed: GRDB on iOS; Room with the bundled SQLite driver on Android; one writer process with file-based exchange for extensions and widgets.
 
 Each device holds the user's full vocabulary and review history and works offline ([local-first](memory://8)). This document covers the storage engine on each platform, the logical schema, migrations, sharing with extensions and widgets, and OS backup for users without an account.
 
@@ -61,7 +61,7 @@ Conventions:
 | `context` | `id`, `entry_id`, `sense_id` NULL, `sentence`, `highlight_offset`, `highlight_length` (UTF-16 code units, as in the domain model; §8.4), `source_id` NULL, `captured_at` | |
 | `card` | `id` (deterministic UUIDv5 of entry + direction, [sync.md](sync.md) §4), `entry_id`, `direction`, `import_ref`, cache: `stability` REAL, `difficulty` REAL, `last_review_day` INTEGER, `due_day` INTEGER, `reps`, `lapses`, `stage`, `params_id` | Cache columns are **not synced**; recomputed locally ([scheduler.md](scheduler.md) §7). Index on `(due_day)` where active. |
 | `review_log` | `id`, `card_id`, `reviewed_at`, `utc_offset_min`, `rating` (1–4 FSRS; NULL only for imported rows that are not answers, [scheduler.md](scheduler.md) §7.1), `answer_ms`, `device_id`, `original_rating` NULL, `import_ref` NULL; local-only derived: `review_day`, `review_type`, `canonical_card_id` | Append-only: synced columns are never updated. Removed only by Entry deletion. |
-| `tag`, `entry_tag` | `tag`: `id`, `name`, `name_key`; `entry_tag`: `id` (deterministic UUIDv5 of entry + tag), `entry_id`, `tag_id`, `present` | Pending PD-3. Add/remove flips `present` (LWW), so re-tagging after un-tagging works; no tombstones on links ([sync.md](sync.md) §4). |
+| `tag`, `entry_tag` | `tag`: `id`, `name`, `name_key`; `entry_tag`: `id` (deterministic UUIDv5 of entry + tag), `entry_id`, `tag_id`, `present` | Tags per PD-3 (confirmed). Add/remove flips `present` (LWW), so re-tagging after un-tagging works; no tombstones on links ([sync.md](sync.md) §4). |
 | `settings` | one row, id = UUIDv5 `settings`; one column per synced setting, sync columns | Synced settings are the fields of one record, merged per field ([sync.md](sync.md) §4). Which settings sync: PD-16. Non-synced settings go to platform settings (UserDefaults / DataStore). |
 | `device` | `id`, `platform`, `display_name`, `first_seen` | This device's row is created on first run. |
 | `inbox_import` | `inbox_id`, `imported_at` | Local only. Makes share-extension import idempotent ([capture-and-extensions.md](capture-and-extensions.md)). |
@@ -129,10 +129,10 @@ A user-visible manual export/import file (JSON/CSV, A5) is a product decision; i
 5. **Sense `order` under concurrent edits.** Integer positions collide when two devices reorder or add Senses offline. Recommendation: fractional index (`REAL` or string key) with id tie-break.
 6. **`updated at` on Entry vs sync clock.** The user-visible `updated at` and the sync clock should be separate fields; the domain model already treats sync versioning as a placeholder, which is fine.
 7. **Entry `kind` is derived.** Not stored, to avoid drift with `text` (same in the domain model; just confirming).
-8. **Preferences need per-key identity** for sync (the `preference` table keyed by name), pending PD-16.
+8. **Resolved:** synced settings are the fields of one `settings` record (§4, PD-16 confirmed).
 
 ## 9. Open questions
 
-- **Q-L1 (owner):** GRDB on iOS instead of SwiftData (newest-API trade-off). Recommendation: GRDB.
-- **Q-L2 (owner):** Room vs SQLDelight. Recommendation: Room + bundled SQLite.
-- **Q-L3 (product):** is a user-visible export file in v1 (A5)? It would also serve as the Android backup payload.
+- **Q-L1: closed.** GRDB on iOS (owner, 2026-11-10).
+- **Q-L2: closed.** Room + bundled SQLite (owner, 2026-11-10).
+- **Q-L3: closed.** CSV + JSON export and JSON restore are confirmed (PD-11, PD-12); the JSON export is also the payload for the Android backup option (b) in §7.

@@ -22,14 +22,17 @@ flowchart TB
     Store[("user.sqlite<br/>GRDB · Room")]
     Dict[("dictionary.sqlite<br/>read-only, bundled")]
     Surf["Widget + local reminders<br/>snapshot file"]
+    Obs["Observability<br/>daily stats queue · crash SDK"]
   end
   subgraph Backend["Backend (Kotlin + Ktor, PostgreSQL, one VPS)"]
     Auth["Auth<br/>Apple · Google → sessions"]
     SyncS["Sync store<br/>generic per-field merge, per-user seq"]
+    Tel["Statistics endpoint<br/>anonymous daily reports"]
     DB[("PostgreSQL")]
   end
   Apple["Sign in with Apple"]
   Google["Sign in with Google"]
+  Sentry["Sentry (EU)<br/>crash reports"]
   OSMT["OS: Apple Translation · ML Kit · TTS"]
   Tools["tools/: dictionary build (Wiktionary/kaikki)<br/>fixture generator (FSRS reference)"]
 
@@ -50,6 +53,9 @@ flowchart TB
   Auth --> Google
   SyncS --> DB
   Auth --> DB
+  Obs -. "no auth, no IDs" .-> Tel
+  Obs -. crashes .-> Sentry
+  Tel --> DB
   Tools -. "builds, published as release asset" .-> Dict
 ```
 
@@ -63,12 +69,13 @@ flowchart TB
 | Capture & surfaces | Share/selection capture (iOS inbox, Android in-process), due-count widget, local reminders. | Behaviour yes, mechanism per OS | [capture-and-extensions.md](capture-and-extensions.md) |
 | Auth | Optional Apple/Google sign-in, sessions, sign-out, account deletion. | Behaviour yes | [auth.md](auth.md) |
 | Backend | Generic record store with per-field merge, plus auth. **No vocabulary logic.** | n/a (single implementation; shares the merge fixtures) | [backend.md](backend.md) |
+| Observability | Crash reports (Sentry, EU, no IDs) and one anonymous daily statistics report per device; queued offline; two switches in Settings. | Statistics report yes (fixtures); crash SDK config same | [observability.md](observability.md) |
 | Parity fixtures | JSON cases for normalisation, IDs, HLC, merge, sync scenarios, scheduler. | They *are* the definition | [parity-testing.md](parity-testing.md) |
 
 **Boundaries that keep the system simple:**
 1. **The network is never on the critical path.**
    - Adding, enriching (dictionary + on-device MT) and reviewing are local.
-   - The backend is used only for sync and sign-in.
+   - The backend is used only for sync, sign-in and anonymous statistics (fire-and-forget).
    - The dictionary is bundled in v1.
 2. **Domain logic runs only on clients.** The backend merges by clocks and never reads values, so there are two implementations of domain rules, not three. (A later exception is a possible per-user FSRS parameter optimiser on the backend, [scheduler.md](scheduler.md) §6.)
 3. **Derived data is never synced:** Card state, match keys, canonical IDs, stats, widget counts. Any device can rebuild it from synced facts.
@@ -134,6 +141,7 @@ The owner confirms the recommendations collected in each document:
 | Enrichment & dictionary | [enrichment.md](enrichment.md), [dictionary-data.md](dictionary-data.md) | Wiktionary primary, bundled (~25 MB), on-device MT fallback |
 | Capture & surfaces | [capture-and-extensions.md](capture-and-extensions.md) | Inbox pattern, snapshot widget, local reminders only |
 | Sync | [sync.md](sync.md) §14 | S1–S6: per-field LWW + HLC, deterministic IDs, derived Card state, delete wins, automatic merge, no push |
-| Backend | [backend.md](backend.md) §8 | B1–B6: Kotlin/Ktor, PostgreSQL, VPS, hosting location after the reachability question, open-source choice |
+| Backend | [backend.md](backend.md) §8 | B1–B5: Kotlin/Ktor, PostgreSQL, VPS without a proxy, EU hosting (Hetzner class), dictionary distribution; B6 (backend open source) stays open |
+| Observability | [observability.md](observability.md) §9 | O1–O3: opt-out default, Sentry SaaS EU for crashes, own anonymous daily statistics endpoint |
 | Auth | [auth.md](auth.md) §10 | A1–A6: both providers on both platforms, opaque tokens, sign-out and deletion behaviour, cross-provider identity, no email |
 | Platform floors | this document §4 | iOS 26, Android minSdk 31 |

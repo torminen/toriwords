@@ -161,7 +161,9 @@ The problem: a person signs in with Apple on the iPhone and with Google on the A
 - Sessions: device ID, platform, timestamps.
 - The user's vocabulary records ([sync.md](sync.md)).
 
-No names, no emails, no analytics. The App Store privacy label is "Data linked to you: user content, identifiers", used only for app functionality.
+No names, no emails. The App Store privacy label is "Data linked to you: user content, identifiers", used only for app functionality.
+
+Anonymous crash reports and usage statistics are separate and never linked to the account ([observability.md](observability.md)). They add "Data not linked to you: diagnostics, usage data".
 
 ## 10. Owner decisions
 

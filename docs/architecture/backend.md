@@ -12,14 +12,15 @@ The backend is deliberately small:
 1. **Sync store.** It stores the user's records and merges them generically: per-field LWW, tombstones and redirects ([sync.md](sync.md) §3, §6, §7, §9.3). It never reads field values.
 2. **Accounts.** Sign in with Apple and Google, sessions, account deletion ([auth.md](auth.md)).
 3. **Static distribution** (optional). Dictionary data packs and their manifest, if [dictionary-data.md](dictionary-data.md) chooses download over bundling.
+4. **Anonymous usage statistics.** One write-only endpoint that stores daily aggregate reports without identifiers ([observability.md](observability.md) §4). Crash reports go to Sentry, not to this backend.
 
 **Not the backend's job:**
 - Vocabulary rules: normalisation, duplicate detection, scheduling. These run on the clients only ([sync.md](sync.md) §1).
 - Translation or LLM proxying. Enrichment is on-device or from bundled data; no paid APIs (owner input).
 - Push notifications: reminders are local ([capture-and-extensions.md](capture-and-extensions.md)).
-- Analytics or tracking.
+- Tracking, user-level analytics, or crash storage ([observability.md](observability.md)).
 
-Without an account, the app never contacts the backend, except for an optional anonymous download of dictionary data.
+Without an account, the app contacts the backend only for anonymous statistics (if the switch is on) and an optional anonymous download of dictionary data.
 
 ## 2. Decision B1: language and framework
 
@@ -70,24 +71,39 @@ create index on records (user_id, owner) where owner is not null;
 | Monthly cost at our scale | ~€5–10 | €0–25 | ~€15–40 (the managed SQL instance dominates) |
 | Ops effort | OS updates, backups, monitoring are ours. | Low. | Low; more configuration. |
 | Portability | Full: the same Compose file runs on any VPS, including a provider in another jurisdiction. | Medium. | Low. |
-| Reachability from Russia (see §4.1) | Choose the provider and location freely. | Depends on the provider's IP ranges. | Hyperscaler ranges have been blocked or throttled in the past. |
+| Reachability from Russia (not required, see §4.1) | Choose the provider and location freely. | Depends on the provider's IP ranges. | Hyperscaler ranges have been blocked or throttled in the past. |
 
 **Recommendation: one small VPS with Docker Compose.**
 - Nightly `pg_dump` plus continuous WAL archiving to object storage, with a monthly restore test.
 - Uptime check; logs without personal data.
-- Everything is packaged so it can move between providers in an hour, which matters because of §4.1.
-- No CDN or proxy in front of the API (see §4.1).
+- Everything is packaged so it can move between providers in an hour.
+- No CDN or proxy in front of the API (see §4.2).
 
-### 4.1 Owner question: where must sync work?
+### 4.1 Location: EU, outside Russia
 
-Since mid-2025, Russian ISPs have throttled or cut connections to sites behind Cloudflare (the "16 KB" cut-off). Cloudflare reported similar disruption for some large Western hosts, including Hetzner, DigitalOcean and OVH. Sources: [Cloudflare blog](https://blog.cloudflare.com/russian-internet-users-are-unable-to-access-the-open-internet), [The Record](https://therecord.media/cloudflare-russia-restricting-access-crackdown), [Meduza/Zona: 16 KB curtain](https://en.zona.media/article/2025/06/19/cloudflare). The 2026 situation is changing and `not verified` for specific providers.
+The owner's answer: **sync must work abroad** (outside Russia). Reachability from inside Russia is not a v1 requirement. Users there may need a VPN for sync and sign-in; the app works offline regardless.
 
-If the owner (or users) sync from inside Russia, the hosting location decides whether sync works at all. Options:
-- (a) Host in Russia (Russian VPS providers). Sign in with Apple and Google still need the backend to reach Apple and Google servers.
-- (b) Host abroad, avoid Cloudflare, and test reachability from the owner's networks.
-- (c) Host abroad and rely on the user's VPN.
+**Recommendation:**
+- **Region:** EU, Germany or Finland.
+  - GDPR is a well-understood regime for the privacy policy ([observability.md](observability.md) §6).
+  - Latency to the rest of Europe is low.
+  - Latency to Apple and Google endpoints is good.
+- **Provider class:** a European developer VPS provider with hourly billing, snapshots and an API. Default: **Hetzner Cloud**, an ARM or x86 instance with 2 vCPU and 4 GB RAM, about €5–10/month (`not verified` for Nov 2026 prices). Equivalent alternatives: Scaleway, OVHcloud, netcup.
+- **Backups:** to object storage at a *different* provider (e.g. Backblaze B2 EU or Scaleway Object Storage), so losing one account does not lose the data.
+- **DNS:** at the registrar or a DNS-only provider, with a low TTL so the host can move quickly.
+- **Monitoring:** an external uptime check from a second region.
 
-The app keeps working offline in every case; only backup and sync are affected. **The owner should say where they will use sync.** The recommended VPS setup supports all three options.
+History of the question: since mid-2025, Russian ISPs have throttled connections to Cloudflare and to some large Western hosts, including Hetzner ([Cloudflare blog](https://blog.cloudflare.com/russian-internet-users-are-unable-to-access-the-open-internet), [The Record](https://therecord.media/cloudflare-russia-restricting-access-crackdown), [Meduza/Zona](https://en.zona.media/article/2025/06/19/cloudflare)). If reachability from Russia becomes a requirement later, the same Compose setup can move to a host that is reachable from there, with no client change other than DNS.
+
+### 4.2 Why no Cloudflare (or other proxy) in front
+
+Russia is no longer the reason, but the choice still holds:
+- **Privacy.** A TLS-terminating proxy sees access and refresh tokens and every user's vocabulary in clear text. That adds a processor to the privacy policy for no functional gain.
+- **No need.** The API is small JSON for a few users; there is no static load to cache. The dictionary is bundled in v1, and data files would come from GitHub Releases (§6).
+- **Simplicity.** Caddy handles TLS and rate limits (§5); one less moving part.
+- **Bonus.** Users in Russia with partial access are not hit by Cloudflare throttling.
+
+Revisit if the service ever faces DDoS or high traffic. The design does not depend on it either way.
 
 ## 5. API
 
@@ -105,6 +121,7 @@ Base: `https://<api-host>/v1`. JSON, gzip/brotli. Every request carries `Toriwor
 | `GET /account` | Linked identities, device sessions, record count, storage used. | For the account screen |
 | `POST /sync/push` | `{deviceId, records: [envelope…]}` → `{acked: [id…]}` | [sync.md](sync.md) §9; ≤ 500 records / 2 MB |
 | `GET /sync/pull?since=<cursor>&limit=<n>[&types=a,b]` | → `{records: […], cursor, hasMore}` | `types` is used for the download-only backfill ([sync.md](sync.md) §10) |
+| `POST /telemetry/daily` | Anonymous daily statistics reports: `{reports: [...]}`, at most 7. | **No auth**; no IP or user agent stored; 16 KB body limit; [observability.md](observability.md) §4.2 |
 | `GET /data/manifest.json` | Dictionary data versions, sizes, SHA-256 hashes, URLs. | Only if download is chosen. No auth. |
 
 **Errors.** Body: `{ "error": "<code>", "message": "…" }`.
@@ -121,7 +138,8 @@ Base: `https://<api-host>/v1`. JSON, gzip/brotli. Every request carries `Toriwor
 **Limits** (generous for one person, to stop abuse of a public endpoint):
 - 1M records per user;
 - 60 push requests per minute per user;
-- 10 sign-in attempts per minute per IP.
+- 10 sign-in attempts per minute per IP;
+- 10 statistics requests per minute per IP. Counted in memory, never stored.
 
 ## 6. Dictionary data distribution
 
@@ -152,7 +170,7 @@ The design works either way:
 |---|---|---|
 | B1 | Kotlin + Ktor 3 on the JVM | Go; Swift (Hummingbird/Vapor); TypeScript |
 | B2 | PostgreSQL | SQLite + Litestream |
-| B3 | One small VPS, Docker Compose, no Cloudflare in front | PaaS + managed Postgres; hyperscaler |
-| B4 | Hosting location chosen after the owner says where sync must work (§4.1) | — |
+| B3 | One small VPS, Docker Compose, no Cloudflare in front (§4.2) | PaaS + managed Postgres; hyperscaler |
+| B4 | EU (Germany/Finland) on a European developer VPS, Hetzner Cloud by default; backups at a second provider (§4.1). Sync from Russia is not required. | Scaleway, OVHcloud, netcup; host in Russia (rejected: the owner needs sync abroad) |
 | B5 | Dictionary data: GitHub Releases + mirror on the backend host (if download is chosen) | Backend only; CDN |
-| B6 | Backend open source: owner's call; the design supports both | — |
+| B6 | **Open question, decided later:** backend open source or private (§7). The design supports both; v1 can start in a private repo and be opened later without changes. | — |

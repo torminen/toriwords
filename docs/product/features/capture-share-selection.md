@@ -43,5 +43,5 @@ The exact text rules (word counting, sentence detection and splitting, markup cl
 ## Offline
 
 - Capture never needs the network and never waits for it. Saving is instant.
-- The dictionary is on the device from first launch (bundled, [dictionary-data.md](../../architecture/dictionary-data.md) §4, pending owner OK on app size), so dictionary suggestions in the sheet work offline.
+- The dictionary is on the device from first launch (bundled, [dictionary-data.md](../../architecture/dictionary-data.md) §4; app size accepted, [memory://17](memory://17)), so dictionary suggestions in the sheet work offline.
 - Enrichment of pending captures happens when the app runs and its sources are available. Until then the entry is in the vocabulary list with "Translation pending" and is not reviewed ([saving without enrichment](enrichment-unavailable.md)).

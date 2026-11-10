@@ -22,13 +22,16 @@
 
 **Empty states elsewhere**
 - **Review, nothing added yet:** "Add words to start reviewing" with the Add button.
-- **Review, all done:** "All done for today. Next review: tomorrow at 09:12", plus **Learn more new words** when new words are waiting.
+- **Review, all done:** "All done for today. Next review: tomorrow" (or "in 3 days"; always a day, never a time), plus **Learn more new words** when new words are waiting.
 - **Words added but none reviewable** (all without translation): points to the "Needs translation" filter.
 - **Search with no results:** offers to add the search text.
 
 ## Edge cases
 
-- **First use is a capture from another app** (the app was installed but never opened): capture works; first-run setup completes silently on first open.
+- **First use is a capture from another app** (the app was installed but never opened): capture works and saves the word, sentence and source.
+  - Android: the capture runs inside the app, so the dictionary is available as usual.
+  - iOS: the share extension can use the dictionary only after the app has been opened once ([dictionary-data.md](../../architecture/dictionary-data.md) §4). Before that, the capture is saved *pending enrichment*, and the meaning is filled in, flagged "Check translation", on first open.
+  - First-run setup completes silently on first open.
 - **Reinstall with an account:** the empty state also shows "Have an account? Sign in to restore your words" in a single line, without blocking.
 - **Device language neither English nor Russian:** the app opens in English.
 

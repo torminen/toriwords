@@ -8,7 +8,7 @@
 ## Behaviour
 
 **Starting**
-- The home screen shows how many cards are due today and a **Review** button. When nothing is due it shows when the next card is due.
+- The home screen shows how many cards are due today and a **Review** button. When nothing is due it shows the day of the next review ("Next review: tomorrow", "in 3 days"). Scheduling is by day, never by time of day.
 - One queue contains everything due. Tags or sources do not split it (PD-3).
 
 **A card** (recommendation PD-1)
@@ -26,14 +26,19 @@
 
 **Session**
 - New cards are mixed in among due reviews, up to the daily new-word limit (default 10).
-- At most one card of an entry is shown per day; the other waits until the next day, unless it is already overdue by more than its interval ([scheduler.md](../../architecture/scheduler.md) §11).
+- At most one card of an entry is shown per day; the other waits for a later day. For a new word this means its recall card is introduced the day after its recognition card. Exact rule: [scheduler.md](../../architecture/scheduler.md#11-daily-queue-and-catch-up-pd-4).
 - A **Forgot** card comes back later in the same session until it is remembered once.
 - Leaving the review at any point keeps every answer already given. There is no "session" to lose.
-- When the queue is empty: a short summary (cards reviewed, words remembered, new words introduced). If more new words are waiting, **Learn more new words** introduces another batch of the daily limit.
+- When the queue is empty: a short summary (cards reviewed, words remembered, new words introduced). If more new words are waiting, **Learn more new words** introduces another batch of the daily limit. This only extends the current session and changes no setting.
 
 **Daily load and catch-up** (recommendation PD-4)
 - A review day starts at 04:00 local time.
-- After a break, when today's due reviews are more than twice the normal load (average reviews per day over the previous 14 days, at least 50): the home screen says "Welcome back — you have N cards waiting. We'll spread them over the next few days." New words pause. Today's queue is capped at the larger of the normal load and a seventh of the backlog, most at-risk cards first. **Review all now** lifts the cap for today on this device. Exact rule: PD-4.
+- After a break, when the backlog is much larger than the user's normal daily load (computed from recent review history), the app enters **catch-up**:
+  - the home screen says "Welcome back — N cards are waiting. We'll spread them over about a week.";
+  - each day shows a manageable share of the backlog, most at-risk cards first, and the share shrinks as the backlog clears;
+  - new words pause until catch-up ends;
+  - **Review all now** shows the rest of the backlog in the current session only. It stores nothing; the next day's share is computed again from the history.
+- The exact numbers (normal load, when catch-up starts and ends, the daily share) are defined only in [scheduler.md](../../architecture/scheduler.md#11-daily-queue-and-catch-up-pd-4), so every device shows the same counts.
 - No guilt messages, no lost streaks.
 
 ## Edge cases

@@ -79,12 +79,8 @@ Architecture docs carry their own owner questions (S1–S6, B1–B6, A1–A6 and
 - At most **10 new words** introduced per day by default, adjustable in settings (0–50). Words beyond the limit wait in a "new" queue; capture is never limited.
 - No cap on due reviews on a normal day.
 - A review day starts at **04:00 local time**, so a late-night session counts as the same day (Anki convention). This is a fixed constant, not a setting ([scheduler.md](../architecture/scheduler.md) §4).
-- **Catch-up after a break:**
-  - *Normal load* = the average number of reviews per day over the previous 14 days, at least 50.
-  - Catch-up is on when the due reviews at the start of today are more than 2 × normal load.
-  - While it is on: today's review queue is capped at max(normal load, ⌈due ÷ 7⌉), so a large backlog spreads over about a week; new words are paused; the most at-risk cards come first (order defined in [scheduler.md](../architecture/scheduler.md) §11).
-  - The app tells the user plainly ("Welcome back — N cards are waiting; we'll spread them over the next days"). **Review all now** lifts the cap for today on this device. No guilt messages.
-  - Every input comes from synced review history and the date, so the cap and the counts are the same on all the user's devices after sync.
+- **Catch-up after a break:** when the backlog is much larger than the user's normal daily load (computed from recent review history), the app says so plainly ("Welcome back — N cards are waiting; we'll spread them over about a week"), pauses new words, and shows a daily share of the backlog, most at-risk cards first, until it is cleared in about a week. **Review all now** shows the rest in the current session only and stores nothing. No guilt messages.
+- All counts are computed from synced review history and the date, so they are the same on all the user's devices after sync. The exact numbers are defined only in [scheduler.md](../architecture/scheduler.md#11-daily-queue-and-catch-up-pd-4).
 
 **Alternatives.**
 - No catch-up handling (Anki): a pile of hundreds of cards after a holiday, the main reason for "backlog anxiety" (I4).
@@ -195,7 +191,7 @@ Available without an account and offline.
 
 ## PD-12. Backup for users without an account
 
-**Recommendation.** P1. The JSON export from PD-11 is also the backup. **Import from a Toriwords JSON file** restores it on a new or reinstalled device. Imported entries merge with existing ones by the duplicate rules ([duplicates](features/duplicates.md)); review histories are combined.
+**Recommendation.** P1. The JSON export from PD-11 is also the backup: the user's records in the sync format ([sync.md](../architecture/sync.md) §12). **Import from a Toriwords JSON file** restores it on a new or reinstalled device. Imported entries merge with existing ones by the duplicate rules ([duplicates](features/duplicates.md)); review histories are combined, and restoring the same file twice changes nothing. Words deleted after the backup was made are not restored (deletion is terminal, PD-17).
 
 **Alternatives.**
 - Rely only on OS device backups (iCloud device backup; Android Auto Backup, which silently stops above 25 MB per app): automatic, but not under the app's control and not cross-platform. The app also uses them as a silent safety net in every case ([local-storage.md](../architecture/local-storage.md) §7).
@@ -221,7 +217,7 @@ Available without an account and offline.
 
 ## PD-15. Deletion recovery
 
-**Recommendation.** Deleting an entry asks for confirmation, then shows an "Undo" for a few seconds. No trash or recycle bin. The deletion takes effect (and syncs) only when the "Undo" disappears, so undo never has to bring back a deletion that other devices already applied (deletion is terminal, PD-17).
+**Recommendation.** Deleting an entry asks for confirmation, then shows an "Undo" for a few seconds. No trash or recycle bin. The deletion takes effect (and syncs) only when the "Undo" disappears, so undo never has to bring back a deletion that other devices already applied (deletion is terminal, PD-17). If the app is closed during the undo window, the deletion is applied; if the app crashes in that window, the deletion is not applied and the word stays ([sync.md](../architecture/sync.md) §6).
 
 **Alternatives.** A trash with 30-day recovery: safer, but another screen and state to sync.
 

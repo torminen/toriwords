@@ -24,7 +24,7 @@
 | Scenario | What the user sees |
 |---|---|
 | **Sign in with local data, empty account** | Local vocabulary is uploaded. "Your vocabulary is backed up." |
-| **Sign in with local data, account already has data** (second device used offline first, or reinstall) | The two are merged automatically: same words become one entry with all meanings, sentences and review history ([duplicates](duplicates.md)). Summary: "Merged: 120 words from this device, 340 from your account, 15 in both." |
+| **Sign in with local data, account already has data** (second device used offline first, or reinstall) | The two are merged automatically: same words become one entry with all meanings, sentences and review history ([duplicates](duplicates.md)). When the first full sync has completed, a summary is shown, for example "Merged: 120 words from this device, 340 from your account, 15 in both". If the first sync is interrupted, it resumes later, and the summary appears only once it is complete. |
 | **Second device, fresh install** | Sign in → the vocabulary downloads. The app is usable during the download; a progress line shows in Settings and on home. |
 | **Same word captured on two devices offline** | One entry after sync, with both sentences and both review histories. |
 | **Same entry edited on two devices offline** | The most recent edit wins. No prompt. |
@@ -42,7 +42,7 @@
 - **Capture from the share extension while sync is running:** saved locally, synced next time.
 - **App updated on one device but not the other:** older versions keep syncing; a version that is too old is asked to update, and keeps working locally meanwhile ([sync.md](../../architecture/sync.md)).
 - **Very large first upload** (thousands of entries): runs in the background and resumes after interruptions.
-- **Device clock wrong:** must not cause lost edits ([sync.md](../../architecture/sync.md)).
+- **Device clock wrong:** a wrong device clock never loses review answers or creates duplicates. An edit made on a device whose clock is far behind can lose to an older edit made elsewhere. If the clock is off by more than an hour, the sync status asks the user to fix the device time ([sync.md](../../architecture/sync.md) §3.2).
 - **Apple hides the email address:** the account screen shows the provider name. The backend never stores emails ([auth.md](../../architecture/auth.md) §8).
 - **Second device sees changes late:** there is no server push in v1; a device picks up changes when it opens, after a change, or in periodic background sync ([sync.md](../../architecture/sync.md) S6).
 

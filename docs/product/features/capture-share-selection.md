@@ -13,7 +13,10 @@
 - Both open a compact **capture sheet** over the current app. The user stays in the app they were reading or watching.
 
 **Capture sheet**
-1. **Short selection** (up to 6 words): the selection becomes the word or phrase to save. The sentence field is empty; the user can paste or type the sentence.
+
+The exact text rules (word counting, sentence detection and splitting, markup cleanup, length limits, highlight positions) are defined once in [capture-and-extensions.md](../../architecture/capture-and-extensions.md) §2 and shared by both platforms. The numbers below are their product meaning.
+
+1. **Short selection** (up to 6 words, not ending with sentence punctuation): the selection becomes the word or phrase to save. The sentence field is empty; the user can paste or type the sentence.
 2. **Longer selection** (more than 6 words, or ending with sentence punctuation): the selection is treated as the sentence. The words are shown as tappable chips. The user taps one word, or several adjacent words for a phrase, to choose what to save. The sentence is kept as context with the chosen word highlighted.
 3. **Shared link** (URL only, no text): the URL and page title are stored as the source. The user types the word.
 4. **Source:** when the share includes a URL and title, they are saved as the source. On Android the app name is saved when the OS provides it. The user can type or edit a source title (for example "The Bear S2E3"). The last used source title is offered again for 30 minutes, so a series session does not need retyping.
@@ -31,7 +34,7 @@
 - **Selection spans several sentences:** after the user picks the word, only the sentence that contains it is kept.
 - **Sentence longer than 500 characters:** it is cut to 500 characters around the chosen word, at word boundaries, with "…" marks.
 - **Very large share** (more than 5,000 characters, for example a whole article): only the first 5,000 characters are shown for picking. The URL, if present, is still saved as the source.
-- **Selection with line breaks, extra spaces or subtitle markup** (for example `<i>`, `[music]`, speaker names before a colon): these are cleaned for display. The chosen text follows the [duplicate](duplicates.md) normalisation.
+- **Selection with line breaks, extra spaces or subtitle markup** (for example `<i>`, `[music]`, speaker names before a colon): these are cleaned for display and for saving (exact rules in [capture-and-extensions.md](../../architecture/capture-and-extensions.md) §2). The chosen text follows the [duplicate](duplicates.md) normalisation.
 - **Word chosen is an inflected form** ("took off"): saved as chosen; the highlight marks it in the sentence. Base form is pending PD-14.
 - **App never opened before:** capture still works. The app finishes first-run setup the next time it opens.
 - **The user dismisses the sheet:** nothing is saved.

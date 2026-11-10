@@ -110,7 +110,7 @@ merge(field_local, field_remote) = wins(remote, local) ? remote : local
 
 Equal `(u, c)` means the same write; the values are equal by construction.
 
-**Who writes rank 1.** Any change caused directly by a user action: typing, picking a translation variant at capture, editing, excluding or resuming, tagging, reordering Senses, deleting. Everything else is rank 0: enrichment fills, `enrichment status`, Card creation, `mergedInto`, Device bookkeeping.
+**Who writes rank 1.** Any change caused directly by a user action: typing, picking a translation variant at capture, editing, excluding or resuming, tagging, reordering Senses, deleting, and clearing Entry `needs check` (by opening the Entry or reviewing one of its Cards). Everything else is rank 0: enrichment fills, `enrichment status`, setting `needs check = true`, Card creation, `mergedInto`, Device bookkeeping.
 
 **Consequence the owner must accept** (listed in §14): if the same field (e.g. the same Sense's translation) is edited on two devices offline, the later edit wins and the other is discarded without a prompt. With one user, this is rare and matches the product rule "never ask to pick a side".
 
@@ -126,9 +126,10 @@ Equal `(u, c)` means the same write; the values are equal by construction.
 | Source with URL | `v5("source:" + normalisedUrl)` | "Sources with the same URL are the same Source". URL normalisation is in the fixtures. |
 | EntryTag | `v5("entrytag:" + entryId + ":" + tagId)`, with a field `present` (bool, LWW) | Re-tagging after un-tagging must work, so this link uses a flag instead of a terminal tombstone. |
 | Settings | `v5("settings")` (per user, since all records are user-scoped) | One synced settings record ([PD-16](../product/proposed-decisions.md)). |
+| Sense created by automatic enrichment | `v5("autosense:" + entryId + ":" + ordinal)` ([enrichment.md](enrichment.md) §4) | Two devices auto-enriching the same pending Entry write the same Sense records, so they merge per field instead of becoming duplicates. User-chosen Senses use UUIDv7. |
 | ReviewLog from import (later) | `v5("import:" + collectionId + ":" + ankiRevlogId)` | Re-importing the same collection does not duplicate history. |
 
-Everything else (Entry, Sense, Context, Source without URL, Tag, ReviewLog, Device) uses UUIDv7. Their natural keys can change (the user can edit the text), so duplicates are resolved by merging (§7), not by ID.
+Everything else (Entry, user-chosen Sense, Context, Source without URL, Tag, ReviewLog, Device) uses UUIDv7. Their natural keys can change (the user can edit the text), so duplicates are resolved by merging (§7), not by ID.
 
 ## 5. Decision S3: Card state, stored or derived
 
@@ -166,7 +167,7 @@ Everything else (Entry, Sense, Context, Source without URL, Tag, ReviewLog, Devi
 
 Rejected:
 - **LWW between delete and edit:** an edit made offline would resurrect a word the user deleted on purpose.
-- **Edit wins / un-delete:** the product has no trash and no undo (domain *Entry states*).
+- **Edit wins / un-delete:** the product has no trash (domain *Entry states*). The short Undo proposed in PD-15 does not need un-delete: the tombstone is written only when the Undo window closes (above), so once a deletion syncs it is final.
 
 ## 7. Decision S5: duplicate merge (natural keys)
 
@@ -222,6 +223,7 @@ The domain rules map directly onto per-field LWW with rank:
 - If enrichment on two devices fills the same field differently (iOS vs Android suggestions), the later clock wins. Both values are machine suggestions, which the domain model accepts.
 - Enrichment is idempotent. A device that receives an Entry with `enrichment = pending` and empty, rank-0 fields may run enrichment, and two devices doing so converge by LWW.
 - **`enrichment status = unavailable` is not final across devices.** A device that gains a source the other device lacked (a newer dictionary version, a downloaded MT model) may run enrichment again on `unavailable` Entries with empty rank-0 fields, and set `done` on success. The later write wins by LWW, as usual.
+- **`needs check`** (Entry, PD-19): automatic enrichment sets it to `true` at rank 0. Opening the Entry or reviewing one of its Cards sets it to `false` at rank 1, and only if it is currently `true`. A user's clear on one device therefore always beats an enrichment re-set from another device, whatever the clocks. Once checked, an Entry stays checked.
 - Field provenance for attribution (`wiktionary`, `on-device translation`, `user`) is an ordinary field written together with the value it describes. Same clock, same rank, so it can never disagree with its value after a merge.
 
 ## 9. Protocol

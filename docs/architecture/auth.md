@@ -133,7 +133,12 @@ Required in-app by the App Store for apps that support account creation. Apple a
 
 **Recommendation:** "Sign out" keeps the data and the app continues local-only. A separate, explicit action "Remove all data from this device" exists in Settings. It warns if there are unsynced changes.
 
-**Guard against mixing accounts:** the app remembers the last account ID. If the user signs in with a different account while local data from the previous one is present, the app asks once: **"Add these N words to this account"** or **"Remove them from this device first"**. This is a question about two people's data, not a sync conflict, so it does not contradict I7.
+**Guard against mixing accounts:** the app remembers the last account ID it synced with.
+- The prompt fires **only** when local data belongs to a *different, known* account: the device was signed in to account X, the user signed out keeping the data, and now signs in to account Y. The app asks once: **"Add these N words to this account"** or **"Remove them from this device first"**.
+- Data created while the device was **never signed in** has no previous account. It merges into the account silently on first sign-in, as in [account & sync](../product/features/account-sync.md).
+- Signing back in to the **same** account X merges silently.
+
+This is a question about whose data it is, not a sync conflict, so it does not contradict I7.
 
 ## 8. Cross-provider identity (Apple vs Google)
 

@@ -26,6 +26,8 @@ Behaviour that must be identical across platforms is pinned by **language-neutra
 | Sync scenarios: duplicates, deletes, enrichment vs user | iOS, Android | `sync/` |
 | Scheduler: replay of ReviewLogs → state, due, stage | iOS, Android | `scheduler/` (case format owned by [scheduler.md](scheduler.md)) |
 | Day boundary: "today" from instant + offset (rollover 04:00) | iOS, Android | `scheduler/day-boundary.json` |
+| Daily queue and catch-up counts ("Due today", new-word quota) | iOS, Android | `scheduler/queue-*.json` ([scheduler.md](scheduler.md) §11) |
+| Capture text rules (cleanup, term vs sentence, limits, highlight) | iOS, Android | `capture/` ([capture-and-extensions.md](capture-and-extensions.md) §2) |
 
 Not covered, because these differ by design (analysis §8.7): suggested translations, TTS voices, and UI layout.
 
@@ -59,6 +61,8 @@ spec/
     scheduler/
       day-boundary.json
       fsrs-*.json              defined in scheduler.md
+      queue-*.json             daily queue and catch-up (scheduler.md §11)
+    capture/                   capture text rules (capture-and-extensions.md §2)
 ```
 
 **How each suite reads the fixtures** (no copying, one source):
@@ -100,9 +104,9 @@ Input `{text, language}` → `{key}`. Proposed pipeline (the fixtures decide edg
 4. Lowercase with the locale-independent Unicode default mapping: Swift `lowercased()`, Kotlin `lowercase()` (root locale). Never use the device locale.
 5. Collapse runs of whitespace to one space; trim.
 6. Strip leading and trailing characters of Unicode category P* (punctuation), repeatedly; then trim again. Symbols (S*) are kept, e.g. `C++`, `$`.
-7. Language-specific step:
+7. Russian letter folding (pending [PD-18](../product/proposed-decisions.md)): if confirmed, `ё` → `е` and `Ё` → `Е`, applied in the general pipeline for every key (harmless for English, and it also applies to Russian tag names). Text is still shown as written. Remaining language-specific steps:
    - EN: none.
-   - RU (used for Sense translation keys): **pending product decision** on `ё` → `е`. Russian text often omits the dots, so "ёлка" and "елка" would otherwise be two Senses. Flagged to product_writer.
+   - none in v1.
 
 Required cases:
 
@@ -125,7 +129,8 @@ Required cases:
 | symbols-kept | `C++` | `c++` |
 | only-punct | `...` | `""` (the caller rejects an empty key) |
 | dotted-capital-i | `İstanbul` | pinned by fixture after both platforms are checked (Swift and Kotlin lowercasing may differ on U+0130). If they differ, both implement the fixture's value explicitly. |
-| ru-yo | `Ёлка` (ru) | `ёлка` or `елка`, per the product decision |
+| ru-yo | `Ёлка` (ru) | `елка` (*pending PD-18*; if PD-18 is rejected, `ёлка`) |
+| ru-yo-tag | tag `Ёж` | `еж` (*pending PD-18*) |
 
 ### 4.2 Sentence, translation and tag keys (`normalization/sentence.json`, `normalization/tag.json`)
 
@@ -135,7 +140,7 @@ Required cases:
   - different capitalisation is equal;
   - a different word in the middle is not equal.
 - **Tag key:** steps 1, 4 and 5 only (NFC, lowercase, whitespace). Tags keep their punctuation, so `C#` ≠ `C`.
-- **Source without URL:** `matchKey(title)` + the app name exactly as stored.
+- **Source without URL:** `matchKey(title)` + the app name exactly as stored. Cases in `normalization/source.json`: same title with different case and quotes + same app → same key; same title + different app → different keys; title only (no app) on both devices → same key.
 
 ### 4.3 URL key (`normalization/url.json`)
 
@@ -151,7 +156,7 @@ Cases: each rule, plus a URL with no path, and a non-http URL (`app://…`), whi
 ## 5. IDs (`ids/uuidv5.json`)
 
 - **Toriwords namespace UUID:** `6f1c2a4e-3b7d-5e59-9a0c-5d8e7f2b1c34`. **Fixed for ever once v1 ships**; changing it would change every deterministic ID.
-- Cases: name → UUID for each pattern in [sync.md](sync.md) §4 (`pair:ru:en`, `card:<entryId>:recognition`, `source:<urlKey>`, `entrytag:<entryId>:<tagId>`, `settings`). Plus UUID byte-order comparison cases for "smallest ID wins".
+- Cases: name → UUID for each pattern in [sync.md](sync.md) §4 (`pair:ru:en`, `card:<entryId>:recognition`, `source:<urlKey>`, `entrytag:<entryId>:<tagId>`, `autosense:<entryId>:<ordinal>`, `settings`). Plus UUID byte-order comparison cases for "smallest ID wins".
 
 ## 6. Clock and merge
 
@@ -198,6 +203,19 @@ The case format, parameters and algorithm are defined in [scheduler.md](schedule
   - offset changes across days (travel);
   - DST transitions;
   - a review stored with offset +3 and replayed on a device at −5, which must give the same day, because the stored offset wins.
+
+### 7.1 Required scheduler, queue and capture cases
+
+Proposed by architect_2. Exact rules: [scheduler.md](scheduler.md) §7.1 and §11, [capture-and-extensions.md](capture-and-extensions.md) §2.
+
+| File | Cases |
+|---|---|
+| `scheduler/fsrs-imported.json` | An imported log with `rating = null` (Anki manual or rescheduled) between rated logs: replay skips it, the fuzz ordinal counts only rated logs, and the result equals the same list without that row. Imported Anki Hard (2) and Easy (4) under the two-button UI are replayed as 2 and 4. |
+| `scheduler/fsrs-clock.json` | Logs out of chronological order because of a wrong device clock; negative elapsed time is clamped to 0. |
+| `scheduler/queue-*.json` | **Normal load:** fewer than 14 active days; zero active days (default); the minimum applies. **Catch-up:** entering and leaving; quota arithmetic; new Cards = 0 in catch-up. **Siblings:** the sibling skip. **Order:** ties broken by Card id. **Counts:** "Due today" for today and for future days, as written to the widget snapshot. **New words:** `introducedToday` with logs from two devices. |
+| `capture/*.json` | Markup cleanup (`<i>`, `[music]`, speaker label); the 6-word / final-punctuation term-vs-sentence classification; sentence boundaries; the 500-character cut with `…`; the 5,000-character cap; the UTF-16 highlight after cleanup; rejection of text with no Latin letters. |
+
+The queue fixtures take synced data plus `today` as input and nothing else. That is how the home screen, widget and reminder agree across devices after sync (scenarios 027–028).
 
 ## 8. Sync scenarios (`sync/*.json`)
 
@@ -267,6 +285,12 @@ A scenario runs the real client sync engine in-process for several **simulated d
 | 021 | Reviews on two devices in different time zones, same Card | Replay uses the stored offsets; same due date on both |
 | 022 | Settings change (target retention) on A while B reviews offline | Both rebuild derived state; same due dates |
 | 023 | Remote clock 3 days ahead | Not adopted into the local HLC; its fields still win |
+| 024 | Same title without URL ("The Bear S2E3", same app) captured on two devices | One Source after sync (§4.2 key) |
+| 025 | Both devices auto-enrich the same pending Entry | One set of Senses (deterministic auto-Sense IDs, [sync.md](sync.md) §4), `needs check = true` |
+| 026 | `needs check` cleared on A (opened) while B re-runs enrichment | `false` everywhere (rank 1 beats rank 0) |
+| 027 | New words introduced on A and B on the same day, then sync | `introducedToday` counts both; remaining new-word quota and "Due today" equal on both devices ([scheduler.md](scheduler.md) §11) |
+| 028 | Backlog reviewed partly on A, partly on B in catch-up mode, then sync | The same `load`, `quota` and "Due today" on both; the widget snapshot numbers agree |
+| 029 | Restore of a JSON backup twice, and onto an account where one Entry was deleted later | No duplicates, no doubled logs; the deleted Entry stays deleted ([sync.md](sync.md) §12) |
 
 ## 9. Process
 

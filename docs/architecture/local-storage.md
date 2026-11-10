@@ -115,6 +115,10 @@ After restore on a new device, the app keeps the user's data but generates a **n
 
 A user-visible manual export/import file (JSON/CSV, A5) is a product decision; if adopted, it reuses the same export format.
 
+### Later (not in v1)
+
+No analytics in the MVP ([no analytics](memory://44)). If product analytics are added later, their local queue and day counters go in local-only tables of `user.sqlite`. Those tables must never sync, and they must be cleared after an OS restore ([observability.md](observability.md)).
+
 ## 8. Domain-model issues relevant to storage (to raise with product_writer and sync)
 
 1. **Unique match key can't be a DB constraint.** "At most one non-deleted Entry per match key" can't be enforced by a UNIQUE index, because sync legitimately delivers a second Entry with the same key from another device. The storage keeps a plain index and the **merge procedure** runs after each sync batch and on local edits. Same applies to Source by URL and Tag by name.

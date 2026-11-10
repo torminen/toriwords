@@ -14,7 +14,7 @@
 - Only local notifications computed on the device. No push server.
 
 **Widget**
-- Home-screen widget with today's due count and the next due time when nothing is due. Tapping opens review.
+- Home-screen widget showing "12 to review · 5 new" (due reviews and new words still available today), or the next due time when nothing is due. Tapping opens review.
 - Lock-screen variant where the OS supports it.
 - The count updates after reviewing, after sync, and at day start.
 
@@ -25,7 +25,8 @@
 - **Time zone change:** the reminder fires at the chosen local time in the new zone.
 - **Reminder time per device:** each device has its own (PD-16).
 - **Catch-up mode:** the count shows today's share, not the whole backlog.
-- **App not opened for a long time:** the OS may limit background updates. The widget and reminder show the best known count; opening the app refreshes them.
+- **App not opened for a long time:** the OS may limit background updates. The widget and reminder show the best known count; opening the app refreshes them. After 7 days without an update the widget shows "Open Toriwords".
+- **Day rollover on Android:** the widget may update up to about an hour after 04:00.
 
 ## Offline
 

@@ -17,9 +17,12 @@
 2. **Longer selection** (more than 6 words, or ending with sentence punctuation): the selection is treated as the sentence. The words are shown as tappable chips. The user taps one word, or several adjacent words for a phrase, to choose what to save. The sentence is kept as context with the chosen word highlighted.
 3. **Shared link** (URL only, no text): the URL and page title are stored as the source. The user types the word.
 4. **Source:** when the share includes a URL and title, they are saved as the source. On Android the app name is saved when the OS provides it. The user can type or edit a source title (for example "The Bear S2E3"). The last used source title is offered again for 30 minutes, so a series session does not need retyping.
-5. **Translation:** the sheet shows the translation and lets the user pick variants as in [add word](add-word.md) **when the platform allows enrichment inside the sheet**. Where it does not (the iOS Share Extension in v1), the sheet saves the raw capture: text, sentence and source, plus a translation if the user typed one. The entry is marked *pending enrichment*, and the app fills in the translation, definition and IPA the next time it runs ([enrichment.md](../../architecture/enrichment.md)).
+5. **Translation:** the sheet shows dictionary (Wiktionary) variants, definitions and IPA, and the user picks variants as in [add word](add-word.md). The first variant is preselected, so Save right away keeps it. This works on both platforms, offline.
+   - **Machine translation** is shown in the sheet on Android. On iOS the share extension does not offer it in v1 ([enrichment.md](../../architecture/enrichment.md) §3).
+   - If there is nothing to pick (no dictionary hit and no machine translation in the sheet) and the user types nothing, the entry is saved *pending enrichment*. The app fills the translation the next time it runs (PD-19).
+   - When a sentence was captured, the machine translation of the whole sentence may be shown as context help where available (PD-19).
 6. **Save** closes the sheet and returns to the source app with a short confirmation. Total target: two taps after the selection for a short selection.
-7. Entries enriched automatically after capture (not chosen by the user) appear in the vocabulary list filter **"Check translation"** until the user opens them or reviews them once, so wrong automatic meanings can be fixed.
+7. Entries whose translation the app filled automatically after capture (not chosen by the user) are flagged **"Check translation"** and listed under that filter until the user opens them or reviews them once, so wrong automatic meanings can be fixed ([domain](../domain-model.md#entry) `needs check`; PD-19).
 
 ## Edge cases
 
@@ -37,4 +40,5 @@
 ## Offline
 
 - Capture never needs the network and never waits for it. Saving is instant.
+- The dictionary is on the device from first launch (bundled, [dictionary-data.md](../../architecture/dictionary-data.md) §4, pending owner OK on app size), so dictionary suggestions in the sheet work offline.
 - Enrichment of pending captures happens when the app runs and its sources are available. Until then the entry is in the vocabulary list with "Translation pending" and is not reviewed ([saving without enrichment](enrichment-unavailable.md)).

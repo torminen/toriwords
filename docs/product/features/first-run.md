@@ -13,7 +13,11 @@
   - **From any app (Android):** select text → Toriwords.
   - **From any app (iOS):** select text → Share → Toriwords. On iOS, a one-time tip shows how to move Toriwords to the front of the share menu.
 - **Add your first word** opens the add screen.
-- **Translation download:** if on-device translation RU ↔ EN is not installed, the app offers to download it the first time it is needed and the device is online. If declined, the app uses Wiktionary only; Settings → Translation offers the download again.
+- **Dictionary:** bundled with the app, available offline from the first launch.
+- **Machine translation data:**
+  - Android: the app downloads the English–Russian model (about 30 MB) automatically on Wi-Fi after first launch; on mobile data the user can start it from Settings → Translation.
+  - iOS: the system asks the user to download the language data the first time translation is needed online.
+  - Until it is there, or if the user declines, the app uses the dictionary only, and Settings → Translation offers the download again.
 - Notifications are not requested at first launch ([reminders](reminders-widget.md)).
 
 **Empty states elsewhere**

@@ -6,15 +6,17 @@ Each item has the same shape so it can be pasted into an owner question: **Recom
 
 Settled owner inputs are not repeated here. They are listed in [README.md](README.md#confirmed-owner-inputs).
 
+Architecture docs carry their own owner questions (S1–S6, B1–B6, A1–A6 and others). Where they overlap with a PD, the owner answers the PD once; see [Mapping to architecture questions](#mapping-to-architecture-questions).
+
 | # | Question | Recommendation (short) |
 |---|---|---|
 | PD-1 | Card directions and exercise types | EN→RU and RU→EN flip cards with the captured sentence; cloze on the captured sentence P1 |
 | PD-2 | Grading | Two buttons: "Forgot" / "Remembered" |
 | PD-3 | Organisation | Flat tags plus filter by source; no decks; one review queue |
-| PD-4 | Daily load and catch-up | 10 new words/day; after a break, spread the backlog over up to 7 days and pause new words |
-| PD-5 | Pronunciation | OS text-to-speech + IPA from Wiktionary; no recorded audio |
+| PD-4 | Daily load and catch-up | 10 new words/day; after a break, cap daily reviews so the backlog spreads over about a week, and pause new words |
+| PD-5 | Pronunciation | OS text-to-speech (US accent by default, UK as a setting) + IPA from Wiktionary; no recorded audio |
 | PD-6 | Topical suggestions | Bundled related-word lists from Wiktionary, offline, same on both platforms; P1 |
-| PD-7 | Reminders and widget | One opt-in daily local reminder, only when cards are due; due-count widget P1; no streaks |
+| PD-7 | Reminders and widget | One opt-in daily local reminder, only when cards are due; widget "12 to review · 5 new" P1; no streaks |
 | PD-8 | Stats | Minimal: today, vocabulary by stage, 30-day activity; no XP or streaks |
 | PD-9 | Sign-out and account deletion | Sign-out keeps local data by default, with an explicit "also remove from this device" option |
 | PD-10 | Apple and Google on one account | One sign-in method per account in v1; linking later |
@@ -23,8 +25,10 @@ Settled owner inputs are not repeated here. They are listed in [README.md](READM
 | PD-13 | Phone-first | Phone layouts; tablets get the same adaptive layout, not tablet-specific screens |
 | PD-14 | Base form at capture | Offer the dictionary form when the selected word is an inflected form; P1 |
 | PD-15 | Deletion recovery | Confirmation dialog + short "Undo" after delete; no trash |
-| PD-16 | Which settings sync | Scheduling settings (new-word limit, review-day start, target retention) sync; reminder time and UI language stay per device |
+| PD-16 | Which settings sync | Scheduling settings (new-word limit, scheduler parameters) sync; reminder time, UI language and accent stay per device |
 | PD-17 | Edit on one device vs delete on another | Delete wins |
+| PD-18 | `ё` and `е` in Russian text | Treat as equal for duplicates and search |
+| PD-19 | Capture-time help | Auto-fill pending captures (flagged "Check translation"); sentence machine translation as context help; Russian → English lookup |
 
 ---
 
@@ -74,9 +78,13 @@ Settled owner inputs are not repeated here. They are listed in [README.md](READM
 **Recommendation.**
 - At most **10 new words** introduced per day by default, adjustable in settings (0–50). Words beyond the limit wait in a "new" queue; capture is never limited.
 - No cap on due reviews on a normal day.
-- A review day starts at **04:00 local time**, so a late-night session counts as the same day (Anki convention).
-- **Catch-up after a break:** when the overdue backlog is larger than about two normal days, the app tells the user plainly, pauses new words, and spreads the backlog over up to 7 days, most at-risk cards first. The user can still choose "Review all now". No guilt messages.
-- How "most at-risk" is defined belongs to the scheduler ([scheduler.md](../architecture/scheduler.md)).
+- A review day starts at **04:00 local time**, so a late-night session counts as the same day (Anki convention). This is a fixed constant, not a setting ([scheduler.md](../architecture/scheduler.md) §4).
+- **Catch-up after a break:**
+  - *Normal load* = the average number of reviews per day over the previous 14 days, at least 50.
+  - Catch-up is on when the due reviews at the start of today are more than 2 × normal load.
+  - While it is on: today's review queue is capped at max(normal load, ⌈due ÷ 7⌉), so a large backlog spreads over about a week; new words are paused; the most at-risk cards come first (order defined in [scheduler.md](../architecture/scheduler.md) §11).
+  - The app tells the user plainly ("Welcome back — N cards are waiting; we'll spread them over the next days"). **Review all now** lifts the cap for today on this device. No guilt messages.
+  - Every input comes from synced review history and the date, so the cap and the counts are the same on all the user's devices after sync.
 
 **Alternatives.**
 - No catch-up handling (Anki): a pile of hundreds of cards after a holiday, the main reason for "backlog anxiety" (I4).
@@ -89,6 +97,7 @@ Settled owner inputs are not repeated here. They are listed in [README.md](READM
 
 **Recommendation.**
 - A **speaker button** on the entry and on both sides of a card plays the English word or phrase (and, on long-press, the sentence) with the OS text-to-speech voice. Works offline when an English voice is installed.
+- Accent: **US English** by default; a per-device setting switches to UK English ([enrichment.md](../architecture/enrichment.md) Q-E3).
 - **IPA** from Wiktionary is shown when available, and the user can edit it.
 - Auto-play on card reveal: off by default, a setting.
 - No recorded audio in v1.
@@ -118,7 +127,7 @@ Settled owner inputs are not repeated here. They are listed in [README.md](READM
 
 **Recommendation.**
 - **Reminder:** one daily local notification at a time the user picks (default 19:00). Sent only when cards are due, with the count ("12 words to review"). Off until the user turns it on. The app suggests turning it on after the first review session, not at first launch.
-- **Widget** (P1): home-screen due-count widget that opens review. Lock-screen variant where the OS supports it.
+- **Widget** (P1): home-screen widget showing "12 to review · 5 new" (due reviews and new words still available today) that opens review. Lock-screen variant where the OS supports it.
 - **No streaks**, no "you'll lose your streak" messages, no promotional notifications.
 - Everything is computed on the device, works offline, no push server.
 
@@ -148,7 +157,9 @@ No XP, levels, streaks or leaderboards.
 ## PD-9. Sign-out and account deletion
 
 **Recommendation.**
-- **Sign-out:** a dialog with "Sign out" (default: vocabulary stays on this device and keeps working locally) and "Sign out and remove data from this device". Changes not yet uploaded are mentioned before sign-out.
+- **Sign-out:** keeps the vocabulary on this device; the app continues local-only. Changes not yet uploaded are mentioned before sign-out.
+- **Remove all data from this device:** a separate, explicit action in Settings. It warns about unsynced changes.
+- **Signing in to a different account** while words from the previous account are still on the device: the app asks once, "Add these N words to this account" or "Remove them from this device first". This is about two people's data, not a sync conflict, so it does not break "never pick a side" (I7).
 - **Account deletion** (required by the App Store when sign-in exists): deletes all cloud data. On the device where it is done, the user chooses again whether to keep the local copy. **Other signed-in devices** are signed out the next time they connect, keep their local data as local-only, and tell the user why.
 
 **Alternatives.**
@@ -156,11 +167,11 @@ No XP, levels, streaks or leaderboards.
 - Sign-out always keeps data: simplest, but no way to clean a device you are giving away, except deleting the app.
 - Account deletion also wipes other devices remotely: thorough, but surprising and destructive.
 
-**Why.** Local-first (memory://8): the device copy belongs to the user; signing out only stops syncing.
+**Why.** Local-first (memory://8): the device copy belongs to the user; signing out only stops syncing. Same as [auth.md](../architecture/auth.md) A3 and A4.
 
 ## PD-10. Apple and Google on one account
 
-**Recommendation.** In v1, an account has **one** sign-in method: Apple or Google. Signing in with the other provider creates a separate account; the sign-in screen says which method this device used before. Linking both methods to one account is later.
+**Recommendation.** In v1, an account has **one** sign-in method: Apple or Google. Signing in with the other provider creates a separate account; the sign-in screen says which method this device used before and suggests using the same method on every device. Explicit linking of both methods to one account (with the two accounts' words merged) is P1. Never link automatically by email. Same as [auth.md](../architecture/auth.md) A5.
 
 **Alternatives.**
 - Linking in settings in v1: needed if the owner uses both an iPhone and an Android phone without Apple sign-in on Android. Sign in with Apple works on Android via the web flow, so a single Apple account already covers both platforms ([auth.md](../architecture/auth.md)).
@@ -187,7 +198,7 @@ Available without an account and offline.
 **Recommendation.** P1. The JSON export from PD-11 is also the backup. **Import from a Toriwords JSON file** restores it on a new or reinstalled device. Imported entries merge with existing ones by the duplicate rules ([duplicates](features/duplicates.md)); review histories are combined.
 
 **Alternatives.**
-- Rely on OS device backups (iCloud/Google device backup): automatic, but not under the app's control and not cross-platform.
+- Rely only on OS device backups (iCloud device backup; Android Auto Backup, which silently stops above 25 MB per app): automatic, but not under the app's control and not cross-platform. The app also uses them as a silent safety net in every case ([local-storage.md](../architecture/local-storage.md) §7).
 - No backup without an account: simplest; a lost phone loses everything.
 
 **Why.** The owner allowed using the app without an account; such users should still be able to move to a new phone.
@@ -219,8 +230,9 @@ Available without an account and offline.
 ## PD-16. Which settings sync
 
 **Recommendation.**
-- Synced (they affect scheduling, so they must be equal on all the user's devices): daily new-word limit, review-day start hour, target retention (if [scheduler.md](../architecture/scheduler.md) exposes it). Tags sync as data.
-- Per device: reminder on/off and time, UI language override, auto-play pronunciation.
+- Synced (they affect scheduling, so they must be equal on all the user's devices): daily new-word limit and the scheduler parameter set, including desired retention. Desired retention is **not shown to the user** in v1 ([scheduler.md](../architecture/scheduler.md) Q-S2). Tags sync as data.
+- The review-day start (04:00) is a constant, not a setting. If it ever becomes configurable, it must sync.
+- Per device: reminder on/off and time, UI language override, pronunciation accent and auto-play.
 
 **Alternatives.**
 - Sync everything (one reminder time for all devices).
@@ -235,3 +247,51 @@ Available without an account and offline.
 **Alternatives.** Edit wins (the entry comes back with its history): no data loss, but a deleted word reappears, which feels like a bug, and it complicates sync.
 
 **Why.** Predictable and the cheapest safe rule ([sync.md](../architecture/sync.md)). Deletion is a deliberate act and rare in practice for a single user.
+
+## PD-18. `ё` and `е` in Russian text
+
+**Recommendation.** Treat `ё` and `е` as the same letter when comparing Russian text: Sense translations for duplicates ("ёлка" = "елка") and Russian search. Text is always displayed as the user or the dictionary wrote it.
+
+**Alternatives.** Keep them distinct: two meanings "ёлка" and "елка" on one entry, and searching "елка" misses "ёлка".
+
+**Why.** Russian text very often omits the dots; the distinction almost never separates two different translations of one English word. Normalisation fixtures: [parity-testing.md](../architecture/parity-testing.md) §4.1 (`ru-yo`).
+
+## PD-19. Capture-time help
+
+**Recommendation.**
+1. **Auto-fill pending captures** (P0). A capture saved without a translation (no dictionary hit in the share sheet, machine translation not available there) gets the first dictionary variant or the machine translation automatically when the app next runs. Such entries are flagged **"Check translation"** until the user opens or reviews them ([capture](features/capture-share-selection.md); [enrichment.md](../architecture/enrichment.md) Q-E1).
+2. **Sentence translation as context help** (P1). When a sentence was captured, the add/capture screen also shows the machine translation of the whole sentence ("In this sentence: …"). It is not stored unless the user copies part of it into a translation ([enrichment.md](../architecture/enrichment.md) Q-E2).
+3. **Russian → English lookup** (P1). Typing Russian in the add field offers English candidates from the dictionary ("how do I say …") ([dictionary-data.md](../architecture/dictionary-data.md) Q-D3).
+
+**Alternatives.**
+1. Leave pending captures without a translation until the user picks one: no wrong automatic meanings, but every capture needs a second visit before it can be reviewed.
+2. No sentence translation: simpler screen, but single-word machine translation is often wrong without context.
+3. English-only input: the app just asks for English.
+
+**Why.** Capture must stay at two taps (A1), and RU learners benefit most from context (§6.3). All three use data the app already has, offline.
+
+## Mapping to architecture questions
+
+The owner answers each topic once. Architecture questions not listed here are technical and asked separately.
+
+| Architecture question | Answered by | Note |
+|---|---|---|
+| [sync.md](../architecture/sync.md) S4 (delete wins, final) | PD-17 | Same recommendation. |
+| [sync.md](../architecture/sync.md) S5 (automatic duplicate merge) | — | Follows from the confirmed "never pick a side" principle and [duplicates](features/duplicates.md); technical. |
+| [sync.md](../architecture/sync.md) §11 Settings | PD-16 | Same list. |
+| [sync.md](../architecture/sync.md) S6 (no server push) | PD-7 | Product consequence: a second device updates when it next syncs; reminders may be stale until then. |
+| [auth.md](../architecture/auth.md) A1 (providers) | Owner input 5 | Apple and Google on both platforms. |
+| [auth.md](../architecture/auth.md) A3 (sign-out) | PD-9 | Same recommendation. |
+| [auth.md](../architecture/auth.md) A4 (account deletion, other devices) | PD-9 | Same recommendation. |
+| [auth.md](../architecture/auth.md) A5 (cross-provider identity) | PD-10 | Same recommendation. |
+| [backend.md](../architecture/backend.md) B4 / §4.1 (where sync must work) | [README](README.md#open-questions-for-the-owner) open question 6 | Owner fact, asked once. |
+| [scheduler.md](../architecture/scheduler.md) Q-S1 (grading) | PD-2 | |
+| [scheduler.md](../architecture/scheduler.md) Q-S2 (desired retention visible) | PD-16 | Hidden in v1. |
+| [scheduler.md](../architecture/scheduler.md) §11 siblings | PD-1 | Behaviour in [review](features/review.md). |
+| [capture-and-extensions.md](../architecture/capture-and-extensions.md) Q-C1 (6-word threshold) | — | Product spec value in [capture](features/capture-share-selection.md); no owner question. |
+| [capture-and-extensions.md](../architecture/capture-and-extensions.md) Q-C2, Q-C3 (widget number, reminders default) | PD-7 | |
+| [enrichment.md](../architecture/enrichment.md) Q-E1, Q-E2 | PD-19 | |
+| [enrichment.md](../architecture/enrichment.md) Q-E3 (accent) | PD-5 | |
+| [dictionary-data.md](../architecture/dictionary-data.md) Q-D3 (reverse lookup, related words) | PD-19, PD-6 | |
+| [local-storage.md](../architecture/local-storage.md) Q-L3 (export file) | PD-11, PD-12 | |
+| [parity-testing.md](../architecture/parity-testing.md) `ru-yo` | PD-18 | |

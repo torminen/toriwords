@@ -26,14 +26,14 @@
 
 **Session**
 - New cards are mixed in among due reviews, up to the daily new-word limit (default 10).
-- The two cards of one entry are never shown on the same day; the second waits until the next day.
+- At most one card of an entry is shown per day; the other waits until the next day, unless it is already overdue by more than its interval ([scheduler.md](../../architecture/scheduler.md) §11).
 - A **Forgot** card comes back later in the same session until it is remembered once.
 - Leaving the review at any point keeps every answer already given. There is no "session" to lose.
 - When the queue is empty: a short summary (cards reviewed, words remembered, new words introduced). If more new words are waiting, **Learn more new words** introduces another batch of the daily limit.
 
 **Daily load and catch-up** (recommendation PD-4)
 - A review day starts at 04:00 local time.
-- After a break, when the backlog is more than about two normal days: the home screen says "Welcome back — you have N cards waiting. We'll spread them over the next few days." New words pause until the backlog is cleared. Each day shows a manageable share, most at-risk cards first. **Review all now** is available.
+- After a break, when today's due reviews are more than twice the normal load (average reviews per day over the previous 14 days, at least 50): the home screen says "Welcome back — you have N cards waiting. We'll spread them over the next few days." New words pause. Today's queue is capped at the larger of the normal load and a seventh of the backlog, most at-risk cards first. **Review all now** lifts the cap for today on this device. Exact rule: PD-4.
 - No guilt messages, no lost streaks.
 
 ## Edge cases

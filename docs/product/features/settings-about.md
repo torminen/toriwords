@@ -6,18 +6,18 @@
 
 ## Behaviour
 
-Settings are short; the defaults are meant to be right for most people (X6).
+Settings are short; the defaults are meant to be right for most people (X6). The review day always starts at 04:00 local time; desired retention and other scheduler parameters are not shown in v1 ([scheduler.md](../../architecture/scheduler.md)).
 
 | Section | Settings | Default | Synced (PD-16) |
 |---|---|---|---|
 | Learning | New words per day (0–50) | 10 | yes |
-| Learning | Day starts at | 04:00 | yes |
 | Reminders | Daily reminder on/off, time ([reminders](reminders-widget.md)) | off, 19:00 | no |
+| Pronunciation | Accent: US / UK | US | no |
 | Pronunciation | Auto-play on card reveal | off | no |
 | Translation | On-device translation status and download; Wiktionary data status | — | no |
 | Language | App language: System / English / Русский | System | no |
 | Account | Sign in, status, sign out, delete account ([account and sync](account-sync.md)) | — | — |
-| Data | Export, restore ([export](export.md)), Tags ([organisation](organisation.md)) | — | — |
+| Data | Export, restore ([export](export.md)), Tags ([organisation](organisation.md)), Remove all data from this device ([account and sync](account-sync.md)) | — | — |
 | About | Version, source code link, licences, attribution, privacy | — | — |
 
 **App language**
@@ -35,7 +35,6 @@ Settings are short; the defaults are meant to be right for most people (X6).
 
 - **System language changes** while "System" is selected: the app follows on next launch.
 - **Lowering the new-word limit** mid-day below what was already introduced: no more new words today; nothing is taken back.
-- **Changing the day start:** applies from the next day.
 - **Settings changed on two devices:** synced settings follow the most recent change.
 
 ## Offline

@@ -30,10 +30,11 @@
 | **Same entry edited on two devices offline** | The most recent edit wins. No prompt. |
 | **Reviewed on both devices offline** | Both answers count; the next due date is the same on both devices after sync. |
 | **Deleted on one device, edited or reviewed on another** | Deletion wins; the other device's changes to that entry are dropped (PD-17). |
-| **Sign out** (PD-9) | Dialog: **Sign out** (vocabulary stays on this device, works locally) or **Sign out and remove data from this device**. Unsynced changes are mentioned first. |
+| **Sign out** (PD-9) | The vocabulary stays on this device and keeps working locally. Unsynced changes are mentioned first. Removing the words from the device is a separate action: Settings → **Remove all data from this device**, with a warning about unsynced changes. |
 | **Account deletion** (PD-9) | Settings → Account → Delete account, with confirmation. All cloud data is deleted. This device asks whether to keep a local copy. Other signed-in devices are signed out when they next connect, keep their local data as local-only, and show "Your account was deleted". |
-| **Signing in with the other provider** (PD-10) | It is a different account in v1. The sign-in screen shows which method this device used before, to prevent a mistake. If the user does it anyway, they get an empty or different account; their local data merges into it as above. |
-| **Session expired / sign-in revoked** | Sync stops; the app keeps working locally and Settings asks to sign in again. Nothing is lost. |
+| **Signing in with the other provider** (PD-10) | It is a different account in v1. The sign-in screen shows which method this device used before, to prevent a mistake. |
+| **Signing in to a different account while the previous account's words are on the device** (PD-9) | The app asks once: **Add these N words to this account** or **Remove them from this device first**. This is about whose data it is, not a sync conflict. Words created while never signed in merge without a question. |
+| **Session expired / sign-in revoked** (including "Stop using Apple ID" in iOS settings) | Sync stops; the app keeps working locally and shows "You were signed out. Sign in again to continue syncing." Nothing is lost. |
 | **Backend unreachable** (outage, blocked network) | The app keeps working. Status shows "Can't reach the server"; sync resumes on its own (X3). |
 
 ## Edge cases
@@ -42,7 +43,8 @@
 - **App updated on one device but not the other:** older versions keep syncing; a version that is too old is asked to update, and keeps working locally meanwhile ([sync.md](../../architecture/sync.md)).
 - **Very large first upload** (thousands of entries): runs in the background and resumes after interruptions.
 - **Device clock wrong:** must not cause lost edits ([sync.md](../../architecture/sync.md)).
-- **Apple hides the email address:** the account screen shows the provider name instead of an email.
+- **Apple hides the email address:** the account screen shows the provider name. The backend never stores emails ([auth.md](../../architecture/auth.md) §8).
+- **Second device sees changes late:** there is no server push in v1; a device picks up changes when it opens, after a change, or in periodic background sync ([sync.md](../../architecture/sync.md) S6).
 
 ## Offline
 

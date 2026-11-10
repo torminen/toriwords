@@ -11,6 +11,7 @@
 - **JSON:** the complete vocabulary: all meanings, sentences, sources, tags and the full review history. Documented format, versioned.
 - The file is created on the device and handed to the share sheet (save to Files, send, AirDrop and so on).
 - Available without an account.
+- Both formats include the Wiktionary attribution line (CC BY-SA) when the export contains Wiktionary-derived text ([dictionary-data.md](../../architecture/dictionary-data.md) §5).
 
 **Restore from JSON** (PD-12)
 - Settings → Import Toriwords backup → pick a JSON file.

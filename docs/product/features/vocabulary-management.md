@@ -13,7 +13,7 @@
 - Filters: stage, **Needs translation**, **Check translation**, **Phrases**, tag (PD-3), source.
 
 **Search**
-- One search field finds entries by English text, Russian translation, definition and sentence text. Case and typographic variants are ignored; Russian "ё" matches "е".
+- One search field finds entries by English text, Russian translation, definition and sentence text. Case and typographic variants are ignored; Russian "ё" matches "е" (pending PD-18).
 - Results update as the user types.
 
 **Entry screen**

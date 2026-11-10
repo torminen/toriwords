@@ -66,8 +66,6 @@ Conventions:
 | `device` | `id`, `platform`, `display_name`, `first_seen` | This device's row is created on first run. |
 | `inbox_import` | `inbox_id`, `imported_at` | Local only. Makes share-extension import idempotent ([capture-and-extensions.md](capture-and-extensions.md)). |
 | `schema_meta` | `version` | Local only. |
-| `telemetry_reports` | `day` (ISO date of the review day), `report` (JSON per [observability.md](observability.md) §4.2), `created_at` | **Pending the owner's observability decision.** Local only, never synced, not in backups. Keeps at most the last 7 unsent reports; rows are deleted once sent. |
-| `telemetry_counters` | `day` (review day number, 04:00 boundary as in [scheduler.md](scheduler.md) §4), `key`, `value` INTEGER | **Pending the owner's observability decision.** Local only, never synced, not in backups. Running counters for the current day (`added.*`, `enrich.*`, `reviews.*`, `tts`, `syncErrors`, `crashedRuns`), plus the active-day history needed for `activeDays7`/`activeDays28` (last 28 days). At the next launch they become one report for the finished day, then are pruned. |
 
 **Foreign keys:** declared with `ON DELETE CASCADE` for local physical cleanup, but **deletion is logical first** (tombstone on the Entry; children are hidden by joins and purged after the tombstone has synced). Sync may deliver children before parents, so FK enforcement during a sync batch is deferred (`PRAGMA defer_foreign_keys = ON` inside the transaction).
 
@@ -110,12 +108,16 @@ Users who never sign in have no cloud copy from Toriwords (see the account & syn
 |---|---|---|
 | Mechanism | iCloud / Finder device backup includes the app container and App Group container. | Auto Backup to Google Drive (quota **25 MB per app**) and device-to-device transfer (no quota). |
 | Include | `user.sqlite` (checkpointed), preferences. | `user.sqlite` via `data_extraction_rules.xml` (`cloud-backup` and `device-transfer`). |
-| Exclude | `dictionary.sqlite` (`isExcludedFromBackup`), inbox, snapshot, caches. Telemetry tables live in `user.sqlite`, so they are cleared after restore (a restored device starts a fresh count). | `dictionary.sqlite`, caches. Telemetry: same rule as iOS. |
+| Exclude | `dictionary.sqlite` (`isExcludedFromBackup`), inbox, snapshot, caches. | `dictionary.sqlite`, caches. |
 | Caveat | None in practice. | **A large collection exceeds 25 MB and Auto Backup silently stops.** Mitigation: (a) accept, and tell the user in settings that sign-in is the reliable backup; (b) back up a compressed export instead of the raw DB (Auto Backup can include any file; a zstd JSON export of 300k logs is likely ≤ 10 MB, `nv`). Recommendation: (b) as P1, written by a periodic worker. |
 
 After restore on a new device, the app keeps the user's data but generates a **new Device id** (the restored `device` row is marked foreign), so two devices never share an id if the old one is still in use.
 
 A user-visible manual export/import file (JSON/CSV, A5) is a product decision; if adopted, it reuses the same export format.
+
+### Later (not in v1)
+
+No analytics in the MVP ([no analytics](memory://44)). If product analytics are added later, their local queue and day counters go in local-only tables of `user.sqlite`. Those tables must never sync, and they must be cleared after an OS restore ([observability.md](observability.md)).
 
 ## 8. Domain-model issues relevant to storage (to raise with product_writer and sync)
 

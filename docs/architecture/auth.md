@@ -1,6 +1,6 @@
 # Auth: optional sign-in, sessions, sign-out and account deletion
 
-Status: **Proposed**. Every choice below waits for owner confirmation (plan step 5). Items that need an explicit owner decision are collected in §10.
+Status: **Confirmed** (owner, 2026-11-10). Confirmed: A1–A6 (§10).
 
 Related:
 - Decisions: [local-first with own backend](memory://8), [open source](memory://12) (no secrets in clients).

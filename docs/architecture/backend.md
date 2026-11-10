@@ -1,6 +1,6 @@
 # Backend: stack, data, hosting and API
 
-Status: **Proposed**. Every choice below waits for owner confirmation (plan step 5).
+Status: **Confirmed** (owner, 2026-11-10). Confirmed: B1–B5 (§8), including EU hosting. **Open:** B6, whether the backend is open source (§7).
 
 Related:
 - Decisions: [local-first with own backend](memory://8) (no BaaS), [open source](memory://12) (whether the backend is open source is **not decided**, so this document does not assume it), [project goals](memory://10), [primary pair RU → EN](memory://11).

@@ -1,6 +1,6 @@
 # Parity testing: shared fixtures for iOS, Android and the backend
 
-Status: **Proposed**.
+Status: **Confirmed** (owner, 2026-11-10). Confirmed: fixtures in `spec/fixtures/` are normative for both apps and the backend.
 
 Related:
 - Decision: [native apps, no shared code](memory://7). Domain rules are implemented twice and must behave identically.

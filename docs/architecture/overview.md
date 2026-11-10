@@ -1,6 +1,6 @@
 # Architecture overview
 
-Status: **Proposed**. It summarises the architecture documents; every choice waits for owner confirmation (plan step 5).
+Status: **Confirmed** (owner, 2026-11-10). It summarises the architecture documents. Confirmed: all areas in §5 except observability (Proposed, owner answer pending) and backend B6 (open).
 
 Toriwords is two native apps and a small backend:
 - iOS: Swift/SwiftUI. Android: Kotlin/Jetpack Compose ([memory://7](memory://7)).
@@ -132,7 +132,7 @@ If the owner's phone is older than these floors, the floor moves down to the own
 
 ## 5. Decisions to confirm (index)
 
-The owner confirms the recommendations collected in each document:
+The owner confirmed the recommendations collected in each document on 2026-11-10, except where marked open or proposed:
 
 | Area | Document | Items |
 |---|---|---|

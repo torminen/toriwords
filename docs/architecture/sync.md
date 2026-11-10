@@ -1,6 +1,6 @@
 # Sync: data model, merge rules and protocol
 
-Status: **Proposed**. Every choice below waits for owner confirmation (plan step 5).
+Status: **Confirmed** (owner, 2026-11-10). Confirmed: S1–S6 (§14).
 
 Related:
 - Decisions: [local-first with own backend](memory://8), [native apps, no shared code](memory://7), [open source](memory://12).

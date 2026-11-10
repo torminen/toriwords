@@ -1,7 +1,7 @@
 # Saving without enrichment
 
 - **Priority:** P0.
-- **Status:** proposed.
+- **Status:** confirmed.
 - **Analysis:** A4, A13, §8.4, §11 Q1; [memory://8](memory://8) (network never required to add words).
 - **Domain:** [Enrichment](../domain-model.md#enrichment).
 

@@ -1,7 +1,7 @@
 # Review
 
 - **Priority:** P0.
-- **Status:** card types pending [PD-1](../proposed-decisions.md#pd-1-card-directions-and-exercise-types), grading pending [PD-2](../proposed-decisions.md#pd-2-grading), daily load pending [PD-4](../proposed-decisions.md#pd-4-daily-load-and-catch-up). The behaviour below follows the recommendations.
+- **Status:** confirmed: card types [PD-1](../proposed-decisions.md#pd-1-card-directions-and-exercise-types), grading [PD-2](../proposed-decisions.md#pd-2-grading), daily load [PD-4](../proposed-decisions.md#pd-4-daily-load-and-catch-up).
 - **Analysis:** A2, A7, I2, I4, I9, §6.4, §7, §11 Q6–Q7.
 - **Domain:** [Card, ReviewLog](../domain-model.md#card). Scheduling: [scheduler.md](../../architecture/scheduler.md).
 
@@ -11,14 +11,14 @@
 - The home screen shows how many cards are due today and a **Review** button. When nothing is due it shows the day of the next review ("Next review: tomorrow", "in 3 days"). Scheduling is by day, never by time of day.
 - One queue contains everything due. Tags or sources do not split it (PD-3).
 
-**A card** (recommendation PD-1)
-- **Recognition (EN → RU):** the front shows the English word or phrase and its sentence with the word highlighted. Tapping the card flips it.
-- **Recall (RU → EN):** the front shows the Russian translation(s) and the sentence with the word blanked.
+**A card** (PD-1). Every entry has both directions.
+- **Recognition** (English shown, answer in Russian): the front shows the English word or phrase and its sentence with the word highlighted. Tapping the card flips it.
+- **Recall** (Russian shown, produce the English): the front shows the Russian translation(s) and the sentence with the word blanked.
 - The back shows the word, all its meanings (translation, definition, part of speech), IPA, the sentence with source, and a speaker button ([pronunciation](pronunciation.md)).
 - If the entry has several sentences, a different one is shown each time.
 - Without a sentence, the card shows only the word or translation.
 
-**Grading** (recommendation PD-2)
+**Grading** (PD-2)
 - After the flip: **Forgot** and **Remembered**. Swiping left or right does the same.
 - The next card appears immediately. The scheduler decides when the card is due again; the user never sees intervals or settings unless they open the entry.
 
@@ -31,7 +31,7 @@
 - Leaving the review at any point keeps every answer already given. There is no "session" to lose.
 - When the queue is empty: a short summary (cards reviewed, words remembered, new words introduced). If more new words are waiting, **Learn more new words** introduces another batch of the daily limit. This only extends the current session and changes no setting.
 
-**Daily load and catch-up** (recommendation PD-4)
+**Daily load and catch-up** (PD-4)
 - A review day starts at 04:00 local time.
 - After a break, when the backlog is much larger than the user's normal daily load (computed from recent review history), the app enters **catch-up**:
   - the home screen says "Welcome back — N cards are waiting. We'll spread them over about a week.";

@@ -1,7 +1,7 @@
 # Settings and about
 
 - **Priority:** P0.
-- **Status:** UI in English and Russian is confirmed (owner input 4). The settings list is proposed; which settings sync is pending [PD-16](../proposed-decisions.md#pd-16-which-settings-sync).
+- **Status:** UI in English and Russian is confirmed (owner input 4). The settings list is confirmed; which settings sync: [PD-16](../proposed-decisions.md#pd-16-which-settings-sync).
 - **Analysis:** X6; [memory://12](memory://12) (attribution, open source).
 
 ## Behaviour
@@ -29,7 +29,8 @@ Settings are short; the defaults are meant to be right for most people (X6). The
 - App version and a link to the open-source repository.
 - **Wiktionary attribution:** "Dictionary data from Wiktionary, available under CC BY-SA", with a link to the licence and the source. Entries whose data came from Wiktionary show a small "Wiktionary" mark on the entry screen, linking to the same attribution.
 - Licences of all bundled data and open-source libraries.
-- A short privacy statement: what is stored on the device, what syncs when signed in, and that nothing else is collected (open question 3 in the [README](../README.md#open-questions-for-the-owner)).
+- A short privacy statement: what is stored on the device and what syncs when signed in.
+- **Privacy: crash reports & anonymous analytics**, see [observability.md](../../architecture/observability.md). The owner wants both; what is collected, whether the user can opt out, and the wording here are pending until the owner confirms the mechanism.
 
 ## Edge cases
 

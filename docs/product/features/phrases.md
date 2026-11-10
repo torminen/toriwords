@@ -1,7 +1,7 @@
 # Phrases as first-class items
 
 - **Priority:** P0.
-- **Status:** proposed.
+- **Status:** confirmed.
 - **Analysis:** A3, §6.1.
 - **Domain:** [Entry](../domain-model.md#entry) (`kind` is derived).
 

@@ -1,7 +1,7 @@
 # Reminders and widget
 
 - **Priority:** P1.
-- **Status:** pending [PD-7](../proposed-decisions.md#pd-7-reminders-and-widget). The behaviour below follows the recommendation: one opt-in daily local reminder, a due-count widget, no streaks.
+- **Status:** confirmed ([PD-7](../proposed-decisions.md#pd-7-reminders-and-widget)): one opt-in daily local reminder, a due-count widget, no streaks.
 - **Analysis:** A11, X4, X11, §8.5.
 
 ## Behaviour

@@ -1,9 +1,9 @@
 # Organisation (tags)
 
 - **Priority:** P1.
-- **Status:** pending [PD-3](../proposed-decisions.md#pd-3-organisation). The behaviour below follows the recommendation: flat tags plus filtering by source, no decks.
+- **Status:** confirmed ([PD-3](../proposed-decisions.md#pd-3-organisation)): flat tags plus filtering by source, no decks.
 - **Analysis:** I2, X6, §6.4.
-- **Domain:** [Tag](../domain-model.md#tag-pending), [Source](../domain-model.md#source).
+- **Domain:** [Tag](../domain-model.md#tag), [Source](../domain-model.md#source).
 
 ## Behaviour
 

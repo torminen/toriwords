@@ -1,7 +1,7 @@
 # Export and backup
 
 - **Priority:** P1.
-- **Status:** pending [PD-11](../proposed-decisions.md#pd-11-export) and [PD-12](../proposed-decisions.md#pd-12-backup-for-users-without-an-account).
+- **Status:** confirmed ([PD-11](../proposed-decisions.md#pd-11-export), [PD-12](../proposed-decisions.md#pd-12-backup-for-users-without-an-account)).
 - **Analysis:** A5, X2; [memory://12](memory://12) (no lock-in).
 
 ## Behaviour

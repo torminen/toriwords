@@ -1,7 +1,7 @@
 # Vocabulary management
 
 - **Priority:** P0 (bulk actions P1).
-- **Status:** proposed. Deletion recovery pending [PD-15](../proposed-decisions.md#pd-15-deletion-recovery); delete-vs-edit across devices pending [PD-17](../proposed-decisions.md#pd-17-edit-on-one-device-vs-delete-on-another).
+- **Status:** confirmed. Deletion recovery: [PD-15](../proposed-decisions.md#pd-15-deletion-recovery); delete-vs-edit across devices: [PD-17](../proposed-decisions.md#pd-17-edit-on-one-device-vs-delete-on-another).
 - **Analysis:** X2, §6.4.
 - **Domain:** [Entry states](../domain-model.md#entry), [Sense](../domain-model.md#sense), [Context](../domain-model.md#context).
 
@@ -13,7 +13,7 @@
 - Filters: stage, **Needs translation**, **Check translation**, **Phrases**, tag (PD-3), source.
 
 **Search**
-- One search field finds entries by English text, Russian translation, definition and sentence text. Case and typographic variants are ignored; Russian "ё" matches "е" (pending PD-18).
+- One search field finds entries by English text, Russian translation, definition and sentence text. Case and typographic variants are ignored; Russian "ё" matches "е" (PD-18).
 - Results update as the user types.
 
 **Entry screen**
@@ -29,7 +29,7 @@
 - **I already know this:** the entry leaves review, stays in the list as "known", and counts as known in stats.
 - **Pause:** the entry leaves review and stays in the list as "paused".
 - **Resume learning:** continues from the existing history.
-- **Delete:** confirmation, then (pending PD-15) a short **Undo**. Deleted entries are gone on all devices with their history; this cannot be reversed after the undo window. Deletion is terminal (pending PD-17).
+- **Delete:** confirmation, then a short **Undo** (PD-15). Deleted entries are gone on all devices with their history; this cannot be reversed after the undo window. Deletion is terminal (PD-17).
 - **Bulk (P1):** multi-select in the list to delete, tag, mark known or pause.
 
 ## Edge cases

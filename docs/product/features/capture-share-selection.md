@@ -1,7 +1,7 @@
 # Capture via Share / text selection
 
 - **Priority:** P0.
-- **Status:** confirmed (owner input 2). Details of the capture sheet are proposed.
+- **Status:** confirmed (owner input 2). Details of the capture sheet are confirmed with PD-14 and PD-19.
 - **Analysis:** A1, A2, A9, I3, §6.1, §8.3, X9.
 - **Domain:** [Entry, Context, Source](../domain-model.md), [enrichment](../domain-model.md#enrichment).
 
@@ -35,7 +35,7 @@ The exact text rules (word counting, sentence detection and splitting, markup cl
 - **Sentence longer than 500 characters:** it is cut to 500 characters around the chosen word, at word boundaries, with "…" marks.
 - **Very large share** (more than 5,000 characters, for example a whole article): only the first 5,000 characters are shown for picking. The URL, if present, is still saved as the source.
 - **Selection with line breaks, extra spaces or subtitle markup** (for example `<i>`, `[music]`, speaker names before a colon): these are cleaned for display and for saving (exact rules in [capture-and-extensions.md](../../architecture/capture-and-extensions.md) §2). The chosen text follows the [duplicate](duplicates.md) normalisation.
-- **Word chosen is an inflected form** ("took off"): saved as chosen; the highlight marks it in the sentence. Base form is pending PD-14.
+- **Word chosen is an inflected form** ("took off"): saved as chosen; the highlight marks it in the sentence. Base form: PD-14.
 - **App never opened before:** capture still works. The app finishes first-run setup the next time it opens.
 - **The user dismisses the sheet:** nothing is saved.
 - **Streaming apps:** text selection does not work in most video players. The spec does not promise capture from Netflix/YouTube subtitles on the phone (X9). The user types the word instead, or uses OCR when it arrives (later).

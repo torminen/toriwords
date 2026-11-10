@@ -1,6 +1,8 @@
 # Toriwords domain model (v1)
 
-Status: **Proposed**. The owner has not yet confirmed the items marked *pending*. The pending decisions are listed in [proposed-decisions.md](proposed-decisions.md).
+Status: **Confirmed** (owner, 2026-11-10). The product decisions it relies on are listed in [proposed-decisions.md](proposed-decisions.md) (PD-1 … PD-19, all confirmed).
+
+**Notation.** "RU → EN" always names the **language pair**: native language Russian, target (learning) language English. It is not a card direction. Card directions are called **recognition** (English shown, answer in Russian) and **recall** (Russian shown, produce the English); see *Card* and PD-1.
 
 This document is platform-agnostic. It defines the vocabulary concepts, their fields, states and invariants as the user experiences them. It does not cover storage, sync mechanisms or scheduling algorithms; those are in [`docs/architecture/`](../architecture/). Field names are descriptive, not a schema.
 
@@ -19,20 +21,20 @@ erDiagram
   Context }o--o| Sense : "illustrates"
   Entry ||--o{ Card : "is practised by"
   Card ||--o{ ReviewLog : "has history"
-  Entry }o--o{ Tag : "organised by (pending)"
+  Entry }o--o{ Tag : "organised by"
   User ||--o{ Device : "signs in on"
 ```
 
 | Concept | One-line meaning |
 |---|---|
-| LanguagePair | The direction the user learns in: native language → target language. |
+| LanguagePair | What the user learns: native language → target language (v1: RU → EN, native Russian learning English). |
 | Entry | One word or phrase in the target language that the user is learning. |
 | Sense | One meaning of an Entry: a native-language translation, optionally with a target-language definition. |
 | Context | A real sentence where the user met the Entry. |
 | Source | Where a Context came from: a web page, an app, or a title the user typed. |
-| Card | One way of practising an Entry (for example EN → RU recognition). The scheduler acts on Cards. |
+| Card | One way of practising an Entry (for example recognition: English shown, answer in Russian). The scheduler acts on Cards. |
 | ReviewLog | An immutable record of one answer to one Card. |
-| Tag (pending) | A user-defined label used to organise Entries. |
+| Tag | A user-defined label used to organise Entries. |
 | User / Device | The optional account and the devices that sync it. |
 
 **Timestamps.** `created at` and `updated at` fields exist for display and sorting only. Conflicts between devices are never resolved by them; ordering uses the sync clock defined in [sync.md](../architecture/sync.md).
@@ -48,7 +50,7 @@ erDiagram
 
 **Invariants**
 - **Identity is (native, target).** Two LanguagePairs with the same languages are the same pair, including when two devices each created one on first run.
-- v1 has exactly one LanguagePair: RU → EN. It is created automatically on first run. The UI does not offer creating or switching pairs.
+- The model supports several LanguagePairs. v1 ships exactly one: RU → EN (native Russian, learning English). It is created automatically on first run. The UI does not offer creating or switching pairs.
 - The two languages of a pair never change after creation.
 - Every Entry belongs to exactly one LanguagePair. Nothing in the model assumes RU or EN, so later versions can add pairs without changing existing data.
 - The app's UI language (EN or RU) is independent of the LanguagePair.
@@ -88,11 +90,11 @@ stateDiagram-v2
 
 - **active:** its Cards take part in review when they are due.
 - **excluded:** its Cards never appear in review, but the Entry stays in the vocabulary list and in search. The scheduling history is kept. Resuming continues from that history. `already known` counts as known in [stats](features/stats.md). `paused` does not.
-- **deleted:** removed for the user everywhere, together with its Senses, Contexts, Cards and ReviewLogs. **Deletion is terminal** (recommended, *pending* [PD-17](proposed-decisions.md#pd-17-edit-on-one-device-vs-delete-on-another)):
+- **deleted:** removed for the user everywhere, together with its Senses, Contexts, Cards and ReviewLogs. **Deletion is terminal** ([PD-17](proposed-decisions.md#pd-17-edit-on-one-device-vs-delete-on-another)):
   - a deleted Entry never comes back, even if another device edited or reviewed it offline at the same time; those edits and reviews are dropped when the devices sync;
   - saving the same text again later creates a fresh Entry with no history;
   - example: the user reviews "mortgage" on phone B offline while deleting it on phone A → after sync, "mortgage" stays deleted on both, and phone B's review is gone.
-- A short undo right after deleting is *pending* ([PD-15](proposed-decisions.md#pd-15-deletion-recovery)). If adopted, the deletion takes effect only when the undo window closes, so undo never resurrects a synced deletion. See [vocabulary management](features/vocabulary-management.md).
+- A short undo follows deleting ([PD-15](proposed-decisions.md#pd-15-deletion-recovery)). The deletion takes effect only when the undo window closes, so undo never resurrects a synced deletion. See [vocabulary management](features/vocabulary-management.md).
 
 **Invariants**
 - `text` is never empty after trimming.
@@ -160,7 +162,7 @@ One way of practising an Entry. Cards are created and removed by the app, not by
 |---|---|
 | id | Stable global identifier. |
 | entry | The Entry it practises. |
-| direction | Which exercise this Card is. Candidates: `recognition` (see EN, recall RU), `recall` (see RU, produce EN), `cloze` (EN sentence with the Entry blanked). The v1 set is *pending* ([PD-1](proposed-decisions.md#pd-1-card-directions-and-exercise-types)). |
+| direction | Which exercise this Card is: `recognition` (English shown, answer in Russian), `recall` (Russian shown, produce the English), `cloze` (English sentence with the Entry blanked). Every reviewable Entry has a `recognition` and a `recall` Card; `cloze` is P1 ([PD-1](proposed-decisions.md#pd-1-card-directions-and-exercise-types)). |
 | created at | Display timestamp. |
 | import ref | Optional: source collection + source card id. |
 | learning stage | **Derived.** User-visible stage: `new` (never reviewed), `learning`, `known well`. Thresholds are defined by the scheduler ([scheduler.md](../architecture/scheduler.md)). |
@@ -184,7 +186,7 @@ One answer to one Card. ReviewLogs are the history of learning and the basis for
 | id | Stable global identifier. |
 | card | The Card that was answered. |
 | reviewed at | Moment of the answer as a UTC instant, plus the device's UTC offset at that moment (needed for "today" in stats and daily limits). |
-| rating | The FSRS grade 1–4 (Again, Hard, Good, Easy), whatever UI produced it. Under two-button grading ([PD-2](proposed-decisions.md#pd-2-grading), *pending*) Toriwords produces 1 or 3. Imported answers keep their 1–4 value. Empty only for imported rows that are not answers ([scheduler.md](../architecture/scheduler.md) §3, §7.1). |
+| rating | The FSRS grade 1–4 (Again, Hard, Good, Easy), whatever UI produced it. Under two-button grading ([PD-2](proposed-decisions.md#pd-2-grading)) Toriwords produces 1 or 3. Imported answers keep their 1–4 value. Empty only for imported rows that are not answers ([scheduler.md](../architecture/scheduler.md) §3, §7.1). |
 | answer duration | How long the user took to answer. |
 | device | The Device the answer was given on. |
 | import ref | Optional, only for imported logs: source collection + source log id. |
@@ -197,9 +199,9 @@ One answer to one Card. ReviewLogs are the history of learning and the basis for
 - ReviewLogs are removed only together with their Card, when the Entry is deleted.
 - Two devices that review the same Card offline both keep their ReviewLogs. Neither answer is lost (unless the Entry is deleted, see *Entry states*).
 
-## Tag (pending)
+## Tag
 
-The organisation shape is *pending* ([PD-3](proposed-decisions.md#pd-3-organisation)). The recommendation is flat, many-to-many tags with no decks.
+Organisation is flat, many-to-many tags with no decks ([PD-3](proposed-decisions.md#pd-3-organisation)).
 
 | Field | Meaning |
 |---|---|
@@ -216,11 +218,11 @@ The organisation shape is *pending* ([PD-3](proposed-decisions.md#pd-3-organisat
 |---|---|---|
 | User | id; linked sign-in identities (provider `apple` or `google` + provider's account id); created at | Exists only after the person signs in. Without a User the app works fully, with all data on the device ([account & sync](features/account-sync.md)). |
 | Device | id; platform (`ios` / `android`); display name; first seen | One installation of the app. It exists from first run, signed in or not. |
-| Preferences | daily new-word limit, scheduler parameter set (incl. desired retention, not user-visible in v1), reminder time, pronunciation accent and auto-play, UI language override | Settings ([settings & about](features/settings-about.md)). Settings that affect scheduling are synced; device-only ones are not (*pending* [PD-16](proposed-decisions.md#pd-16-which-settings-sync)). The review day starts at 04:00 local time; this is a constant, not a setting ([scheduler.md](../architecture/scheduler.md) §4). |
+| Preferences | daily new-word limit, scheduler parameter set (incl. desired retention, not user-visible in v1), reminder time, pronunciation accent and auto-play, UI language override | Settings ([settings & about](features/settings-about.md)). Settings that affect scheduling are synced; device-only ones are not ([PD-16](proposed-decisions.md#pd-16-which-settings-sync)). The review day starts at 04:00 local time; this is a constant, not a setting ([scheduler.md](../architecture/scheduler.md) §4). |
 
 **Invariants**
 - Data created before sign-in belongs to the User after sign-in, and is merged with that User's existing data (see *Duplicates*).
-- How many identities one User can have (Apple, Google or both) is *pending* ([PD-10](proposed-decisions.md#pd-10-apple-and-google-on-one-account)).
+- In v1 a User has one sign-in identity, Apple or Google; linking both is later ([PD-10](proposed-decisions.md#pd-10-apple-and-google-on-one-account)).
 
 ## Duplicates
 
@@ -240,7 +242,7 @@ The same item can be created more than once: on two devices offline, before and 
 - **Normalisation.** The exact rules are fixed by shared fixtures in [parity-testing.md](../architecture/parity-testing.md), so iOS and Android produce identical keys. The product intent for the Entry match key:
   - Ignored: letter case, leading and trailing whitespace and punctuation, repeated inner spaces, typographic variants of apostrophes, quotes and dashes ("don't" = "don’t").
   - Not ignored: inflection ("ran" ≠ "run"), spelling variants ("colour" ≠ "color"), articles that are part of the text ("the" in "the Bear").
-  - Russian text (Sense translations, Russian search): `ё` and `е` are treated as equal (recommended, *pending* [PD-18](proposed-decisions.md#pd-18-ё-and-е-in-russian-text)). The text is displayed as typed.
+  - Russian text (Sense translations, Russian search): `ё` and `е` are treated as equal ([PD-18](proposed-decisions.md#pd-18-ё-and-е-in-russian-text)). The text is displayed as typed.
   - Sentences (Context key) use the sentence rules: spaces and quote styles are ignored, but **case and punctuation are kept**.
 - Because match keys are derived, a future change of the normalisation rules rebuilds them on each device and may then merge Entries that became equal.
 - **Repeat capture:** saving text whose natural key matches an existing Entry never creates a second Entry. The new Context is attached to the existing Entry, and a new translation becomes a new Sense only if it is not already there. Details: [duplicates](features/duplicates.md).

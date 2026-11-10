@@ -30,7 +30,7 @@ SQLite 3, FTS5, read-only, opened `immutable=1`. Schema (normative once confirme
 | `translation_ru` | `id`, `headword_id`, `sense_id` NULL, `text`, `origin` (`enwikt`/`ruwikt`), `rank` | Russian variants; `sense_id` set when the source ties them to a sense. |
 | `form` | `form_key`, `headword_id`, `form_tags` | Inflected form → lemma (*ran* → *run*, *mortgages* → *mortgage*). |
 | `example` | `sense_id`, `text_en` | Wiktionary usage examples, short ones only. |
-| `related` | `headword_id`, `related_headword_id`, `kind` (`synonym`/`related`/`derived`) | Input for related-word suggestions (I1) if product adopts them. |
+| `related` | `headword_id`, `related_headword_id`, `kind` (`synonym`/`related`/`derived`/`phrase`) | Input for related-word suggestions (PD-6). `phrase` rows are computed at build time: dictionary phrases whose words include the headword's key or one of its forms ("mortgage" → "mortgage rate"). Lists are ranked by kind, then `freq_rank`, so both platforms show the same top 8. |
 | `ru_fts` | FTS5 over `translation_ru.text` | Reverse lookup: user types Russian, gets English candidates. |
 
 Autocomplete uses a prefix range scan on `headword.key` (`key >= ? AND key < ?||x'FFFF'`), ordered by `freq_rank`, not FTS. That is fast and works identically on both platforms.

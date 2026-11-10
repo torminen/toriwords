@@ -60,7 +60,8 @@ Because quality is uneven and outputs differ per OS, MT is never auto-accepted w
 | No dictionary hit, MT language data missing and offline | Saved with `enrichment_status = pending` and no translation; not reviewable until it has one (domain invariant). Retried when MT becomes available. |
 | No hit and MT failed/unavailable after retries | `enrichment_status = unavailable`; the user is told and can type a translation. |
 | Retry policy | On app foreground and after MT model download completes; give up after the dictionary is checked and MT returned nothing or errored 3 times. Deterministic per device, but per-device results can differ; stored values sync and settle it. |
-| Two devices enrich the same pending Entry offline | Both write Senses. Sync merge rules ([sync.md](sync.md)) resolve the field; the enrichment rule "fill only if empty" is evaluated locally, so a later device sees the field filled after sync and doesn't overwrite. |
+| Two devices enrich the same pending Entry offline | Automatic enrichment creates its Senses with **deterministic ids**: UUIDv5(entry id, `"auto"`, ordinal). Both devices therefore write the *same* Sense records, and per-field LWW ([sync.md](sync.md)) keeps one value per field instead of producing duplicate Senses. User-chosen Senses keep random UUIDv7 ids. "Fill only if empty" is evaluated locally, so a device that already sees the field filled after sync doesn't overwrite it. |
+| "Check translation" ([capture](../product/features/capture-share-selection.md) step 7) | Automatic enrichment sets a synced Entry flag `needs_check = true`. Opening the Entry or reviewing one of its Cards on any device sets it to `false` (LWW), so the filter clears everywhere after sync. |
 
 ## 5. Pronunciation (TTS)
 

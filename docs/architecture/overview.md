@@ -133,7 +133,7 @@ The owner confirms the recommendations collected in each document:
 | Local storage | [local-storage.md](local-storage.md) | GRDB (iOS), Room + bundled SQLite (Android), files for extensions |
 | Enrichment & dictionary | [enrichment.md](enrichment.md), [dictionary-data.md](dictionary-data.md) | Wiktionary primary, bundled (~25 MB), on-device MT fallback |
 | Capture & surfaces | [capture-and-extensions.md](capture-and-extensions.md) | Inbox pattern, snapshot widget, local reminders only |
-| Sync | [sync.md](sync.md) §13 | S1–S6: per-field LWW + HLC, deterministic IDs, derived Card state, delete wins, automatic merge, no push |
+| Sync | [sync.md](sync.md) §14 | S1–S6: per-field LWW + HLC, deterministic IDs, derived Card state, delete wins, automatic merge, no push |
 | Backend | [backend.md](backend.md) §8 | B1–B6: Kotlin/Ktor, PostgreSQL, VPS, hosting location after the reachability question, open-source choice |
 | Auth | [auth.md](auth.md) §10 | A1–A6: both providers on both platforms, opaque tokens, sign-out and deletion behaviour, cross-provider identity, no email |
 | Platform floors | this document §4 | iOS 26, Android minSdk 31 |

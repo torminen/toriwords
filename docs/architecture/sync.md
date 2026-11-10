@@ -112,7 +112,7 @@ Equal `(u, c)` means the same write; the values are equal by construction.
 
 **Who writes rank 1.** Any change caused directly by a user action: typing, picking a translation variant at capture, editing, excluding or resuming, tagging, reordering Senses, deleting. Everything else is rank 0: enrichment fills, `enrichment status`, Card creation, `mergedInto`, Device bookkeeping.
 
-**Consequence the owner must accept** (listed in §13): if the same field (e.g. the same Sense's translation) is edited on two devices offline, the later edit wins and the other is discarded without a prompt. With one user, this is rare and matches the product rule "never ask to pick a side".
+**Consequence the owner must accept** (listed in §14): if the same field (e.g. the same Sense's translation) is edited on two devices offline, the later edit wins and the other is discarded without a prompt. With one user, this is rare and matches the product rule "never ask to pick a side".
 
 ## 4. Decision S2: identifiers
 
@@ -162,6 +162,8 @@ Everything else (Entry, Sense, Context, Source without URL, Tag, ReviewLog, Devi
 - **Tombstones are kept for ever** (envelope only, about 100 bytes). Purging them would need "every device has seen it" tracking, and a device that was offline long enough would otherwise resurrect deleted words.
 - **Re-capturing a deleted word** creates a new Entry with a new ID and no history. Deleted Entries do not count for duplicate detection.
 
+- **Undo after delete** (PD-15): during the undo window the Entry is hidden locally, but no tombstone is written and nothing is pushed. When the window closes, or when the app goes to the background or is terminated, the tombstone is written in one transaction. A crash inside the window leaves the Entry not deleted, which is the safe failure.
+
 Rejected:
 - **LWW between delete and edit:** an edit made offline would resurrect a word the user deleted on purpose.
 - **Edit wins / un-delete:** the product has no trash and no undo (domain *Entry states*).
@@ -185,6 +187,7 @@ They are computed locally with the shared normalisation ([parity-testing.md](par
 | Sense | canonical Entry + `matchKey(translation)`. If the translation is empty: canonical Entry + `matchKey(definition)`. |
 | Context | canonical Entry + `normaliseSentence(sentence)` + canonical Source (or none) |
 | Tag | `matchKey(name)` |
+| Source without URL | `matchKey(title)` + app name (domain *Duplicates*) |
 | Source with URL, LanguagePair, Card, EntryTag | Deterministic ID (§4): no merge needed, because duplicates collapse into one record. |
 
 ### 7.3 Algorithm
@@ -209,6 +212,7 @@ It runs on every client after each pull is applied, and after a local edit that 
 - **Survivor already deleted:** deleted Entries do not take part. If device A deleted "mortgage" and device B captured it again offline, B's Entry stays as a new word (§6).
 - **Concurrent edit of the loser** after it was merged on another device: the edit lands on the loser's fields, and the loser stays hidden. Mitigation: when a client receives an edit to a merged record, it re-runs step 4 for that record, so the newer user value reaches the survivor through the same comparator. This is deterministic too.
 - **User-initiated merge** (text edit collision): the same algorithm, with the same survivor rule. The product shows one merged Entry. Which ID survives is invisible to the user.
+- **Sense order after a merge** (domain: "order follows the earlier-created entry"): display order is a derived sort key: `(sense.entry == canonical entry ? 0 : 1, position, id)`. The survivor's own Senses come first, then the merged-in ones, each group in its own order. Nothing is rewritten. A later user reorder writes new `position` values (rank 1) as usual.
 
 ## 8. Enrichment vs user edits across devices
 
@@ -217,6 +221,7 @@ The domain rules map directly onto per-field LWW with rank:
 - If enrichment on device B and a user edit on device A hit the same field concurrently, rank 1 wins regardless of clocks.
 - If enrichment on two devices fills the same field differently (iOS vs Android suggestions), the later clock wins. Both values are machine suggestions, which the domain model accepts.
 - Enrichment is idempotent. A device that receives an Entry with `enrichment = pending` and empty, rank-0 fields may run enrichment, and two devices doing so converge by LWW.
+- **`enrichment status = unavailable` is not final across devices.** A device that gains a source the other device lacked (a newer dictionary version, a downloaded MT model) may run enrichment again on `unavailable` Entries with empty rank-0 fields, and set `done` on success. The later write wins by LWW, as usual.
 - Field provenance for attribution (`wiktionary`, `on-device translation`, `user`) is an ordinary field written together with the value it describes. Same clock, same rank, so it can never disagree with its value after a merge.
 
 ## 9. Protocol
@@ -292,12 +297,29 @@ A first pull of the planning size (300k records) is about 60 MB of JSON, roughly
 | **Account deleted on another device** | The next request gets 410 `account_deleted`. Handled as in [auth.md](auth.md) §6. |
 | **Settings** | Scheduling-relevant settings (target retention, the parameter set, the daily new-card limit, and the day rollover if it ever becomes a setting) must be in the synced Settings record. Otherwise "same history → same due date" breaks across the user's own devices. Per-device settings (reminder time, UI language) stay local. Input to PD-16. |
 
-## 12. Possible later extensions (not v1)
+## 12. Backup file (JSON export / restore, PD-11/PD-12)
+
+**Recommendation:** the JSON backup is the user's records in the sync envelope format of §2.1, field clocks included, in a documented wrapper:
+
+```json
+{ "format": "toriwords-backup", "version": 1, "exportedAt": "…", "protocol": 1,
+  "records": [ { "id": "…", "type": "entry", "schema": 1, "fields": { … } }, … ] }
+```
+
+- **Restore = apply the records as if they were pulled** (§9.2), then run the duplicate merge (§7) and recompute derived state. Then:
+  - importing the same file twice changes nothing (same IDs, same clocks);
+  - review histories combine without doubling;
+  - restore on a signed-in device syncs like any other change.
+- **Tombstones are not exported.** Restoring onto an account that has since deleted some of these Entries does **not** bring them back, because deletion is terminal (§6). Product should mention this in the restore summary, for example "3 words were deleted earlier and were not restored".
+- **Newer-version backups:** unknown fields and types are preserved like in sync (§10). A file with a higher `protocol` major is refused with "Update the app".
+- The CSV export is a separate, lossy, human-oriented format. It is not a backup.
+
+## 13. Possible later extensions (not v1)
 
 - **Push-triggered sync** (silent APNs/FCM, or an SSE long-poll), so a second device updates in seconds. Needs push credentials on the backend.
 - **End-to-end encryption.** The server merges by clocks only, so field values could be encrypted on the client. The cost is cross-platform key management (Apple and Google keychains do not share keys), so it is out of scope for v1. It is not ruled out.
 
-## 13. Decisions to confirm (owner list)
+## 14. Decisions to confirm (owner list)
 
 | # | Proposal | Main alternative |
 |---|---|---|

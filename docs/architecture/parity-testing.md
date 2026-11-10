@@ -127,12 +127,15 @@ Required cases:
 | dotted-capital-i | `İstanbul` | pinned by fixture after both platforms are checked (Swift and Kotlin lowercasing may differ on U+0130). If they differ, both implement the fixture's value explicitly. |
 | ru-yo | `Ёлка` (ru) | `ёлка` or `елка`, per the product decision |
 
-### 4.2 Sentence key (`normalization/sentence.json`)
+### 4.2 Sentence, translation and tag keys (`normalization/sentence.json`, `normalization/tag.json`)
 
-Used for Context duplicates. Steps 1–3 and 5 of §4.1; **case and punctuation are kept**. Cases:
-- the same sentence with different quote styles is equal;
-- the same sentence with and without a trailing space is equal;
-- different capitalisation is **not** equal.
+- **Sentence key** (Context duplicates) and **translation key** (Sense duplicates): the same pipeline as the match key (§4.1), as the domain model specifies ("translations and sentences are compared with the same rules"). Cases:
+  - the same sentence with different quote styles is equal;
+  - the same sentence with and without trailing punctuation or space is equal;
+  - different capitalisation is equal;
+  - a different word in the middle is not equal.
+- **Tag key:** steps 1, 4 and 5 only (NFC, lowercase, whitespace). Tags keep their punctuation, so `C#` ≠ `C`.
+- **Source without URL:** `matchKey(title)` + the app name exactly as stored.
 
 ### 4.3 URL key (`normalization/url.json`)
 

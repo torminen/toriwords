@@ -173,7 +173,7 @@ Only id, entry, direction, created at and import ref are synced.
 
 **Invariants**
 - **Identity is Entry + direction.** Cards created independently for the same Entry and direction (for example on two devices) are the same Card.
-- A Card exists for every direction in the v1 set as soon as its Entry becomes reviewable. A `cloze` Card (if adopted) also needs at least one Context with a highlight.
+- A Card exists for every direction in the v1 set as soon as its Entry becomes reviewable. A `cloze` Card (P1) also needs at least one Context with a highlight.
 - A Card's due date and stage are a pure function of its ReviewLogs, the scheduling settings and the scheduler. The same history gives the same result on iOS and Android.
 - Excluding an Entry does not change its Cards' history. Deleting an Entry deletes its Cards.
 
@@ -208,7 +208,7 @@ Organisation is flat, many-to-many tags with no decks ([PD-3](proposed-decisions
 | id | Stable global identifier. |
 | name | Display name. |
 
-**Invariants (if adopted)**
+**Invariants**
 - An Entry can have any number of Tags. Deleting a Tag never deletes Entries.
 - Tags do not split review: there is one review queue for all active Entries.
 
@@ -285,15 +285,15 @@ Anki import is after v1. The model must be able to receive it without changes:
 | Anki | Toriwords |
 |---|---|
 | Note | Entry. The user maps note fields: which field is the word or phrase (`text`), which is the translation (Sense `translation`), and optionally which is an example (Context `sentence`) and the definition. Other fields go to `note`. |
-| Card | Card. A card generated in the "front → back" direction of the mapped fields becomes `recognition`; "back → front" becomes `recall`; a cloze note becomes `cloze` if PD-1 adopts it, otherwise `recognition`. Card types that do not map are not imported, and their notes are still imported as Entries. |
+| Card | Card. A card generated in the "front → back" direction of the mapped fields becomes `recognition`; "back → front" becomes `recall`; a cloze note becomes `cloze` (P1, PD-1), or `recognition` while cloze is not available. Card types that do not map are not imported, and their notes are still imported as Entries. |
 | Revlog entry | ReviewLog with the timestamp, rating (mapped, see below) and answer duration. Anki's review kind (learn / review / relearn / filtered / manual), rating 1–4 and interval are kept in the `original *` fields. |
-| Deck | Tag with the deck name (if PD-3 adopts Tags). |
+| Deck | Tag with the deck name (PD-3). |
 | Note tags | Tags. |
 | Suspended card | Entry `excluded` / `paused` when all its cards are suspended. |
 
 - **Re-import is idempotent.** Entries, Cards and ReviewLogs keep an `import ref` (collection + Anki note / card / revlog id). Importing the same collection twice, or on two devices, does not duplicate history.
 - **Not answers.** Anki revlog rows of kind manual / rescheduled are imported with an empty rating, kept for history and ignored by the scheduler (confirmed in [scheduler.md](../architecture/scheduler.md) §7.1). The scheduler never reads `original kind`.
 - **Rich text:** Anki fields are HTML. Import converts them to plain text, keeps line breaks, and drops formatting. Media (images, audio) is not imported in the first version of import. The user is told how many fields had media.
-- **Ratings:** Anki's buttons are the FSRS grades, so imported answers keep their 1–4 value one to one, whatever grading UI PD-2 adopts. Collapsing Hard/Easy into Good would lose scheduling information.
+- **Ratings:** Anki's buttons are the FSRS grades, so imported answers keep their 1–4 value one to one, even though Toriwords' own two-button grading (PD-2) produces only 1 or 3. Collapsing Hard/Easy into Good would lose scheduling information.
 - **Duplicates:** an imported note whose `text` matches an existing Entry merges into it (see *Duplicates*), and review histories are combined.
 - How imported history turns into scheduling state is defined in [scheduler.md](../architecture/scheduler.md).

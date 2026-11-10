@@ -29,8 +29,7 @@ Settings are short; the defaults are meant to be right for most people (X6). The
 - App version and a link to the open-source repository.
 - **Wiktionary attribution:** "Dictionary data from Wiktionary, available under CC BY-SA", with a link to the licence and the source. Entries whose data came from Wiktionary show a small "Wiktionary" mark on the entry screen, linking to the same attribution.
 - Licences of all bundled data and open-source libraries.
-- A short privacy statement: what is stored on the device and what syncs when signed in.
-- **Privacy: crash reports & anonymous analytics**, see [observability.md](../../architecture/observability.md). The owner wants both; what is collected, whether the user can opt out, and the wording here are pending until the owner confirms the mechanism.
+- A short **privacy** note: the vocabulary is stored on the device; when signed in it also syncs to the Toriwords server. The app collects no analytics or usage data and has no tracking or crash-reporting SDK ([memory://44](memory://44)). Only the crash and performance reports the OS itself provides exist, and they need no setting in the app.
 
 ## Edge cases
 

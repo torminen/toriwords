@@ -14,7 +14,7 @@
    - **English definition(s)** from Wiktionary for the selected meanings, if any. The definition is in English; translations are in Russian.
    - **IPA** pronunciation from Wiktionary, if any.
    - An optional **sentence** field (where the user met the word) and an optional **source** title (for example "The Bear S2E3"). When a sentence is present, its machine translation is shown as context help, not saved (PD-19).
-   - Tags (if PD-3 adopts them).
+   - Tags (PD-3).
 4. **Save** creates the entry with the chosen meanings. Each chosen variant becomes a separate meaning (Sense). Variants that were not chosen are discarded.
 5. Every field in the preview is editable before saving. A field the user edits is never changed by enrichment later.
 6. After saving, the screen confirms ("Saved") and clears for the next word, so several words can be added in a row. Related-word suggestions may appear ([topical suggestions](topical-suggestions.md)).
@@ -36,6 +36,6 @@
 ## Offline
 
 - Saving always works offline.
-- Autocomplete, Wiktionary translations, definitions and IPA work offline from first launch: the dictionary is bundled with the app ([dictionary-data.md](../../architecture/dictionary-data.md) §4; the owner still has to accept about 25 MB of extra app size).
+- Autocomplete, Wiktionary translations, definitions and IPA work offline from first launch: the dictionary is bundled with the app ([dictionary-data.md](../../architecture/dictionary-data.md) §4; about 25 MB of app size, accepted by the owner).
 - Machine translation works offline once the OS translation language data is on the device. Before that, the preview says the machine translation is unavailable ([first run](first-run.md) describes the download).
 - If no suggestions are available, the user can type a translation or save without one; the entry is enriched later ([saving without enrichment](enrichment-unavailable.md)).

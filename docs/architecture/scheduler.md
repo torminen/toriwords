@@ -32,13 +32,14 @@ FSRS ratings: `Again = 1`, `Hard = 2`, `Good = 3`, `Easy = 4`. The product gradi
 
 | Product scheme | Mapping |
 |---|---|
-| Two buttons (recommended by the analysis, I2): "Don't know" / "Know" | Again / Good. Hard and Easy are never produced; FSRS-6 works without them. |
+| Two buttons (PD-2 recommendation): "Forgot" / "Remembered" | Again / Good. Hard and Easy are never produced; FSRS-6 works without them. |
 | Four buttons (Anki-style) | One to one. |
 | Inferred from a typed answer (if a typing exercise is adopted) | Exact match → Good; accepted with a typo tolerance or after a hint → Hard; wrong or "show answer" → Again. The typo rule must itself be in the fixtures. |
 
 Rules:
 - The stored ReviewLog `rating` is always the **FSRS rating (1–4)**, whatever UI produced it. The UI scheme can then change later without migrating history.
-- An imported Anki log stores Anki's 1–4 as `original rating`; its FSRS rating is the same value (Anki's buttons are the FSRS buttons).
+- An imported Anki answer stores Anki's button 1–4 as its FSRS `rating` **one to one**, also under a two-button UI. Anki's buttons are the FSRS buttons, and collapsing Hard/Easy into Good would throw away scheduling information. `original rating` keeps the same value for display.
+- `rating` is **nullable only for imported rows that are not answers** (§7.1). Logs written by Toriwords always have a rating.
 
 ## 4. Time model: days, not minutes
 
@@ -55,6 +56,7 @@ Rules:
 - **Review day of a ReviewLog** = `dayNumber(reviewedAt, offsetAtReview)`. The domain model already stores the UTC offset with `reviewed at`. The review day is therefore fixed forever at write time and **replay never depends on the current time zone**.
 - **Today** = `dayNumber(now, current device offset)`.
 - **Time-zone change.** Nothing stored is rewritten. "Today" is computed with the new offset, so after flying east a card may become due a few hours earlier, and after flying west a little later. A day can look 20 or 28 hours long. The scheduler tolerates this: `elapsedDays` is computed from review days, never negative (clamped to ≥ 0).
+- **Wrong device clock.** `reviewedAt` comes from the device clock and is stored as given; nothing corrects it. Because elapsed days are clamped at 0 and replay sorts by `(reviewedAt, id)`, a clock set to the future only makes that one review count on a later day. A clock set to the past makes it sort earlier. Both outcomes are deterministic on every device after sync. The app may warn when the clock differs from the server time by more than a day at sync time ([sync.md](sync.md)), but the scheduler never depends on that.
 - **Due** is stored as a day number (`dueDay`). A Card is **due** when `dueDay ≤ today`. That definition is used everywhere: review queue, due count, widget, reminders ([capture-and-extensions.md](capture-and-extensions.md)).
 
 ## 5. FSRS-6 formulas
@@ -143,14 +145,28 @@ These values are recalled from the py-fsrs FSRS-6 defaults. **They must be check
 Cached fields: `stability`, `difficulty`, `lastReviewDay`, `dueDay`, `reps`, `lapses`, `stage`.
 
 **Replay:**
-1. Take the Card's ReviewLogs, sorted by `(reviewedAt, id)` ascending (id = UUIDv7 bytes, unsigned lexicographic, as a tie-breaker).
-2. Fold §5 over them, starting from "new". A log of review type `imported` is replayed like any other.
-3. The result replaces the cache.
+1. Take the ReviewLogs of the **canonical** Card. These are the logs of the Card itself plus those of every Card that merged into it ([sync.md](sync.md) §7.3). Sort them by `(reviewedAt, id)` ascending (id = UUIDv7 bytes, unsigned lexicographic, as a tie-breaker).
+2. **Skip logs with no `rating`** (§7.1).
+3. Fold §5 over the remaining logs, starting from "new". Imported answers are replayed like native ones; review type and elapsed days are derived here, never read from storage.
+4. The result replaces the cache. The fuzz seed (§9) uses the canonical Card id and the 1-based ordinal of the log among the non-skipped logs.
+
+### 7.1 Imported rows that are not answers
+
+Anki's revlog contains rows that record an action rather than an answer: **manual** rows (set due date, Forget/reset) and **rescheduled** rows. Anki stores them with button `0`.
+
+**Rule: they are imported for history with `rating = NULL` and the scheduler ignores them.** Their kind, interval and other details stay in the `original *` fields, which the scheduler never reads.
+
+| Option | For | Against |
+|---|---|---|
+| **(a) Ignore (recommended)** | One simple rule ("no rating → not an answer"); the scheduler stays independent of Anki's vocabulary; FSRS rebuilds the state from the real answers, which is how Anki's own FSRS treats these rows. | A user's manual "Forget" in Anki does not reset the Toriwords state. FSRS still sees the full answer history, which is arguably more accurate. |
+| (b) Treat a reset row as "start from new" | Mirrors the Anki state exactly. | The scheduler must read `original kind`, which ties it to Anki semantics; reset detection in Anki revlogs is heuristic. |
+
+Filtered-deck (cram) rows that have a button 1–4 **are** answers and are replayed.
 
 **When to replay:**
 - After a local review: apply one step incrementally (identical result to full replay, by construction).
 - After sync brings in ReviewLogs for a Card from another device that are **older** than the Card's newest local log: full replay of that Card. Concurrent offline reviews on two devices thus merge into one deterministic state ([sync.md](sync.md)).
-- After a parameter change, an Anki import, or an Entry merge that moves logs: full replay of affected Cards.
+- After a parameter change, an Anki import, or an Entry merge that changes a Card's canonical Card: full replay of the affected Cards.
 - Cost: replay is O(logs per card); even 100 logs × 20 000 cards is well under a second in native code.
 
 **Excluded Entries** keep their Cards and logs; the cache stays as is, and the Card simply isn't queued. On resume, the Card is due by its existing `dueDay` (probably overdue, which FSRS handles with the real elapsed time).
@@ -191,16 +207,50 @@ The domain model's `learning stage`:
 
 The 21-day threshold mirrors Anki's "mature" cut-off. It is a product-tunable constant, fixed in the fixtures.
 
-## 11. Daily load (inputs for product, I4)
+## 11. Daily queue and catch-up (PD-4)
 
-The scheduler only answers "which Cards are due". The queue rules are a product decision, but they must be deterministic for counts to match across devices:
+PD-4 and [review](../product/features/review.md) set the product rules. This section makes them exact, so that the home screen, widget and reminder show the **same numbers on every device with the same synced data**. Everything is computed from synced data (ReviewLogs, Cards, Entries, synced settings) plus `today`, and nothing about the queue is stored.
 
-- **New Cards per day:** a limit (product default, e.g. 10). The count of new Cards introduced today = Cards whose first ReviewLog has review day = today, **across all synced devices**.
-- **Review order:** due Cards sorted by `dueDay` ascending, then by retrievability ascending (most forgotten first), then by Card id. After a long break, FSRS needs no special "catch-up mode": overdue Cards keep their real elapsed time, and a product-level daily review cap (if any) only limits how many are shown today.
-- **Siblings:** if an Entry has several Cards (PD-1), the queue shows at most one of them per day unless the others are already overdue by more than their interval. (Proposed; product to confirm.)
+**Sets**, for today `T`, over canonical Cards of `active`, reviewable Entries:
+- **Started** Card: has at least one rated log before day `T`. **New** Card: no rated log before day `T`.
+- `reviewedToday` = Started Cards with at least one rated log on day `T`.
+- `waiting` = Started Cards with `dueDay ≤ T` and no rated log on day `T`.
+- `introducedToday` = Cards whose first rated log is on day `T`.
+
+**Normal load:**
+```
+activeDays = the last 14 distinct review days before T that have ≥ 1 rated log
+reviewsInActiveDays = number of (Card, day) pairs on those days where the Card was Started before that day
+normalLoad = activeDays empty ? 20 : max(20, ceil(reviewsInActiveDays / |activeDays|))
+```
+
+**Catch-up mode:**
+```
+load    = |waiting| + |reviewedToday|
+catchUp = load > 2 · normalLoad
+quota   = catchUp ? normalLoad + ceil((load − normalLoad) / 3) : ∞
+```
+- `normalLoad` depends only on days before `T`, and reviewing moves a Card from `waiting` to `reviewedToday`, so `load`, `catchUp` and `quota` stay constant while the user reviews. They change within a day only when sync brings in another device's logs, or when the user excludes or resumes Entries.
+- With an inflow of about `normalLoad` per day, the excess above `normalLoad` shrinks by about a third per day. Catch-up ends when `load ≤ 2 · normalLoad`. That takes about 6 days for a backlog of 13 normal days, and longer for larger backlogs. This is how "spread over up to 7 days" is implemented. The product text should say "about a week".
+- "Most at-risk first" means the order below.
+
+**Today's queue:**
+1. **Reviews:** `waiting` Cards in order: retrievability `R(T − lastReviewDay, S)` ascending, then `dueDay` ascending, then Card id. Take the first `max(0, quota − |reviewedToday|)` of them.
+2. **New Cards:** `0` in catch-up mode. Otherwise `max(0, newLimit − |introducedToday|)` New Cards, ordered by Entry creation time, then direction (`recognition` before `recall` before `cloze`), then Card id.
+3. **Siblings:** walking the combined list (reviews first, then new), skip a Card if another Card of the same Entry has a rated log on day `T` or was already taken earlier in the walk. Skipped Cards stay due and come first by order on a later day.
+4. **Same-day re-shows:** Cards answered Forgot today have `dueDay = T` and are re-shown within the session (§5.5). They are in `reviewedToday` and are not limited by the quota.
+
+**Numbers shown:**
+- **"Due today"** (home, widget, reminder) = reviews taken in step 1 after the sibling rule + new Cards taken in step 2 after the sibling rule.
+- In catch-up, the home screen also shows `|waiting|` as "N waiting".
+- **"Next due"**, when nothing is due today, is a **day**, not a time: the smallest `dueDay > T` ("tomorrow", or a date). Scheduling is day-based, so there is no exact time.
+- **"Review all now"** and **"Learn more new words"** are session-only overrides: they extend the current session's list and store nothing. Answers made through them are ordinary ReviewLogs, and they count in `reviewedToday` and `introducedToday` from then on.
+
+All of the above goes into the queue fixtures ([parity-testing.md](parity-testing.md)).
 
 ## 12. Open questions
 
 - **Q-S1 (product, PD-2):** two-button grading assumed as the default mapping. Four buttons are also supported without changes here.
-- **Q-S2 (product):** is desired retention user-visible? Recommendation: no.
+- **Q-S2 (product):** is desired retention user-visible? Recommendation: no. It is still a synced setting (PD-16), so a later UI can expose it.
 - **Q-S3 (owner):** after v1, should a signed-in user get per-user parameters from a backend optimiser (§6 option b)?
+- **Q-S4 (product, PD-16):** the review-day start is a **constant 04:00** here and in [sync.md](sync.md). The domain model and PD-16 list a synced "review-day start hour" setting. Recommendation: drop the setting in v1.

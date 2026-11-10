@@ -22,12 +22,29 @@ Screenshot OCR and desktop/browser extensions are **out of v1** (owner decision)
 ## 2. Common capture flow (both platforms)
 
 1. Receive text (and URL/title when the OS provides them).
-2. **Classify:** if the text is ≤ 6 words (constant, in fixtures), treat it as the term. If longer, treat it as a **sentence**: show it tokenised and let the user tap a word or drag over a phrase to choose the term. The sentence becomes the Context, and the chosen span becomes the highlight.
-3. **Dictionary lookup** ([enrichment.md](enrichment.md) §2): show senses and RU variants; the user picks one or more, or edits.
-4. **Save:** creates or merges the Entry by match key (domain *Duplicates*), its Senses, a Context (if a sentence exists) and a Source (if a URL or title exists).
-5. Dismiss. Total target: ≤ 2 s from share to saved for a dictionary hit.
+2. **Clean** the text ([capture](../product/features/capture-share-selection.md) edge cases):
+   - Remove `<…>` tags and `[…]` / `(…)` annotations made only of letters and spaces (subtitle markup such as `[music]`).
+   - Remove a leading speaker label: up to 3 words followed by `:` at the start of a line.
+   - Turn line breaks into spaces and collapse whitespace.
+   - Keep only the first **5,000** characters for picking.
+3. **Classify:** the text is a **term** if it has ≤ 6 words (whitespace-separated tokens after cleaning) **and** does not end with `.`, `!`, `?` or `…`. Otherwise it is a **sentence source**: it is shown as tappable word chips, and the user taps one word or several adjacent words to choose the term.
+   - Text without any Latin letter can't be saved (Save stays disabled; the user can edit the text).
+4. **Sentence extraction** (sentence sources only): keep the one sentence that contains the chosen span.
+   - Sentence boundaries: `.`, `!`, `?` or `…`, optionally followed by closing quotes or brackets, then whitespace. A line break in the original text also counts.
+   - If that sentence is longer than **500** characters, cut it to 500 characters around the chosen span, at word boundaries, and mark the cuts with `…`.
+   - The chosen span becomes the highlight (UTF-16 offset and length within the stored sentence).
+5. **Dictionary lookup** ([enrichment.md](enrichment.md) §2): show senses and RU variants; the user picks one or more, or edits. **This is available on both platforms, including the iOS Share Extension**, because it reads only the bundled dictionary file (§3).
+6. **Save:** creates or merges the Entry by match key (domain *Duplicates*), its Senses, a Context (if a sentence exists) and a Source (if a URL or title exists).
+7. Dismiss. Total target: ≤ 2 s from share to saved for a dictionary hit.
 
-Duplicates: if the match key already exists, the sheet says "Already in your words" and offers "Add this sentence as an example" instead of creating a new Entry (product to confirm in its duplicates feature).
+Duplicates: if the match key already exists, the sheet says "Already in your vocabulary" and saves the new sentence and source onto the existing Entry ([duplicates](../product/features/duplicates.md)). On iOS the extension checks this against the **vocabulary index file** (§3); the app import re-checks against the DB, so a stale index never creates a duplicate.
+
+The cleaning, word count, classification, sentence boundaries and the 500-character cut are deterministic text rules. They go into the shared fixtures ([parity-testing.md](parity-testing.md)) so both platforms save the same Context for the same shared text.
+
+**Sticky capture fields:** the last used source title and tags are offered again for 30 minutes ([capture](../product/features/capture-share-selection.md), [organisation](../product/features/organisation.md)).
+- They are kept in a small local-only file in the App Group (iOS), read and written by both the extension and the app, last writer wins.
+- On Android they are kept in DataStore.
+- They are not synced.
 
 ## 3. iOS Share Extension: inbox pattern
 
@@ -39,6 +56,10 @@ Duplicates: if the match key already exists, the sheet says "Already in your wor
 **Design:**
 - The extension UI is SwiftUI, with no MT, no sync, and no access to `user.sqlite` ([local-storage.md](local-storage.md) §6).
 - It opens `AppGroup/dictionary.sqlite` read-only and immutable, for lookup and autocomplete. Memory is a few MB with a small SQLite cache.
+- **Vocabulary index:** for duplicate detection, the app writes `AppGroup/vocab-index.json` after every change that adds, renames or deletes Entries.
+  - Content: `{format, generatedAt, entries: [[matchKey, entryId, primaryTranslation], …]}`, sorted by match key.
+  - Size: about 50 bytes per Entry, so ~0.5 MB for 10,000 Entries.
+  - It is written atomically (temp file then rename). The extension only reads it.
 - On Save it writes **one JSON file** atomically, as `AppGroup/inbox/<captureId>.json`, using the write-to-temp-then-rename pattern.
 - It posts a Darwin notification (`com.toriwords.inbox.changed`) so that a running app imports immediately.
 - **App side:** on launch, on foreground, and on the Darwin notification, the app imports every inbox file in `captureId` order. Each import runs in one transaction that also records the file in the `inbox_import` table, and the file is deleted only after the transaction commits.
@@ -87,18 +108,18 @@ Duplicates: if the match key already exists, the sheet says "Already in your wor
 
 ## 5. Due-count widget
 
-**Definition of the number** (identical on both platforms, from [scheduler.md](scheduler.md) §4 and §11):
-- `dueReviews(day)` = active Cards with `due_day ≤ day` and at least one ReviewLog.
-- `newAvailable(day)` = `min(newLimit − newIntroducedOn(day), unreviewed reviewable Cards)`.
-- Whether the widget shows `dueReviews` only or `dueReviews + newAvailable` is a product choice. Recommendation: show both as "12 to review · 5 new".
+**Definition of the number:** "Due today" from [scheduler.md](scheduler.md) §11: reviews within today's quota (the catch-up share when in catch-up mode) plus today's new Cards, after the sibling rule. The same number is shown on the home screen, in the widget and in the reminder.
+- Whether the widget shows the two parts separately ("12 to review · 5 new") is a product detail.
+- When nothing is due, the widget shows the **next due day** ("Next: tomorrow"), not a time; scheduling is day-based.
 
 **Snapshot file.** The app writes it after every change: review, capture import, sync apply, settings change, and day rollover while running.
 ```json
 { "format": 1, "generatedAt": 1762790400000, "utcOffsetMin": 180,
   "days": [ { "day": 20402, "dueReviews": 12, "newAvailable": 5 },
-            { "day": 20403, "dueReviews": 19, "newAvailable": 10 } /* … 7 days */ ] }
+            { "day": 20403, "dueReviews": 19, "newAvailable": 10 } /* … 7 days */ ],
+  "nextDueDay": 20402 }
 ```
-- Counts for future days assume no further reviews, which is correct until the user reviews, and reviewing rewrites the snapshot.
+- Counts for future days apply the [scheduler.md](scheduler.md) §11 rules to that day, assuming no further reviews. That is correct until the user reviews, and reviewing rewrites the snapshot.
 - The widget picks the entry for `today` computed with the current offset. If the snapshot is older than 7 days, it shows "Open Toriwords".
 
 | | iOS (WidgetKit) | Android (Jetpack Glance) |
@@ -149,7 +170,5 @@ No streak pressure or nagging copy in reminders (X4, X11). Live Activities and L
 
 ## 9. Open questions
 
-- **Q-C1 (product):** the ≤ 6-word threshold between "term" and "sentence" in the capture sheet.
-- **Q-C2 (product):** the widget number: reviews only, or reviews + new.
-- **Q-C3 (product):** whether reminders are on by default (recommendation: off, offered after the first review session).
-- **Q-C4 (spike):** Safari JS preprocessing, to capture the surrounding sentence on iOS.
+- **Q-C1 (product):** the iOS Share Extension shows dictionary variants in the sheet (§3). The product capture doc currently says it saves only raw captures; aligning that is a cross-review finding.
+- **Q-C2 (spike):** Safari JS preprocessing, to capture the surrounding sentence on iOS.

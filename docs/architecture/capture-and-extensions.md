@@ -55,7 +55,7 @@ Duplicates: if the match key already exists, the sheet says "Already in your wor
   "languagePair": { "native": "ru", "target": "en" },
   "term": "take off",
   "sentence": "The plane took off an hour late.",
-  "highlight": { "start": 10, "end": 18 },
+  "highlight": { "offset": 10, "length": 8 },
   "source": { "url": "https://…", "title": "…" },
   "chosenSenses": [
     { "translation": "взлетать", "definition": "To leave the ground…", "pos": "verb",
@@ -64,7 +64,7 @@ Duplicates: if the match key already exists, the sheet says "Already in your wor
   "origin": "shared"
 }
 ```
-- Highlight offsets are code points on NFC text ([local-storage.md](local-storage.md) §8.4).
+- Highlight offset and length are UTF-16 code units, as in the domain model ([local-storage.md](local-storage.md) §8.4).
 - An unknown `format` is left in the inbox untouched. That only happens if the app is older than the extension, which can't happen within one installed bundle; the check is defensive.
 
 **Why not let the extension write the DB:** see [local-storage.md](local-storage.md) §6. In short: `0xDEAD10CC` lock kills, no cross-process observation, and migration ownership.

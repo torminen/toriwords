@@ -25,7 +25,7 @@ Behaviour that must be identical across platforms is pinned by **language-neutra
 | Field comparator and envelope merge | iOS, Android, backend | `merge/` |
 | Sync scenarios: duplicates, deletes, enrichment vs user | iOS, Android | `sync/` |
 | Scheduler: replay of ReviewLogs → state, due, stage | iOS, Android | `scheduler/` (case format owned by [scheduler.md](scheduler.md)) |
-| Day boundary: "today" from instant + offset + rollover hour | iOS, Android | `scheduler/day-boundary.json` |
+| Day boundary: "today" from instant + offset (rollover 04:00) | iOS, Android | `scheduler/day-boundary.json` |
 
 Not covered, because these differ by design (analysis §8.7): suggested translations, TTS voices, and UI layout.
 
@@ -185,10 +185,12 @@ Input: two envelopes of the same record. Expected: the merged envelope. Cases:
 ## 7. Scheduler conventions (`scheduler/`)
 
 The case format, parameters and algorithm are defined in [scheduler.md](scheduler.md). This document fixes only the conventions every scheduler fixture follows:
-- **Input:** Settings (target retention, day-rollover hour, parameters, scheduler version) and a list of ReviewLogs `{id, reviewedAt, utcOffsetMinutes, rating, kind?}` in arbitrary order. The runner sorts them by `(reviewedAt, id)`, so sort order is tested too.
+- **Input:** Settings (target retention, parameter set, scheduler version) and a list of ReviewLogs `{id, reviewedAt, utcOffsetMinutes, rating, kind?}` in arbitrary order. The runner sorts them by `(reviewedAt, id)`, so sort order is tested too.
 - **Expected after each log and at the end:** stage, `due` (instant), interval in days. These are user-visible values and must match **exactly**. Internal floating-point state (e.g. stability, difficulty) is compared with a relative tolerance of `1e-9`, because Swift and Kotlin may call different `exp`/`pow` implementations that differ in the last bit.
 - **Rounding** of floating-point values into user-visible integers is specified in [scheduler.md](scheduler.md) and must be robust to that last-bit difference. Fixtures include values near rounding boundaries.
-- **`day-boundary.json`:** `(instant, utcOffsetMinutes, rolloverHour)` → local review day. Cases:
+- **Fuzz** is seeded from the Card ID and the review count ([scheduler.md](scheduler.md) §9). After an Entry merge, the seed uses the **canonical** Card ID ([sync.md](sync.md) §7.3), so merged history replays identically everywhere.
+- **Generator:** expected values are produced by `tools/fixtures/` (a dev tool, not app code). It wraps the pinned reference FSRS-6 implementation (py-fsrs or fsrs-rs, [scheduler.md](scheduler.md) §2) with the Toriwords rules: whole days, `dayNumber`, deterministic fuzz, stage thresholds. Generated files are committed. A regenerated file that differs from the committed one fails CI until the change is reviewed.
+- **`day-boundary.json`:** `(instant, utcOffsetMinutes)` → review day, per the `dayNumber` formula in [scheduler.md](scheduler.md) §4 (rollover at 04:00 local). Cases:
   - just before and just after the rollover hour;
   - offset changes across days (travel);
   - DST transitions;

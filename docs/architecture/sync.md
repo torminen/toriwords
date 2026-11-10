@@ -143,13 +143,13 @@ Everything else (Entry, Sense, Context, Source without URL, Tag, ReviewLog, Devi
 **Recommendation: derived.** Synced Card fields are only `entry`, `direction` and `createdAt`. Each client caches the scheduler state (`due`, stage, and the scheduler's own variables) in **local-only columns**. It updates them:
 - **Incrementally** when the user answers on this device (one scheduler step).
 - **By full replay of that Card** when a pull brings ReviewLogs for it, when a merge (§7) changes its canonical Card, or when its Entry is resumed.
-- **By full rebuild** of all Cards when the scheduler version, target retention, day-rollover hour or scheduler parameters change. These settings are synced, so every device rebuilds the same way.
+- **By full rebuild** of all Cards when the scheduler version, target retention or the parameter set changes. These settings are synced, so every device rebuilds the same way. The day rollover is a constant (04:00) in v1 ([scheduler.md](scheduler.md) §4); if it ever becomes a setting, it must sync too.
 
 **Replay contract** (the details belong to [scheduler.md](scheduler.md)):
 - The input is the Card's canonical ReviewLogs sorted by `(reviewedAt, id)` and the synced Settings.
 - Each ReviewLog carries `reviewedAt` as a UTC instant in milliseconds **plus the UTC offset in minutes at the time of the answer**. "Which day was this" is therefore fixed by the log itself, not by the replaying device's time zone.
 - Derived values per log (elapsed time, review type) are recomputed during replay, never read from storage.
-- Imported logs that are not answers (Anki manual/reschedule rows) are skipped by the replay.
+- How imported logs are replayed (including Anki rows that are not answers, such as manual reschedules) is defined in [scheduler.md](scheduler.md) §7.
 
 ## 6. Decision S4: deletion
 
@@ -252,7 +252,7 @@ sequenceDiagram
   - a periodic background task (`BGAppRefreshTask` / WorkManager), best effort.
 
   There is no server push in v1. A second device sees changes when it next syncs.
-- **Extensions** (Share Extension, widgets) never call the network. They write to the shared local store through the same write path (HLC + outbox). The app pushes later ([capture-and-extensions.md](capture-and-extensions.md)).
+- **Extensions** never call the network and never write synced records. The iOS Share Extension drops a capture file into the App Group inbox. The app imports it through the normal write path (HLC + outbox) and pushes later. Widgets only read a snapshot file ([capture-and-extensions.md](capture-and-extensions.md) §3, §5). The HLC state therefore lives only in the app's store.
 - **Failures:**
   - Network errors back off exponentially, up to 15 min, while the app is open.
   - On 401, refresh the token ([auth.md](auth.md)).
@@ -290,7 +290,7 @@ A first pull of the planning size (300k records) is about 60 MB of JSON, roughly
 | **New device / reinstall** | New Device ID. The local store is empty except the auto-created LanguagePair (deterministic ID) and Settings. Then a full pull. |
 | **Sign-out** | Depends on the owner decision in [auth.md](auth.md) §7: keep the data as local-only (recommended), or remove it from the device. The cursor and tokens are discarded either way. |
 | **Account deleted on another device** | The next request gets 410 `account_deleted`. Handled as in [auth.md](auth.md) §6. |
-| **Settings** | Scheduling-relevant settings (target retention, day-rollover hour, daily new-card limit) must be in the synced Settings record. Otherwise "same history → same due date" breaks across the user's own devices. Per-device settings (reminder time, UI language) stay local. Input to PD-16. |
+| **Settings** | Scheduling-relevant settings (target retention, the parameter set, the daily new-card limit, and the day rollover if it ever becomes a setting) must be in the synced Settings record. Otherwise "same history → same due date" breaks across the user's own devices. Per-device settings (reminder time, UI language) stay local. Input to PD-16. |
 
 ## 12. Possible later extensions (not v1)
 

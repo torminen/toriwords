@@ -38,25 +38,31 @@ Inputs: [domain-model.md](../product/domain-model.md). Related: [scheduler.md](s
 
 ## 4. Logical schema of `user.sqlite`
 
-Draft, based on the domain model. Column names are normative once confirmed. Sync metadata columns are placeholders until [sync.md](sync.md) fixes the clock and granularity.
+Draft, based on the domain model. Column names are normative once confirmed. Sync metadata follows [sync.md](sync.md) (per-field LWW with HLC).
 
 Conventions:
 - `id`: UUIDv7, stored as 16-byte `BLOB`.
 - Instants: `INTEGER` Unix milliseconds UTC. Offsets: `INTEGER` minutes.
 - Enums: `TEXT` with the exact spellings below.
-- Every synced table has the sync columns: `updated_at_hlc TEXT NOT NULL`, `deleted INTEGER NOT NULL DEFAULT 0` (tombstone), `dirty INTEGER NOT NULL DEFAULT 1` (local change not yet uploaded). Final names and semantics: [sync.md](sync.md).
+- Every synced table has the sync columns ([sync.md](sync.md) §2.1, §3):
+  - `field_clocks TEXT NOT NULL`: JSON map of field name → `{c, u}` (HLC string, author rank).
+  - `deleted INTEGER NOT NULL DEFAULT 0`: terminal tombstone.
+  - `merged_into BLOB NULL`: terminal redirect to a surviving duplicate.
+  - `extra TEXT NULL`: JSON with fields this app version does not know, kept with their clocks and sent back unchanged.
+- Local-only, non-synced columns: `canonical_id BLOB` on `entry`, `sense`, `context`, `tag` (resolved `merged_into` chain, indexed), and on child tables `canonical_entry_id`. They are recomputed after every pull ([sync.md](sync.md) §7.3).
+- Local-only tables: `pending_changes(record_id, type, field)` (the outbox, appended in the same transaction as each write), `sync_state(key, value)` (cursor, HLC state `{ms, counter}`, account ID).
 
 | Table | Columns (besides sync columns) | Notes |
 |---|---|---|
 | `language_pair` | `id`, `native_lang` (BCP-47, `ru`), `target_lang` (`en`), `created_at` | One row in v1. |
 | `entry` | `id`, `language_pair_id`, `text`, `match_key`, `ipa`, `note`, `status` (`active`/`excluded`), `excluded_reason` (`known`/`paused`/NULL), `enrichment_status` (`pending`/`done`/`unavailable`), `origin` (`typed`/`shared`/`text_selection`/`imported`), `created_at`, `updated_at` | `kind` is derived from `text`, not stored. Index on `(language_pair_id, match_key)` — **not UNIQUE** (§8). |
-| `sense` | `id`, `entry_id`, `translation`, `definition`, `part_of_speech`, `position` (REAL, fractional index), `translation_src`, `definition_src`, `pos_src` (`user`/`wiktionary`/`mt_apple`/`mt_mlkit`), `user_edited_mask` (INTEGER bit set), `dict_version`, `dict_headword_key`, `dict_sense_ordinal` | `position` as fractional index so concurrent reorders merge per row. |
-| `source` | `id`, `kind` (`web`/`app`/`other`), `url`, `url_key` (normalised URL), `title`, `app` | Index on `url_key` (not UNIQUE, §8). |
-| `context` | `id`, `entry_id`, `sense_id` NULL, `sentence`, `highlight_start`, `highlight_end` (code-point offsets on NFC text, §8.4), `source_id` NULL, `captured_at` | |
-| `card` | `id`, `entry_id`, `direction`, cache: `stability` REAL, `difficulty` REAL, `last_review_day` INTEGER, `due_day` INTEGER, `reps`, `lapses`, `stage`, `params_id` | Cache columns are **not synced**; recomputed locally ([scheduler.md](scheduler.md) §7). Index on `(due_day)` where active. |
-| `review_log` | `id`, `card_id`, `reviewed_at`, `utc_offset_min`, `review_day` (derived at write, stored for queries), `rating` (1–4 FSRS), `review_type`, `answer_ms`, `device_id`, `original_rating` NULL | Append-only: no UPDATE. Removed only by Entry deletion. |
-| `tag`, `entry_tag` | `tag`: `id`, `name`, `name_key`; `entry_tag`: `id`, `entry_id`, `tag_id` | Pending PD-3. Join rows have their own id so add/remove syncs as row tombstones. |
-| `preference` | `key`, `value` (JSON), sync columns | Which keys sync is pending PD-16; non-synced keys go to platform settings (UserDefaults / DataStore). |
+| `sense` | `id`, `entry_id`, `translation`, `definition`, `part_of_speech`, `position` (REAL, fractional index), `translation_src`, `definition_src`, `pos_src` (`user`/`wiktionary`/`mt_apple`/`mt_mlkit`), `dict_version`, `dict_headword_key`, `dict_sense_ordinal` | `position` as fractional index so concurrent reorders merge per field; ties broken by id. "User has edited this field" is the field's author rank `u = 1` in `field_clocks`; there is no separate mask. |
+| `source` | `id` (UUIDv5 of `url_key` when a URL exists, else UUIDv7), `kind` (`web`/`app`/`other`), `url`, `url_key` (normalised URL), `title`, `app` | Deterministic id makes same-URL Sources collapse ([sync.md](sync.md) §4). |
+| `context` | `id`, `entry_id`, `sense_id` NULL, `sentence`, `highlight_offset`, `highlight_length` (UTF-16 code units, as in the domain model; §8.4), `source_id` NULL, `captured_at` | |
+| `card` | `id` (deterministic UUIDv5 of entry + direction, [sync.md](sync.md) §4), `entry_id`, `direction`, `import_ref`, cache: `stability` REAL, `difficulty` REAL, `last_review_day` INTEGER, `due_day` INTEGER, `reps`, `lapses`, `stage`, `params_id` | Cache columns are **not synced**; recomputed locally ([scheduler.md](scheduler.md) §7). Index on `(due_day)` where active. |
+| `review_log` | `id`, `card_id`, `reviewed_at`, `utc_offset_min`, `rating` (1–4 FSRS), `answer_ms`, `device_id`, `original_rating` NULL, `import_ref` NULL; local-only derived: `review_day`, `review_type`, `canonical_card_id` | Append-only: synced columns are never updated. Removed only by Entry deletion. |
+| `tag`, `entry_tag` | `tag`: `id`, `name`, `name_key`; `entry_tag`: `id` (deterministic UUIDv5 of entry + tag), `entry_id`, `tag_id`, `present` | Pending PD-3. Add/remove flips `present` (LWW), so re-tagging after un-tagging works; no tombstones on links ([sync.md](sync.md) §4). |
+| `settings` | one row, id = UUIDv5 `settings`; one column per synced setting, sync columns | Synced settings are the fields of one record, merged per field ([sync.md](sync.md) §4). Which settings sync: PD-16. Non-synced settings go to platform settings (UserDefaults / DataStore). |
 | `device` | `id`, `platform`, `display_name`, `first_seen` | This device's row is created on first run. |
 | `inbox_import` | `inbox_id`, `imported_at` | Local only. Makes share-extension import idempotent ([capture-and-extensions.md](capture-and-extensions.md)). |
 | `schema_meta` | `version` | Local only. |
@@ -70,7 +76,7 @@ Conventions:
 - Each app keeps an ordered list of numbered, forward-only migrations (`GRDB DatabaseMigrator` / Room `Migration` objects). `schema_meta.version` is identical across platforms for the same logical schema; a migration that changes the logical schema bumps it on both.
 - Migrations run at app start, **only in the main app process**, before any UI or sync.
 - Additive changes (new nullable column, new table) are the norm. Renames and drops go through "add new, copy, stop reading old, drop in a later release".
-- The sync protocol carries the schema version, so an older app never receives fields it can't store without loss; unknown fields are preserved server-side ([sync.md](sync.md)). No change ever requires a full re-upload (I7).
+- Records carry a per-type schema version. An older app stores fields it does not know in `extra` and sends them back unchanged, so it never erases data written by a newer app. Unknown record types are skipped and later backfilled download-only ([sync.md](sync.md) §10). No change ever requires a full re-upload (I7).
 - Migration tests: each platform has a fixture DB per historical version and checks it migrates to the current one with identical logical content (same fixture inputs on both platforms, [parity-testing.md](parity-testing.md)).
 
 ## 6. Sharing with extensions and widgets
@@ -111,9 +117,9 @@ A user-visible manual export/import file (JSON/CSV, A5) is a product decision; i
 ## 8. Domain-model issues relevant to storage (to raise with product_writer and sync)
 
 1. **Unique match key can't be a DB constraint.** "At most one non-deleted Entry per match key" can't be enforced by a UNIQUE index, because sync legitimately delivers a second Entry with the same key from another device. The storage keeps a plain index and the **merge procedure** runs after each sync batch and on local edits. Same applies to Source by URL and Tag by name.
-2. **Merging conflicts with "ReviewLog is never edited".** The domain says the loser's ReviewLogs "belong to the surviving Entry's Card". Re-pointing `review_log.card_id` is an edit. Options for [sync.md](sync.md): (a) keep logs immutable and add a `card.merged_into` redirect, with replay collecting logs of the Card and all Cards redirected to it; (b) allow exactly one mutation, the card reference, by the merge procedure; (c) make Card ids deterministic, e.g. UUIDv5(entry id, direction), and the merge choose the surviving Entry deterministically (e.g. lowest id) so both devices converge. Recommendation: (a) + deterministic survivor = lowest Entry id. Needs agreement with sync.md.
+2. **(Resolved in [sync.md](sync.md) §4, §7: deterministic Card IDs + smallest-ID survivor + local canonical-ID columns; ReviewLogs are never rewritten.)** **Merging conflicts with "ReviewLog is never edited".** The domain says the loser's ReviewLogs "belong to the surviving Entry's Card". Re-pointing `review_log.card_id` is an edit. Options for [sync.md](sync.md): (a) keep logs immutable and add a `card.merged_into` redirect, with replay collecting logs of the Card and all Cards redirected to it; (b) allow exactly one mutation, the card reference, by the merge procedure; (c) make Card ids deterministic, e.g. UUIDv5(entry id, direction), and the merge choose the surviving Entry deterministically (e.g. lowest id) so both devices converge. Recommendation: (a) + deterministic survivor = lowest Entry id. Needs agreement with sync.md.
 3. **`elapsed since previous review` should not be stored as truth.** After two devices' concurrent logs merge, the stored value from one device is wrong relative to the merged order. Recommendation: derive it during replay from review days; keep it out of the stored schema, or store it as informational only.
-4. **Highlight offsets need a unit.** "Position of the occurrence in the sentence" must be specified as Unicode scalar (code point) offsets on NFC text, since Swift `String` and Kotlin `String` index differently (grapheme clusters vs UTF-16). Recommendation: code-point offsets, in fixtures.
+4. **Highlight offsets need a unit.** Swift `String` and Kotlin `String` index differently (grapheme clusters vs UTF-16). **Resolved:** the domain model fixes offset + length in UTF-16 code units (Kotlin native; Swift via `String.utf16` / `NSRange`).
 5. **Sense `order` under concurrent edits.** Integer positions collide when two devices reorder or add Senses offline. Recommendation: fractional index (`REAL` or string key) with id tie-break.
 6. **`updated at` on Entry vs sync clock.** The user-visible `updated at` and the sync clock should be separate fields; the domain model already treats sync versioning as a placeholder, which is fine.
 7. **Entry `kind` is derived.** Not stored, to avoid drift with `text` (same in the domain model; just confirming).

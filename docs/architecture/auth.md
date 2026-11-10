@@ -163,7 +163,7 @@ The problem: a person signs in with Apple on the iPhone and with Google on the A
 
 No names, no emails. The App Store privacy label is "Data linked to you: user content, identifiers", used only for app functionality.
 
-Anonymous crash reports and usage statistics are separate and never linked to the account ([observability.md](observability.md)). They add "Data not linked to you: diagnostics, usage data".
+The apps collect no analytics or crash data in v1 ([observability.md](observability.md), [memory://44](memory://44)), so the label has nothing else.
 
 ## 10. Owner decisions
 

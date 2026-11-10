@@ -1,26 +1,60 @@
-# Observability: crash reports and anonymous usage statistics
+# Observability: crash reports and usage statistics
 
-Status: **Proposed**. The owner asked for crash reports and anonymous analytics in v1. This document proposes how, and lists the owner questions in §9.
+Status: **Confirmed** (owner, 2026-11-10): **no analytics and no crash-reporting SDK in v1** ([decision](memory://44)). §2 below is a proposal kept for later. It is not in v1 and needs an owner decision.
 
 Related:
-- Decisions: [local-first with own backend](memory://8), [open source, no secrets in clients](memory://12), [project goals](memory://10).
-- Architecture: [backend.md](backend.md) (endpoint, hosting), [auth.md](auth.md) §9 (privacy label), [local-storage.md](local-storage.md), [parity-testing.md](parity-testing.md).
+- Decisions: [no analytics in the MVP](memory://44), [local-first with own backend](memory://8), [open source, no secrets in clients](memory://12), [v1 scope](memory://15).
+- Architecture: [backend.md](backend.md), [auth.md](auth.md) §9 (privacy label).
 
-## 1. Constraints
+## 1. v1 position
+
+**What v1 does not have:**
+- The apps send **no usage data and no crash reports** of their own.
+- No analytics SDK, no crash SDK (no Sentry, no Crashlytics).
+- No telemetry endpoint on the backend.
+- No DSN or ingest key in the repository or in release CI.
+- No local telemetry tables.
+
+**Where crash and performance visibility comes from:** only what the platforms provide without app code.
+
+| Platform | Source | Coverage |
+|---|---|---|
+| iOS | App Store Connect / Xcode Organizer: crash reports, hangs, energy and launch metrics (MetricKit-based aggregates) | Only users who allowed "Share with App Developers" in iOS settings; delayed by about a day. TestFlight builds report crashes and feedback too. |
+| Android | Google Play Console → Android vitals: crash and ANR rates, stack traces (deobfuscated with the R8 mapping uploaded at release) | Only users who allowed usage & diagnostics on the device; delayed. |
+
+**Release process requirements** (no app code involved):
+- Archive the dSYMs with each iOS build (Xcode does this by default).
+- Upload the R8 `mapping.txt` with each Play release. Otherwise Play stack traces stay obfuscated.
+
+**Consequences:**
+- Settings has no privacy or analytics switches; no consent prompt is needed.
+- Store labels:
+  - App Store: only "Data linked to you: user content, identifiers", for app functionality and only for signed-in users ([auth.md](auth.md) §9).
+  - Play Data safety: the same.
+- Product questions like retention, capture-method use or dictionary hit rate cannot be measured in v1. Owner feedback and store reviews are the only sources.
+
+## 2. Later (not in v1, needs owner decision)
+
+This was the architect's proposal for v1. The owner deferred it ([memory://44](memory://44)). It is kept so it can be picked up without redoing the analysis. If revived, it would add:
+- `POST /v1/telemetry/daily` to [backend.md](backend.md);
+- Settings switches, which are product scope;
+- a local `telemetry_reports` table, which is [local-storage.md](local-storage.md) scope.
+
+### L1. Constraints
 
 | # | Constraint | Consequence |
 |---|---|---|
 | C1 | Open-source clients, no secrets ([memory://12](memory://12)). | Only public ingest keys may be embedded (e.g. a Sentry DSN). This is acceptable only if the worst abuse is bounded: quota exhaustion or junk data, never cost overruns or data access. |
 | C2 | Local-first ([memory://8](memory://8)). | Reports are queued on the device and sent opportunistically. They never block start-up, capture, review or sync. If the queue fails, data is dropped silently. |
 | C3 | No account needed. | Reports carry no account ID, Device ID or provider subject, even when the user is signed in. |
-| C4 | **No install ID** (this proposal). | Nothing ties two reports from one device together. Retention is measured with counters computed on the device (§4.2) instead. |
+| C4 | **No install ID** (this proposal). | Nothing ties two reports from one device together. Retention is measured with counters computed on the device (§L4.2) instead. |
 | C5 | **The user's vocabulary never leaves the device through telemetry.** | No words, translations, contexts, source titles or URLs. No screenshots, view hierarchies or session replay. Breadcrumbs hold only screen names. |
 | C6 | User control. | Settings → Privacy has two switches: "Send crash reports" and "Send anonymous usage statistics". Turning a switch off deletes its queue immediately. |
-| C7 | Parity. | Both apps send the same statistics report (§4), checked by fixtures. Crash reporting is platform-native by nature; only its configuration must match. |
-| C8 | Hosting abroad (EU, [backend.md](backend.md) §4.1). | GDPR applies (§6). |
+| C7 | Parity. | Both apps send the same statistics report (§L4), checked by fixtures. Crash reporting is platform-native by nature; only its configuration must match. |
+| C8 | Hosting abroad (EU, [backend.md](backend.md) §L4.1). | GDPR applies (§L6). |
 | C9 | Forks and dev builds. | The DSN and the statistics endpoint are injected only by the official release CI. Debug builds and forks have them empty, so both switches are hidden and nothing is sent. |
 
-## 2. Crash reporting: options
+### L2. Crash reporting: options
 
 | | (a) MetricKit + Play vitals only | (b) Sentry SaaS (EU region) | (c) Sentry-compatible self-hosted | (d) Firebase Crashlytics | (e) Own endpoint on our backend |
 |---|---|---|---|---|---|
@@ -28,35 +62,35 @@ Related:
 | Coverage | Only users who allowed sharing diagnostics with developers at OS level (iOS opt-in, Android usage & diagnostics). Partial and delayed (~1 day). | Every user with the switch on. | Same as (b). | Same as (b). | Same as (b). |
 | Client code | None (MetricKit optional). | SDK (`sentry-cocoa`, `sentry-android`, MIT). | Same as (b). | Firebase SDK + `GoogleService-Info.plist` / `google-services.json` in the public repo. | Native crash capture is hard to write correctly. Use MetricKit on iOS and `ApplicationExitInfo` + an uncaught-exception handler on Android. |
 | Symbolication | Done by Apple and Google. | Upload dSYMs and R8 mappings from CI; the auth token lives in CI secrets only. | Sentry self-hosted: full support. GlitchTip (light, open source): native symbolication is limited (`not verified`). | Automatic. | We would build dSYM (`atos`) and R8 retrace pipelines ourselves. |
-| Identifiers | None. | Auto session tracking adds a random installation ID; **we turn it off** (§5). | Same as (b). | Firebase Installation ID, always present. Conflicts with C3/C4. | None. |
+| Identifiers | None. | Auto session tracking adds a random installation ID; **we turn it off** (§L5). | Same as (b). | Firebase Installation ID, always present. Conflicts with C3/C4. | None. |
 | Third party sees | Apple, Google (already the platform). | Sentry (US company, data stored in Frankfurt): stack traces, device model, OS, IP (not stored when configured). | Nobody. | Google. | Nobody. |
 | Cost | Free. | Free developer tier (≈5k errors/month, `not verified` for Nov 2026). Paid on-demand budget set to 0, so abuse can only exhaust the quota. | Sentry self-hosted needs ~16 GB RAM and ~20 containers: far above our VPS. GlitchTip fits a 2–4 GB VPS. | Free. | Days of work, then ongoing maintenance. |
 | Abuse of the public key (C1) | n/a | DSN is public by design; rate limits, spike protection and a zero overage budget bound it. | Our own rate limits. | API key is public by design; bounded by Firebase. | Our own rate limits. |
 
-## 3. Usage statistics: options
+### L3. Usage statistics: options
 
 | | (a) Self-hosted PostHog / Plausible-like | (b) TelemetryDeck (SaaS) | (c) Own minimal endpoint on our backend |
 |---|---|---|---|
-| Model | Event stream with a distinct ID (PostHog); page-view model (Plausible, web-first). | Signals with a hashed per-install user ID by default. Swift SDK first-class, Kotlin SDK available. | **One aggregated report per device per day**, with no ID (§4). |
+| Model | Event stream with a distinct ID (PostHog); page-view model (Plausible, web-first). | Signals with a hashed per-install user ID by default. Swift SDK first-class, Kotlin SDK available. | **One aggregated report per device per day**, with no ID (§L4). |
 | Hosting | PostHog self-hosted needs ClickHouse, Kafka and Redis: 8 GB+ RAM. Plausible needs ClickHouse, ~2 GB. Both are larger than the app backend itself. | EU company and hosting. Free tier ≈100k signals/month (`not verified` for Nov 2026). | Same Ktor service and Postgres; one table. |
 | Identifiers | Distinct ID per install (can be randomised per session). | Hashed install ID (salted). | None. |
 | Analysis | Funnels, paths, dashboards. | Dashboards and funnels. | SQL views; a simple dashboard (e.g. Metabase or Grafana) later if wanted. |
-| Parity | Two SDKs, same event names by convention. | Two SDKs, same signal names by convention. | One JSON schema plus fixtures (§4.3). |
+| Parity | Two SDKs, same event names by convention. | Two SDKs, same signal names by convention. | One JSON schema plus fixtures (§L4.3). |
 | Third party sees | Nobody. | TelemetryDeck. | Nobody. |
 | Fits "no identifiers" (C3, C4) | Only with effort. | Partly (pseudonymous ID). | Yes. |
 
-## 4. Recommendation
+### L4. Proposed design (deferred)
 
 **Crash reports: (b) Sentry SaaS, EU region**, configured as in §5, plus (a) MetricKit / Play vitals as a free, always-on baseline. Symbolicated, grouped crashes from both platforms are the main value, and building that ourselves (e) costs more than the rest of observability together. Crashlytics is rejected because of the Firebase Installation ID and a Google SDK in a privacy-first open-source app. Exit path: if the owner prefers no third party, GlitchTip self-hosted with the same SDKs, after checking its iOS and Android symbolication (`not verified`).
 
 **Usage statistics: (c) own minimal endpoint**, `POST /v1/telemetry/daily`.
 - It needs no third party, no identifiers and no extra infrastructure.
 - It has one schema for both apps, so parity is testable.
-- The questions v1 needs (§4.1) are answerable from daily aggregates. Funnels and per-user paths are deliberately out of scope.
+- The questions v1 needs (§L4.1) are answerable from daily aggregates. Funnels and per-user paths are deliberately out of scope.
 
-### 4.1 Questions the statistics answer
+#### L4.1 Questions the statistics answer
 
-| # | Question | Fields (§4.2) |
+| # | Question | Fields (§L4.2) |
 |---|---|---|
 | Q1 | Do people keep using the app after 1, 4, 12 weeks? | `cohortWeek`, `activeDays7`, `activeDays28` |
 | Q2 | How do words get in: share/selection capture, manual add, import? | `added.*` |
@@ -67,7 +101,7 @@ Related:
 | Q7 | Which OS and app versions are in use (to plan minimum OS)? | `platform`, `osMajor`, `appVersion` |
 | Q8 | How often does the app crash (crash-free days)? | `crashedRuns` |
 
-### 4.2 The daily report (v1)
+#### L4.2 The daily report
 
 The app counts locally during the review day (the same 04:00 boundary as the scheduler, [scheduler.md](scheduler.md) §4). When a day is over, at the next launch, it builds one report for that day.
 
@@ -115,7 +149,7 @@ Rules:
 - Abuse is bounded by a 10-requests-per-minute limit per IP (counted in memory, never stored), a 7-report batch maximum and a 16 KB body limit. The worst case is skewed statistics, which can be filtered out.
 - Rows are kept 25 months, then deleted.
 
-### 4.3 Parity
+#### L4.3 Parity
 
 `spec/fixtures/telemetry/` holds:
 - the JSON schema;
@@ -123,13 +157,13 @@ Rules:
 
 Both apps compute the report from the same domain events, so it is tested like the rest of the domain core ([parity-testing.md](parity-testing.md)).
 
-## 5. Sentry configuration (both platforms)
+### L5. Sentry configuration (both platforms)
 
 | Setting | Value | Why |
 |---|---|---|
 | Region | EU (`*.de.sentry.io`) | Data stays in the EU (C8). |
 | `sendDefaultPii` | false; server option "Prevent storing of IP addresses" on | C3 |
-| User / installation ID | none; auto session tracking **off** (it creates a random installation ID) | C4. Crash-free rate comes from `crashedRuns` (§4.2) instead. |
+| User / installation ID | none; auto session tracking **off** (it creates a random installation ID) | C4. Crash-free rate comes from `crashedRuns` (§L4.2) instead. |
 | Attachments, screenshots, view hierarchy, session replay | off | C5 |
 | Breadcrumbs | navigation (screen names) and sync state only; no UI text, no network URLs with query strings | C5 |
 | `beforeSend` | strips exception messages that could contain user text (e.g. SQLite errors with values); keeps the type and stack | C5 |
@@ -139,14 +173,14 @@ Both apps compute the report from the same domain events, so it is tested like t
 
 Both apps share this table; a CI check compares the two configuration files against it.
 
-## 6. Consent default and privacy labels
+### L6. Consent default and privacy labels
 
-**Default: on (opt-out) or off (opt-in)?** This is owner question O1.
+**Default: on (opt-out) or off (opt-in)?** This is former option O1.
 
 | | Opt-out (on by default, disclosed on first run and in Settings) | Opt-in (off until the user turns it on) |
 |---|---|---|
 | Data volume | Most users. | Typically a small minority opts in. Statistics are biased towards engaged users. |
-| GDPR / ePrivacy (EU hosting, EU users) | Statistics (§4.2) have no identifier and coarse buckets, which arguably makes them non-personal data. Crash reports pass through Sentry with an IP address (not stored) and device details, so they rely on legitimate interest plus an easy opt-out. Storing counters on the device for statistics may need consent under ePrivacy art. 5(3) in some readings. **`not verified`: this is not legal advice.** | Clearly compliant. |
+| GDPR / ePrivacy (EU hosting, EU users) | Statistics (§L4.2) have no identifier and coarse buckets, which arguably makes them non-personal data. Crash reports pass through Sentry with an IP address (not stored) and device details, so they rely on legitimate interest plus an easy opt-out. Storing counters on the device for statistics may need consent under ePrivacy art. 5(3) in some readings. **`not verified`: this is not legal advice.** | Clearly compliant. |
 | Store review | Both stores accept opt-out for diagnostics not linked to the user. | Same. |
 
 **Recommendation:** split the two switches:
@@ -167,26 +201,16 @@ Both apps share this table; a CI check compares the two configuration files agai
 
 **Privacy policy** (needed anyway for sign-in): lists Sentry as processor and the statistics fields above.
 
-## 7. Effect on other documents
-
-- [backend.md](backend.md):
-  - §1: the backend also receives anonymous daily statistics;
-  - §5: the new endpoint;
-  - "Without an account the app never contacts the backend" becomes "… except anonymous statistics (if on) and dictionary data".
-- [auth.md](auth.md) §9: the privacy label adds diagnostics and usage data, not linked.
-- [local-storage.md](local-storage.md) (architect_2): one local-only table `telemetry_reports` and the day counters. They are not synced and not in backups.
-- Product spec (product_writer): Settings → Privacy with the two switches, the first-run notice, and the open question in [README](../product/README.md) Q3 (currently "none").
-
-## 8. Later (not v1)
-
-- Performance metrics (launch time, hangs) from MetricKit / `ApplicationExitInfo` added to the daily report.
-- A dashboard on top of the statistics table.
-- Feedback with an attached diagnostic bundle, sent only on explicit user action.
-
-## 9. Owner decisions
+### L7. Options the owner would choose between
 
 | # | Question | Recommendation | Alternatives |
 |---|---|---|---|
-| O1 | Default for crash reports and statistics | Both on by default (opt-out), two switches in Settings, notice on first run | Statistics opt-in, crashes opt-out; both opt-in |
-| O2 | Crash reports via a third party | Sentry SaaS, EU region, free tier, no IDs, no user content | Self-hosted GlitchTip (needs a larger VPS, symbolication `not verified`); MetricKit + Play vitals only (no third party, partial coverage) |
-| O3 | Statistics granularity | One anonymous daily aggregate per device, no install ID: no funnels or per-user paths | TelemetryDeck (hashed install ID, funnels; third party) |
+| L-O1 | Default for crash reports and statistics | Both on by default (opt-out), two switches in Settings, notice on first run | Statistics opt-in, crashes opt-out; both opt-in |
+| L-O2 | Crash reports via a third party | Sentry SaaS, EU region, free tier, no IDs, no user content | Self-hosted GlitchTip (needs a larger VPS, symbolication `not verified`); MetricKit + Play vitals only (no third party, partial coverage) |
+| L-O3 | Statistics granularity | One anonymous daily aggregate per device, no install ID: no funnels or per-user paths | TelemetryDeck (hashed install ID, funnels; third party) |
+
+### L8. Further extensions
+
+- Performance metrics (launch time, hangs) from MetricKit / `ApplicationExitInfo` added to the daily report (if it exists).
+- A dashboard on top of the statistics table.
+- Feedback with an attached diagnostic bundle, sent only on explicit user action.

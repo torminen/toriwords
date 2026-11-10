@@ -12,15 +12,14 @@ The backend is deliberately small:
 1. **Sync store.** It stores the user's records and merges them generically: per-field LWW, tombstones and redirects ([sync.md](sync.md) §3, §6, §7, §9.3). It never reads field values.
 2. **Accounts.** Sign in with Apple and Google, sessions, account deletion ([auth.md](auth.md)).
 3. **Static distribution** (optional). Dictionary data packs and their manifest, if [dictionary-data.md](dictionary-data.md) chooses download over bundling.
-4. **Anonymous usage statistics.** One write-only endpoint that stores daily aggregate reports without identifiers ([observability.md](observability.md) §4). Crash reports go to Sentry, not to this backend.
 
 **Not the backend's job:**
 - Vocabulary rules: normalisation, duplicate detection, scheduling. These run on the clients only ([sync.md](sync.md) §1).
 - Translation or LLM proxying. Enrichment is on-device or from bundled data; no paid APIs (owner input).
 - Push notifications: reminders are local ([capture-and-extensions.md](capture-and-extensions.md)).
-- Tracking, user-level analytics, or crash storage ([observability.md](observability.md)).
+- Analytics, telemetry or crash reports: none in v1 ([observability.md](observability.md), [memory://44](memory://44)).
 
-Without an account, the app contacts the backend only for anonymous statistics (if the switch is on) and an optional anonymous download of dictionary data.
+Without an account, the app never contacts the backend, except for an optional anonymous download of dictionary data.
 
 ## 2. Decision B1: language and framework
 
@@ -85,7 +84,7 @@ The owner's answer: **sync must work abroad** (outside Russia). Reachability fro
 
 **Recommendation:**
 - **Region:** EU, Germany or Finland.
-  - GDPR is a well-understood regime for the privacy policy ([observability.md](observability.md) §6).
+  - GDPR is a well-understood regime for the privacy policy.
   - Latency to the rest of Europe is low.
   - Latency to Apple and Google endpoints is good.
 - **Provider class:** a European developer VPS provider with hourly billing, snapshots and an API. Default: **Hetzner Cloud**, an ARM or x86 instance with 2 vCPU and 4 GB RAM, about €5–10/month (`not verified` for Nov 2026 prices). Equivalent alternatives: Scaleway, OVHcloud, netcup.
@@ -121,7 +120,6 @@ Base: `https://<api-host>/v1`. JSON, gzip/brotli. Every request carries `Toriwor
 | `GET /account` | Linked identities, device sessions, record count, storage used. | For the account screen |
 | `POST /sync/push` | `{deviceId, records: [envelope…]}` → `{acked: [id…]}` | [sync.md](sync.md) §9; ≤ 500 records / 2 MB |
 | `GET /sync/pull?since=<cursor>&limit=<n>[&types=a,b]` | → `{records: […], cursor, hasMore}` | `types` is used for the download-only backfill ([sync.md](sync.md) §10) |
-| `POST /telemetry/daily` | Anonymous daily statistics reports: `{reports: [...]}`, at most 7. | **No auth**; no IP or user agent stored; 16 KB body limit; [observability.md](observability.md) §4.2 |
 | `GET /data/manifest.json` | Dictionary data versions, sizes, SHA-256 hashes, URLs. | Only if download is chosen. No auth. |
 
 **Errors.** Body: `{ "error": "<code>", "message": "…" }`.
@@ -138,8 +136,7 @@ Base: `https://<api-host>/v1`. JSON, gzip/brotli. Every request carries `Toriwor
 **Limits** (generous for one person, to stop abuse of a public endpoint):
 - 1M records per user;
 - 60 push requests per minute per user;
-- 10 sign-in attempts per minute per IP;
-- 10 statistics requests per minute per IP. Counted in memory, never stored.
+- 10 sign-in attempts per minute per IP.
 
 ## 6. Dictionary data distribution
 

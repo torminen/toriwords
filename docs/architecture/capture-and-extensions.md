@@ -27,7 +27,7 @@ Screenshot OCR and desktop/browser extensions are **out of v1** (owner decision)
    - Remove a leading speaker label: up to 3 words followed by `:` at the start of a line.
    - Turn line breaks into spaces and collapse whitespace.
    - Keep only the first **5,000** characters for picking.
-3. **Classify:** the text is a **term** if it has ≤ 6 words (whitespace-separated tokens after cleaning) **and** does not end with `.`, `!`, `?` or `…`. Otherwise it is a **sentence source**: it is shown as tappable word chips, and the user taps one word or several adjacent words to choose the term.
+3. **Classify:** the text is a **sentence source** if it has **more than 6 words** (whitespace-separated tokens after cleaning) **or** ends with `.`, `!`, `?` or `…` (optionally followed by closing quotes or brackets). Otherwise it is a **term**. A sentence source is shown as tappable word chips, and the user taps one word or several adjacent words to choose the term.
    - Text without any Latin letter can't be saved (Save stays disabled; the user can edit the text).
 4. **Sentence extraction** (sentence sources only): keep the one sentence that contains the chosen span.
    - Sentence boundaries: `.`, `!`, `?` or `…`, optionally followed by closing quotes or brackets, then whitespace. A line break in the original text also counts.
@@ -108,8 +108,10 @@ The cleaning, word count, classification, sentence boundaries and the 500-charac
 
 ## 5. Due-count widget
 
-**Definition of the number:** "Due today" from [scheduler.md](scheduler.md) §11: reviews within today's quota (the catch-up share when in catch-up mode) plus today's new Cards, after the sibling rule. The same number is shown on the home screen, in the widget and in the reminder.
-- Whether the widget shows the two parts separately ("12 to review · 5 new") is a product detail.
+**Definition of the number:** "Due today" from [scheduler.md](scheduler.md) §11, shown as two parts: **"12 to review · 5 new"** (PD-7).
+- `dueReviews` = the reviews taken for today. **In catch-up mode it is today's capped share (the quota), never the whole backlog.**
+- `newAvailable` = today's new Cards (0 in catch-up mode), after the sibling rule.
+- The same numbers are shown on the home screen, in the widget and in the reminder.
 - When nothing is due, the widget shows the **next due day** ("Next: tomorrow"), not a time; scheduling is day-based.
 
 **Snapshot file.** The app writes it after every change: review, capture import, sync apply, settings change, and day rollover while running.
@@ -170,5 +172,6 @@ No streak pressure or nagging copy in reminders (X4, X11). Live Activities and L
 
 ## 9. Open questions
 
-- **Q-C1 (product):** the iOS Share Extension shows dictionary variants in the sheet (§3). The product capture doc currently says it saves only raw captures; aligning that is a cross-review finding.
+- **Q-C1 (product):** the iOS Share Extension shows dictionary variants in the sheet (§3). Raised in the cross-review for the product capture doc.
+- Widget number format: **closed**, "12 to review · 5 new" (PD-7).
 - **Q-C2 (spike):** Safari JS preprocessing, to capture the surrounding sentence on iOS.

@@ -69,6 +69,7 @@ The word or phrase the user is learning. It is the unit the user sees in the voc
 | status | `active` or `excluded`. See *Entry states*. |
 | excluded reason | When `excluded`: `already known` or `paused`. |
 | enrichment status | `pending`, `done` or `unavailable`. See *Enrichment*. |
+| needs check | `true` when the app filled the translation automatically without the user choosing it (for example a pending capture enriched later). Cleared when the user opens the Entry or reviews it once. Drives the "Check translation" filter ([capture](features/capture-share-selection.md)). |
 | origin | How it was created: `typed`, `shared`, `text selection`, or later `imported`. |
 | import ref | Optional, for future imports: source collection + source item id (for example an Anki note id). |
 | created at / updated at | Display timestamps. |
@@ -215,7 +216,7 @@ The organisation shape is *pending* ([PD-3](proposed-decisions.md#pd-3-organisat
 |---|---|---|
 | User | id; linked sign-in identities (provider `apple` or `google` + provider's account id); created at | Exists only after the person signs in. Without a User the app works fully, with all data on the device ([account & sync](features/account-sync.md)). |
 | Device | id; platform (`ios` / `android`); display name; first seen | One installation of the app. It exists from first run, signed in or not. |
-| Preferences | daily new-word limit, review-day start hour, target retention (if the scheduler exposes it), reminder time, UI language override | Settings ([settings & about](features/settings-about.md)). Settings that affect scheduling are synced; device-only ones are not (*pending* [PD-16](proposed-decisions.md#pd-16-which-settings-sync)). |
+| Preferences | daily new-word limit, scheduler parameter set (incl. desired retention, not user-visible in v1), reminder time, pronunciation accent and auto-play, UI language override | Settings ([settings & about](features/settings-about.md)). Settings that affect scheduling are synced; device-only ones are not (*pending* [PD-16](proposed-decisions.md#pd-16-which-settings-sync)). The review day starts at 04:00 local time; this is a constant, not a setting ([scheduler.md](../architecture/scheduler.md) §4). |
 
 **Invariants**
 - Data created before sign-in belongs to the User after sign-in, and is merged with that User's existing data (see *Duplicates*).
@@ -231,7 +232,7 @@ The same item can be created more than once: on two devices offline, before and 
 | Entry | LanguagePair + match key | `text` → match key |
 | Card | Entry + direction | — |
 | Sense | Entry + translation (or definition, if the translation is empty) | translation / definition text |
-| Source | URL; if there is no URL: title + app | URL; title |
+| Source | URL; if there is no URL: title + app | URL (URL rules); title (match-key rules) |
 | Context | Entry + sentence + Source | sentence text |
 | Tag | name | name: case and surrounding/repeated whitespace ignored |
 | Entry ↔ Tag membership | Entry + Tag | — |
@@ -239,7 +240,8 @@ The same item can be created more than once: on two devices offline, before and 
 - **Normalisation.** The exact rules are fixed by shared fixtures in [parity-testing.md](../architecture/parity-testing.md), so iOS and Android produce identical keys. The product intent for the Entry match key:
   - Ignored: letter case, leading and trailing whitespace and punctuation, repeated inner spaces, typographic variants of apostrophes, quotes and dashes ("don't" = "don’t").
   - Not ignored: inflection ("ran" ≠ "run"), spelling variants ("colour" ≠ "color"), articles that are part of the text ("the" in "the Bear").
-  - Translations and sentences are compared with the same rules.
+  - Russian text (Sense translations, Russian search): `ё` and `е` are treated as equal (recommended, *pending* [PD-18](proposed-decisions.md#pd-18-ё-and-е-in-russian-text)). The text is displayed as typed.
+  - Sentences (Context key) use the sentence rules: spaces and quote styles are ignored, but **case and punctuation are kept**.
 - Because match keys are derived, a future change of the normalisation rules rebuilds them on each device and may then merge Entries that became equal.
 - **Repeat capture:** saving text whose natural key matches an existing Entry never creates a second Entry. The new Context is attached to the existing Entry, and a new translation becomes a new Sense only if it is not already there. Details: [duplicates](features/duplicates.md).
 - **Editing:** if the user edits an Entry's `text` so that its match key equals another Entry's, the app offers to merge the two. They cannot coexist.

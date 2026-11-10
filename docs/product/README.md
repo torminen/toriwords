@@ -9,7 +9,7 @@ Toriwords is a native iOS and Android app for building a personal vocabulary of 
 | Document | Contents |
 |---|---|
 | [domain-model.md](domain-model.md) | Concepts (Entry, Sense, Context, Source, Card, ReviewLog, …), fields, states, invariants, duplicates, sync requirements, future Anki mapping |
-| [proposed-decisions.md](proposed-decisions.md) | Every product choice that needs owner confirmation (PD-1 … PD-17) |
+| [proposed-decisions.md](proposed-decisions.md) | Every product choice that needs owner confirmation (PD-1 … PD-19), mapped to the architecture owner questions |
 | [features/](features/) | One file per feature: behaviour, edge cases, offline behaviour, priority |
 | [`../architecture/`](../architecture/) | How it is built (architect) |
 
@@ -90,9 +90,10 @@ Cross-cutting rules that apply to every feature:
 
 ## Open questions for the owner
 
-Besides PD-1 … PD-17:
+Besides PD-1 … PD-19:
 1. Which phone(s) does the owner use, with which device language (§11 Q12)? This affects PD-10 and the translation download prompt.
 2. Where does the owner watch series and read articles (§11 Q13)? This decides when OCR capture returns to the roadmap.
 3. Should the app collect any usage analytics or crash reports? The spec currently assumes **none** beyond what the OS stores provide by default.
 4. Should a review answer be undoable ("Undo last answer" in a review session)? Not in the spec yet; it interacts with immutable review history ([domain-model.md](domain-model.md#reviewlog)).
-5. When the user types Russian in the add-word field, should the app offer English candidates (see [add word](features/add-word.md#edge-cases))? The spec proposes yes.
+5. *(Moved to [PD-19](proposed-decisions.md#pd-19-capture-time-help).)*
+6. Where will the owner use sync (in Russia or abroad)? Hosting location decides whether sync is reachable ([backend.md](../architecture/backend.md) §4.1). The app works offline either way.

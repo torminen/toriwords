@@ -9,7 +9,7 @@
 - After saving a word, and on every entry screen, a **Related words** row shows up to 8 related English words and phrases: synonyms, related and derived terms, and common phrases containing the word ("mortgage" → "mortgage rate", "remortgage", "loan").
 - Each suggestion shows its primary Russian translation and has **Add** (one tap, saves with that translation and enrichment as usual) and a tap to preview.
 - Words already in the vocabulary are marked and are not offered for adding.
-- The user can dismiss a suggestion. It is not shown again for that entry.
+- The user can dismiss a suggestion. It stays hidden for the rest of the session on that device; dismissals are not saved or synced in v1.
 - The same word gives the same suggestions on iOS and Android.
 
 ## Edge cases

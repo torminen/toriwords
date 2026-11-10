@@ -14,9 +14,9 @@
 - Only local notifications computed on the device. No push server.
 
 **Widget**
-- Home-screen widget showing "12 to review · 5 new" (due reviews and new words still available today), or the next due time when nothing is due. Tapping opens review.
+- Home-screen widget showing "12 to review · 5 new" (due reviews and new words still available today), or the day of the next review when nothing is due ("Next review: tomorrow"; never a time). Tapping opens review.
 - Lock-screen variant where the OS supports it.
-- The count updates after reviewing, after sync, and at day start.
+- The count is the same "Due today" number as on the home screen ([scheduler.md](../../architecture/scheduler.md#11-daily-queue-and-catch-up-pd-4)). It updates after reviewing, after sync, and at day start.
 
 ## Edge cases
 

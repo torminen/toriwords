@@ -94,6 +94,6 @@ Besides PD-1 … PD-19:
 1. Which phone(s) does the owner use, with which device language (§11 Q12)? This affects PD-10 and the translation download prompt.
 2. Where does the owner watch series and read articles (§11 Q13)? This decides when OCR capture returns to the roadmap.
 3. Should the app collect any usage analytics or crash reports? The spec currently assumes **none** beyond what the OS stores provide by default.
-4. Should a review answer be undoable ("Undo last answer" in a review session)? Not in the spec yet; it interacts with immutable review history ([domain-model.md](domain-model.md#reviewlog)).
+4. Should a review answer be undoable ("Undo last answer" in a review session)? Not in the spec yet. It is feasible only before the answer is written: the last answer stays on the device, unrecorded, until the next answer or the end of the session, and undo discards it. Once recorded and synced it cannot be undone, because review history is immutable ([domain-model.md](domain-model.md#reviewlog)).
 5. *(Moved to [PD-19](proposed-decisions.md#pd-19-capture-time-help).)*
 6. Where will the owner use sync (in Russia or abroad)? Hosting location decides whether sync is reachable ([backend.md](../architecture/backend.md) §4.1). The app works offline either way.

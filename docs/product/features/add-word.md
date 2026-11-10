@@ -30,7 +30,7 @@
 - **Different suggestions on iOS and Android:** acceptable (owner input 3). What the user saves is what syncs.
 - **Russian typed in the field:** the app offers English candidates for the Russian text from the dictionary ("how do I say …"). Picking one continues as usual. If there are none, it says "Type the English word or phrase". *Pending [PD-19](../proposed-decisions.md#pd-19-capture-time-help).*
 - **Text with only spaces or punctuation:** Save is disabled.
-- **Very long text** (over 100 characters): the app warns that it looks like a sentence and offers to save it as the sentence instead and pick the word inside it, as in [capture](capture-share-selection.md).
+- **Text that looks like a sentence:** the same rule as in capture (more than 6 words, or ending with sentence punctuation; exact rule in [capture-and-extensions.md](../../architecture/capture-and-extensions.md) §2). The app offers to save it as the sentence and pick the word or phrase inside it, as in [capture](capture-share-selection.md).
 - **Leaving the screen with unsaved input:** the app asks whether to discard it.
 
 ## Offline

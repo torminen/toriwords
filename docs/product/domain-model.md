@@ -184,7 +184,7 @@ One answer to one Card. ReviewLogs are the history of learning and the basis for
 | id | Stable global identifier. |
 | card | The Card that was answered. |
 | reviewed at | Moment of the answer as a UTC instant, plus the device's UTC offset at that moment (needed for "today" in stats and daily limits). |
-| rating | The grade in the v1 grading scheme (*pending*, [PD-2](proposed-decisions.md#pd-2-grading)). |
+| rating | The FSRS grade 1–4 (Again, Hard, Good, Easy), whatever UI produced it. Under two-button grading ([PD-2](proposed-decisions.md#pd-2-grading), *pending*) Toriwords produces 1 or 3. Imported answers keep their 1–4 value. Empty only for imported rows that are not answers ([scheduler.md](../architecture/scheduler.md) §3, §7.1). |
 | answer duration | How long the user took to answer. |
 | device | The Device the answer was given on. |
 | import ref | Optional, only for imported logs: source collection + source log id. |
@@ -256,11 +256,11 @@ Enrichment fills an Entry's empty fields from Wiktionary or on-device translatio
 
 - **Fills only empty fields.** Enrichment never overwrites a field that has a value.
 - **User edits win forever.** A field the user has edited is never changed by enrichment again, even if the user later empties it.
-- **Idempotent.** Enrichment may run again at any time, on any device. If an enriched value was lost in a sync conflict with a user edit of another field, a later run fills the empty, non-user-edited fields again. The user sees no difference.
+- **Idempotent.** Enrichment may run again at any time, on any device. Automatic enrichment on two devices of the same Entry produces the same meanings, not duplicates ([enrichment.md](../architecture/enrichment.md) §4). If an enriched value was lost in a sync conflict with a user edit of another field, a later run fills the empty, non-user-edited fields again. The user sees no difference.
 - **Status:**
   - `pending`: captured without enrichment yet (for example saved from the share extension or while translation was unavailable); the app retries automatically.
   - `done`: enrichment ran.
-  - `unavailable`: nothing was found or the source is unavailable and retries have stopped; the user is told and can type a translation.
+  - `unavailable`: no source on this device produced a value. The user is told and can type a translation. It is retried automatically when a new source becomes available on any device (machine translation data downloaded, dictionary updated); see [sync.md](../architecture/sync.md) §8.
 - Enriched values are stored on the Entry and synced. Different suggestions on iOS and Android affect only what is offered at capture, never stored data or behaviour afterwards (analysis §8.7).
 - Data that comes from Wiktionary keeps its provenance, so the app can show attribution (CC BY-SA, [open source](memory://12)).
 
@@ -290,8 +290,8 @@ Anki import is after v1. The model must be able to receive it without changes:
 | Suspended card | Entry `excluded` / `paused` when all its cards are suspended. |
 
 - **Re-import is idempotent.** Entries, Cards and ReviewLogs keep an `import ref` (collection + Anki note / card / revlog id). Importing the same collection twice, or on two devices, does not duplicate history.
-- **Not answers.** Anki revlog rows of kind manual / rescheduled are kept for history but ignored by the scheduler (to be confirmed in [scheduler.md](../architecture/scheduler.md)).
+- **Not answers.** Anki revlog rows of kind manual / rescheduled are imported with an empty rating, kept for history and ignored by the scheduler (confirmed in [scheduler.md](../architecture/scheduler.md) §7.1). The scheduler never reads `original kind`.
 - **Rich text:** Anki fields are HTML. Import converts them to plain text, keeps line breaks, and drops formatting. Media (images, audio) is not imported in the first version of import. The user is told how many fields had media.
-- **Ratings:** if PD-2 adopts two buttons, Anki "Again" maps to the failing grade and Hard/Good/Easy map to the passing grade. If PD-2 adopts four buttons, the mapping is one to one.
+- **Ratings:** Anki's buttons are the FSRS grades, so imported answers keep their 1–4 value one to one, whatever grading UI PD-2 adopts. Collapsing Hard/Easy into Good would lose scheduling information.
 - **Duplicates:** an imported note whose `text` matches an existing Entry merges into it (see *Duplicates*), and review histories are combined.
 - How imported history turns into scheduling state is defined in [scheduler.md](../architecture/scheduler.md).

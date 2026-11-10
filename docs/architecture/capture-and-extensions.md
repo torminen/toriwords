@@ -1,10 +1,10 @@
 # Capture, extensions, widget and reminders
 
-Status: **Proposed**. Pending owner confirmation in step 5. Nothing here is a `decision` yet.
+Status: **Confirmed** (owner, 2026-11-10). Confirmed: share and text-selection capture, the iOS inbox pattern, the due-count widget, and local-only reminders (PD-7). Open: Q-C2 (spike).
 
 Covers the OS integration points that run outside the main review UI:
 - share and text-selection capture (confirmed for v1);
-- the due-count widget and local reminders (proposed; product confirms in the feature list).
+- the due-count widget and local reminders (PD-7, confirmed).
 
 Screenshot OCR and desktop/browser extensions are **out of v1** (owner decision). Related: [local-storage.md](local-storage.md) §6, [enrichment.md](enrichment.md), [scheduler.md](scheduler.md) §4, analysis §8.3, §8.5, A9, A11, X9.
 
@@ -172,6 +172,6 @@ No streak pressure or nagging copy in reminders (X4, X11). Live Activities and L
 
 ## 9. Open questions
 
-- **Q-C1 (product):** the iOS Share Extension shows dictionary variants in the sheet (§3). Raised in the cross-review for the product capture doc.
+- **Q-C1: closed.** The iOS Share Extension shows dictionary variants; machine translation is Android-only in the sheet. The product capture doc is aligned.
 - Widget number format: **closed**, "12 to review · 5 new" (PD-7).
-- **Q-C2 (spike):** Safari JS preprocessing, to capture the surrounding sentence on iOS.
+- **Q-C2 (spike): open.** Safari JS preprocessing, to capture the surrounding sentence on iOS.

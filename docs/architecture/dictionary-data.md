@@ -1,6 +1,6 @@
 # Dictionary data (Wiktionary pipeline)
 
-Status: **Proposed**. Pending owner confirmation in step 5. Nothing here is a `decision` yet.
+Status: **Confirmed** (owner, 2026-11-10). Confirmed: Wiktionary (enwiktionary + ruwiktionary via kaikki) as the primary source; a ~25 MB file bundled in the app; CC BY-SA 4.0 obligations as in §5. Open: Q-D1, RU coverage, decided after the first build (§1).
 
 The offline dictionary behind autocomplete, translation variants, definitions, IPA and inflection lookup. It is the **primary** enrichment source ([enrichment.md](enrichment.md)) and is **byte-identical on iOS and Android**, so dictionary suggestions are the same on both platforms (analysis §8.7 option c).
 
@@ -16,7 +16,7 @@ Constraints: free and redistributable ([open source](memory://12)); judged by Ru
 
 Not used in v1: Tatoeba sentences (CC BY 2.0 FR, product question I5/Q2), Wiktionary audio (per-file Commons licences; device TTS instead, [enrichment.md](enrichment.md)), paid APIs.
 
-**Quality is `nv`.** RU coverage of both sources for the owner's vocabulary (series and articles) must be measured before the owner confirms. Proposed acceptance check in the build: for a test list of ~500 words and ~200 phrases taken from the owner's real content, report the share with ≥ 1 Russian translation. Target ≥ 90 % of words and ≥ 60 % of phrases; the rest falls back to on-device MT.
+**Quality is `nv`.** RU coverage of both sources for the owner's vocabulary (series and articles) must be measured in the first build (Q-D1, open). Proposed acceptance check in the build: for a test list of ~500 words and ~200 phrases taken from the owner's real content, report the share with ≥ 1 Russian translation. Target ≥ 90 % of words and ≥ 60 % of phrases; the rest falls back to on-device MT.
 
 ## 2. Output: `dictionary.sqlite`
 
@@ -31,7 +31,7 @@ SQLite 3, FTS5, read-only, opened `immutable=1`. Schema (normative once confirme
 | `form` | `form_key`, `headword_id`, `form_tags` | Inflected form → lemma (*ran* → *run*, *mortgages* → *mortgage*). |
 | `example` | `sense_id`, `text_en` | Wiktionary usage examples, short ones only. |
 | `related` | `headword_id`, `related_headword_id`, `kind` (`synonym`/`related`/`derived`/`phrase`) | Input for related-word suggestions (PD-6). `phrase` rows are computed at build time: dictionary phrases whose words include the headword's key or one of its forms ("mortgage" → "mortgage rate"). Lists are ranked by kind, then `freq_rank`, so both platforms show the same top 8. |
-| `ru_fts` | FTS5 over `translation_ru.text_folded`: a build-time copy of the text, lowercased with `ё` → `е` (pending [PD-18](../product/proposed-decisions.md#pd-18-ё-and-е-in-russian-text)), tokenizer `unicode61 remove_diacritics 0` | Reverse lookup ([PD-19](../product/proposed-decisions.md#pd-19-capture-time-help)(3)): the user types Russian and gets English candidates. Query text gets the same folding at runtime (the `ru-yo` rule in [parity-testing.md](parity-testing.md) §4.1), so "елка" finds "ёлка". Folding is done explicitly, not by the tokenizer, because `remove_diacritics` would also fold `й` → `и`. |
+| `ru_fts` | FTS5 over `translation_ru.text_folded`: a build-time copy of the text, lowercased with `ё` → `е` ([PD-18](../product/proposed-decisions.md#pd-18-ё-and-е-in-russian-text)), tokenizer `unicode61 remove_diacritics 0` | Reverse lookup ([PD-19](../product/proposed-decisions.md#pd-19-capture-time-help)(3)): the user types Russian and gets English candidates. Query text gets the same folding at runtime (the `ru-yo` rule in [parity-testing.md](parity-testing.md) §4.1), so "елка" finds "ёлка". Folding is done explicitly, not by the tokenizer, because `remove_diacritics` would also fold `й` → `и`. |
 
 Autocomplete uses a prefix range scan on `headword.key` (`key >= ? AND key < ?||x'FFFF'`), ordered by `freq_rank`, not FTS. That is fast and works identically on both platforms.
 
@@ -77,6 +77,6 @@ Build steps (each deterministic):
 
 ## 7. Open questions
 
-- **Q-D1 (owner):** is the measured RU coverage (§1 check) good enough to make Wiktionary the primary source, with on-device MT as fallback? Decided after the first build.
-- **Q-D2 (owner):** accept ~25 MB extra app size for an offline dictionary from first launch? Recommendation: yes.
-- **Q-D3 (product):** reverse RU → EN lookup ("how do I say …") and related-word suggestions from `related` are available from the same file at no extra cost. Adopt in v1?
+- **Q-D1 (owner): open.** Is the measured RU coverage (§1 check) good enough for Wiktionary to stay the primary source, with on-device MT as fallback? To be decided after the first build.
+- **Q-D2: closed.** The ~25 MB bundled dictionary is accepted (owner, 2026-11-10).
+- **Q-D3: closed.** Reverse RU → EN lookup (PD-19(3)) and related-word suggestions (PD-6) are adopted.

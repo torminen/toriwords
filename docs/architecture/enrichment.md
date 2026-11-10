@@ -56,12 +56,12 @@ Because quality is uneven and outputs differ per OS, MT is never auto-accepted w
 | Situation | Behaviour |
 |---|---|
 | Dictionary hit, user confirms | Entry saved with chosen Senses; `enrichment_status = done`. |
-| Quick save from share/selection without choosing (if the product offers it) | Entry saved with `enrichment_status = pending`. On next foreground, the app fills the **first dictionary variant**, or the MT result if there's no hit, into the empty translation, marked with its provenance; the user can review it later in the vocabulary list. (Product to confirm: auto-fill vs leaving it for the user.) |
+| Capture saved without a chosen translation (no dictionary hit in the share sheet, MT not available there) — [PD-19](../product/proposed-decisions.md#pd-19-capture-time-help)(1) | Entry saved with `enrichment_status = pending`. When the app next runs, it fills the **first dictionary variant**, or the MT result if there is no hit, into the empty translation with its provenance (rank 0). It sets `needs_check = true`, so the Entry appears under "Check translation" until it is opened or reviewed. |
 | No dictionary hit, MT language data missing and offline | Saved with `enrichment_status = pending` and no translation; not reviewable until it has one (domain invariant). Retried when MT becomes available. |
 | No hit and MT failed/unavailable after retries | `enrichment_status = unavailable`; the user is told and can type a translation. |
 | Retry policy | On app foreground and after MT model download completes; give up after the dictionary is checked and MT returned nothing or errored 3 times. Deterministic per device, but per-device results can differ; stored values sync and settle it. |
 | Two devices enrich the same pending Entry offline | Automatic enrichment creates its Senses with **deterministic ids**: UUIDv5(entry id, `"auto"`, ordinal). Both devices therefore write the *same* Sense records, and per-field LWW ([sync.md](sync.md)) keeps one value per field instead of producing duplicate Senses. User-chosen Senses keep random UUIDv7 ids. "Fill only if empty" is evaluated locally, so a device that already sees the field filled after sync doesn't overwrite it. |
-| "Check translation" ([capture](../product/features/capture-share-selection.md) step 7) | Automatic enrichment sets a synced Entry flag `needs_check = true`. Opening the Entry or reviewing one of its Cards on any device sets it to `false` (LWW), so the filter clears everywhere after sync. |
+| "Check translation" ([capture](../product/features/capture-share-selection.md) step 7) | Automatic enrichment of a translation sets the synced Entry flag `needs_check = true`. Opening the Entry or reviewing one of its Cards on any device sets it to `false`, but only when it is currently `true`, so merely viewing an Entry doesn't write. **Both writes use author rank 0** and resolve by clock (LWW). If clearing used rank 1, a later automatic fill could never raise the flag again ([sync.md](sync.md) §3.2). This is a deliberate exception to "user actions write rank 1": the flag is UI state, not user content. |
 
 ## 5. Pronunciation (TTS)
 
@@ -69,7 +69,7 @@ Because quality is uneven and outputs differ per OS, MT is never auto-accepted w
 |---|---|---|
 | API | `AVSpeechSynthesizer`, `AVSpeechSynthesisVoice(language: "en-US")` (or `en-GB` per a product setting). | `TextToSpeech`, `Locale.US` / `Locale.UK`. |
 | Offline | Built-in voices are on-device; enhanced/premium voices need a download in Settings. | Depends on the engine; Google TTS has offline voices once downloaded. |
-| Missing voice | Fall back to any `en` voice; if none, hide the play button and show the IPA. | `isLanguageAvailable` → if missing, offer the system "install voice data" intent; else hide play, show IPA. |
+| Missing voice | If the chosen accent (US/UK, PD-5) is missing, fall back to any `en-*` voice. If no English voice exists, the play button **stays visible but disabled**. Tapping it explains how to add a voice in Settings → Accessibility → Spoken Content (no public API opens that screen). IPA stays visible. | `isLanguageAvailable` for the chosen accent; else any English locale. If none, the button stays visible but disabled, and tapping it offers the installer (`TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA`). IPA stays visible. |
 
 Audio is generated on demand and never stored or synced. Voices differ by platform; that's acceptable for audio. Recorded audio (Wiktionary/Commons) is out of v1 because of per-file licences.
 
@@ -81,6 +81,6 @@ Audio is generated on demand and never stored or synced. Voices differ by platfo
 
 ## 7. Open questions
 
-- **Q-E1 (product):** quick save with automatic first-variant fill vs always asking the user (§4).
-- **Q-E2 (product):** show sentence MT as context help in the add flow? Recommendation: yes, when a sentence was captured.
-- **Q-E3 (product):** US vs UK pronunciation default, or a setting.
+- **Q-E1 → [PD-19](../product/proposed-decisions.md#pd-19-capture-time-help)(1):** automatic fill of pending captures, flagged "Check translation".
+- **Q-E2 → PD-19(2):** sentence MT as context help.
+- **Q-E3 → [PD-5](../product/proposed-decisions.md#pd-5-pronunciation):** US vs UK pronunciation default.

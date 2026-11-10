@@ -209,7 +209,12 @@ The 21-day threshold mirrors Anki's "mature" cut-off. It is a product-tunable co
 
 ## 11. Daily queue and catch-up (PD-4)
 
-PD-4 and [review](../product/features/review.md) set the product rules. This section makes them exact, so that the home screen, widget and reminder show the **same numbers on every device with the same synced data**. Everything is computed from synced data (ReviewLogs, Cards, Entries, synced settings) plus `today`, and nothing about the queue is stored.
+PD-4 and [review](../product/features/review.md) set the product intent:
+- after a break, the backlog is spread over about a week;
+- new words pause while catching up;
+- "Review all now" is available.
+
+**This section is the single source of truth for the exact numbers.** It makes them exact, so that the home screen, widget and reminder show the **same numbers on every device with the same synced data**. Everything is computed from synced data (ReviewLogs, Cards, Entries, synced settings) plus `today`, and nothing about the queue is stored.
 
 **Sets**, for today `T`, over canonical Cards of `active`, reviewable Entries:
 - **Started** Card: has at least one rated log before day `T`. **New** Card: no rated log before day `T`.
@@ -221,7 +226,7 @@ PD-4 and [review](../product/features/review.md) set the product rules. This sec
 ```
 activeDays = the last 14 distinct review days before T that have ≥ 1 rated log
 reviewsInActiveDays = number of (Card, day) pairs on those days where the Card was Started before that day
-normalLoad = activeDays empty ? 20 : max(20, ceil(reviewsInActiveDays / |activeDays|))
+normalLoad = activeDays empty ? 50 : max(50, ceil(reviewsInActiveDays / |activeDays|))
 ```
 
 **Catch-up mode:**
@@ -231,20 +236,21 @@ catchUp = load > 2 · normalLoad
 quota   = catchUp ? normalLoad + ceil((load − normalLoad) / 3) : ∞
 ```
 - `normalLoad` depends only on days before `T`, and reviewing moves a Card from `waiting` to `reviewedToday`, so `load`, `catchUp` and `quota` stay constant while the user reviews. They change within a day only when sync brings in another device's logs, or when the user excludes or resumes Entries.
-- With an inflow of about `normalLoad` per day, the excess above `normalLoad` shrinks by about a third per day. Catch-up ends when `load ≤ 2 · normalLoad`. That takes about 6 days for a backlog of 13 normal days, and longer for larger backlogs. This is how "spread over up to 7 days" is implemented. The product text should say "about a week".
+- The floor of 50 (the product's minimum normal day) keeps catch-up from triggering for new users with little history. With an inflow of about `normalLoad` per day, the excess above `normalLoad` shrinks by about a third per day. Catch-up ends when `load ≤ 2 · normalLoad`. That takes about 6 days for a backlog of 13 normal days, and longer for larger backlogs. This is how "about a week" is implemented.
+- **Rejected alternative:** `quota = max(normalLoad, ceil(load / 7))`, recomputed daily. With a daily inflow near `normalLoad`, the backlog settles at about 7 × inflow and catch-up never ends. A fixed seven-day plan would need the backlog size stored at the start of catch-up as synced state, which this stateless formula avoids.
 - "Most at-risk first" means the order below.
 
 **Today's queue:**
 1. **Reviews:** `waiting` Cards in order: retrievability `R(T − lastReviewDay, S)` ascending, then `dueDay` ascending, then Card id. Take the first `max(0, quota − |reviewedToday|)` of them.
 2. **New Cards:** `0` in catch-up mode. Otherwise `max(0, newLimit − |introducedToday|)` New Cards, ordered by Entry creation time, then direction (`recognition` before `recall` before `cloze`), then Card id.
-3. **Siblings:** walking the combined list (reviews first, then new), skip a Card if another Card of the same Entry has a rated log on day `T` or was already taken earlier in the walk. Skipped Cards stay due and come first by order on a later day.
+3. **Siblings** (adopted in the product spec, pending [PD-1](../product/proposed-decisions.md#pd-1-card-directions-and-exercise-types)): walking the combined list (reviews first, then new), skip a Card if another Card of the same Entry has a rated log on day `T` or was already taken earlier in the walk. Skipped Cards stay due and come first by order on a later day.
 4. **Same-day re-shows:** Cards answered Forgot today have `dueDay = T` and are re-shown within the session (§5.5). They are in `reviewedToday` and are not limited by the quota.
 
 **Numbers shown:**
 - **"Due today"** (home, widget, reminder) = reviews taken in step 1 after the sibling rule + new Cards taken in step 2 after the sibling rule.
 - In catch-up, the home screen also shows `|waiting|` as "N waiting".
 - **"Next due"**, when nothing is due today, is a **day**, not a time: the smallest `dueDay > T` ("tomorrow", or a date). Scheduling is day-based, so there is no exact time.
-- **"Review all now"** and **"Learn more new words"** are session-only overrides: they extend the current session's list and store nothing. Answers made through them are ordinary ReviewLogs, and they count in `reviewedToday` and `introducedToday` from then on.
+- **"Review all now"** and **"Learn more new words"** are **device-local, session-only overrides**: they extend the current session's list on this device only and store nothing; nothing about them is synced, and the other devices' numbers are unaffected until the resulting ReviewLogs sync. Answers made through them are ordinary ReviewLogs, and they count in `reviewedToday` and `introducedToday` from then on.
 
 All of the above goes into the queue fixtures ([parity-testing.md](parity-testing.md)).
 

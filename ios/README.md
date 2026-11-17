@@ -103,9 +103,13 @@ The app reads these values from Info.plist keys (`ToriAPIBaseURL`, `ToriGoogleCl
 
 | Target | Bundle ID | Notes |
 |---|---|---|
-| `Toriwords` (app) | `com.toriwords.app` | App Group, Sign in with Apple, background fetch (`BGTaskSchedulerPermittedIdentifiers`), URL scheme |
-| `ToriwordsShare` | `com.toriwords.app.share` | Share Extension, App Group |
-| `ToriwordsWidget` | `com.toriwords.app.widget` | WidgetKit, App Group |
+| `Toriwords` (app) | `com.toriwords.app` | Entitlements: App Group, Sign in with Apple (`Default`). Background fetch (`BGTaskSchedulerPermittedIdentifiers`). URL schemes `toriwords` and the Google reversed client ID (OAuth redirect). |
+| `ToriwordsShare` | `com.toriwords.app.share` | Share Extension (text, one web URL, Safari web page with `ExtensionPreprocessing.js`). Entitlement: App Group. |
+| `ToriwordsWidget` | `com.toriwords.app.widget` | WidgetKit (small, medium, lock-screen circular and rectangular). Entitlement: App Group. |
+
+All three targets: iOS 26.0, Swift 6 language mode, `CFBundleLocalizations` en + ru. The app sets
+`ITSAppUsesNonExemptEncryption = NO` and is portrait-only on iPhone (all orientations on iPad). The Keychain session
+item uses the app's default access group, so no Keychain Sharing entitlement is needed.
 
 ### Signing
 

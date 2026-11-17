@@ -1,6 +1,7 @@
 import ProjectDescription
 
-// Skeleton (plan step 1). Entitlements, full Info.plist, dictionary build phase and test targets: step 11.
+// Toriwords app + Share Extension + widget (doc 36 §2.2). Values come from Config/Shared.xcconfig; ToriKit tests run
+// from the ToriKit package itself (README), so the project has no test targets.
 
 let deploymentTargets = DeploymentTargets.iOS("26.0")
 let settings = Settings.settings(
@@ -12,9 +13,17 @@ let settings = Settings.settings(
 )
 
 /// App Group shared by the app, the Share Extension and the widget (doc 36 §2.2).
-let appGroupEntitlements: Entitlements = .dictionary([
-    "com.apple.security.application-groups": .array([.string("$(TORI_APP_GROUP_ID)")]),
+let appGroup: Plist.Value = .array([.string("$(TORI_APP_GROUP_ID)")])
+let extensionEntitlements: Entitlements = .dictionary(["com.apple.security.application-groups": appGroup])
+/// The app also signs in with Apple (§12.1). Keychain: the session item uses the app's default access group, so no
+/// `keychain-access-groups` entry (extensions never see tokens, §2.2).
+let appEntitlements: Entitlements = .dictionary([
+    "com.apple.security.application-groups": appGroup,
+    "com.apple.developer.applesignin": .array([.string("Default")]),
 ])
+
+/// UI in English and Russian (§2.1), on every target.
+let localizations: Plist.Value = .array([.string("en"), .string("ru")])
 
 let project = Project(
     name: "Toriwords",
@@ -28,8 +37,20 @@ let project = Project(
             deploymentTargets: deploymentTargets,
             infoPlist: .extendingDefault(with: [
                 "CFBundleDisplayName": "ToriWords",
+                "CFBundleLocalizations": localizations,
                 "UILaunchScreen": [:],
-                "CFBundleURLTypes": [["CFBundleURLSchemes": ["$(TORI_URL_SCHEME)"]]],
+                // Phone-first portrait layouts; iPad runs the same adaptive layouts in every orientation (§2.1).
+                "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
+                "UISupportedInterfaceOrientations~ipad": [
+                    "UIInterfaceOrientationPortrait", "UIInterfaceOrientationPortraitUpsideDown",
+                    "UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight",
+                ],
+                "ITSAppUsesNonExemptEncryption": false,
+                // toriwords:// deep links (§2.2) and the Google OAuth redirect (reversed client ID, §12.2).
+                "CFBundleURLTypes": [
+                    ["CFBundleURLName": "com.toriwords.app", "CFBundleURLSchemes": ["$(TORI_URL_SCHEME)"]],
+                    ["CFBundleURLName": "google-oauth", "CFBundleURLSchemes": ["$(TORI_GOOGLE_REVERSED_CLIENT_ID)"]],
+                ],
                 "BGTaskSchedulerPermittedIdentifiers": ["$(TORI_BG_REFRESH_TASK_ID)"],
                 "UIBackgroundModes": ["fetch"],
                 "ToriAPIBaseURL": "$(TORI_API_BASE_URL)",
@@ -40,7 +61,7 @@ let project = Project(
             // §8.3: the full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app
             // installs the full file when present, else the sample (Debug/CI). Release fails without the full file.
             resources: ["App/**/*.xcstrings", "Resources/dictionary*.sqlite"],
-            entitlements: appGroupEntitlements,
+            entitlements: appEntitlements,
             scripts: [
                 .pre(script: """
                     if [ "$CONFIGURATION" = "Release" ] && [ ! -f "$SRCROOT/Resources/dictionary.sqlite" ]; then
@@ -58,7 +79,10 @@ let project = Project(
                 .external(name: "ToriSync"),
                 .external(name: "ToriEnrichment"),
                 .external(name: "ToriUI"),
-            ]
+            ],
+            // The Release dictionary check reads Resources/ outside declared inputs (a declared input would fail Debug
+            // builds without the full file), so this target's scripts run unsandboxed.
+            settings: .settings(base: ["ENABLE_USER_SCRIPT_SANDBOXING": "NO"])
         ),
         .target(
             name: "ToriwordsShare",
@@ -68,6 +92,7 @@ let project = Project(
             deploymentTargets: deploymentTargets,
             infoPlist: .extendingDefault(with: [
                 "CFBundleDisplayName": "ToriWords",
+                "CFBundleLocalizations": localizations,
                 "NSExtension": [
                     "NSExtensionPointIdentifier": "com.apple.share-services",
                     "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).ShareViewController",
@@ -84,7 +109,7 @@ let project = Project(
             ]),
             sources: ["ShareExtension/**/*.swift"],
             resources: ["ShareExtension/ExtensionPreprocessing.js", "ShareExtension/*.xcstrings"],
-            entitlements: appGroupEntitlements,
+            entitlements: extensionEntitlements,
             dependencies: [
                 .external(name: "ToriCore"),
                 .external(name: "ToriShared"),
@@ -100,11 +125,12 @@ let project = Project(
             deploymentTargets: deploymentTargets,
             infoPlist: .extendingDefault(with: [
                 "CFBundleDisplayName": "ToriWords",
+                "CFBundleLocalizations": localizations,
                 "NSExtension": ["NSExtensionPointIdentifier": "com.apple.widgetkit-extension"],
             ]),
             sources: ["WidgetExtension/**/*.swift"],
             resources: ["WidgetExtension/*.xcstrings"],
-            entitlements: appGroupEntitlements,
+            entitlements: extensionEntitlements,
             dependencies: [
                 .external(name: "ToriCore"),
                 .external(name: "ToriShared"),

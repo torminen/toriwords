@@ -210,9 +210,16 @@ extension ToriStore {
 
     /// Tag Entries by name (reuse by tag key, else create): `present = 1` on the canonical pair's EntryTag (§11.7).
     public func tag(_ entries: [ToriID], name: String) throws {
+        try tag(entries, names: [name])
+    }
+
+    /// Bulk Tag (§14.3, UQ-10): only adds; every name on every Entry in one transaction.
+    public func tag(_ entries: [ToriID], names: [String]) throws {
         try write { tx in
-            let tag = try Self.tagID(tx, name: name)
-            for e in entries { try Self.setMembership(tx, entry: e, tag: tag, present: true) }
+            for name in names {
+                let tag = try Self.tagID(tx, name: name)
+                for e in entries { try Self.setMembership(tx, entry: e, tag: tag, present: true) }
+            }
         }
     }
 

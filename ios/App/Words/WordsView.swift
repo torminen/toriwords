@@ -3,7 +3,9 @@ import ToriCore
 import ToriStore
 import ToriUI
 
-/// Words list (doc 35 §3.5, Product §5.7; wireframes 3-5 W1–W3, 8-6 A3, 10-3 T2).
+/// Words list (doc 35 §3.5, Product §5.7; wireframes 3-5 W1–W3, 8-6 A3, 10-3 B1, B2, T2).
+/// Select mode (UQ-9: "Select" in the ••• menu or long-press a row): checkboxes, Cancel · N selected · Select all,
+/// bottom bar Tag · Known · Pause · Delete (Resume learning when every selected word is Known or Paused).
 struct WordsView: View {
     let store: ToriStore
     @State private var query: WordsQuery
@@ -12,6 +14,10 @@ struct WordsView: View {
     @State private var tagCounts: [ToriID: Int] = [:]
     @State private var showTagFilter = false
     @State private var confirmDelete: WordRow?
+    @State private var selecting = false
+    @State private var selection: Set<ToriID> = []
+    @State private var bulkTagging = false
+    @State private var confirmBulkDelete = false
     @Environment(AppEnvironment.self) private var env
     @Environment(Router.self) private var router
     @Environment(PendingDeletion.self) private var deletion
@@ -22,14 +28,25 @@ struct WordsView: View {
     }
 
     private var visible: [WordRow] { rows.filter { !deletion.hidden.contains($0.id) } }
+    /// Selected rows still in the list (a filter, search, sync or delete can drop some), in list order.
+    private var selectedRows: [WordRow] { visible.filter { selection.contains($0.id) } }
 
     var body: some View {
         List {
             Section {
                 ForEach(visible, id: \.id) { row in
-                    Button { router.push(.entry(row.id)) } label: { WordRowView(row: row) }
-                        .buttonStyle(.plain)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) { swipeActions(row) }
+                    if selecting {
+                        selectableRow(row)
+                    } else {
+                        Button { router.push(.entry(row.id)) } label: { WordRowView(row: row) }
+                            .buttonStyle(.plain)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) { swipeActions(row) }
+                            .contextMenu {
+                                Button { startSelecting(row.id) } label: {
+                                    Label { Text("Select") } icon: { Image(systemName: "checkmark.circle") }
+                                }
+                            }
+                    }
                 }
             } header: {
                 VStack(alignment: .leading, spacing: Spacing.s) {
@@ -44,20 +61,16 @@ struct WordsView: View {
                     prompt: Text("Search words, translations, sentences"))
         .navigationTitle(Text("Words"))
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Menu {
-                    Picker(selection: $query.sort) {
-                        Text("Newest").tag(WordsQuery.Sort.newest)
-                        Text("A–Z").tag(WordsQuery.Sort.alphabetical)
-                        Text("Next due").tag(WordsQuery.Sort.nextDue)
-                    } label: { Text("Sort") }
-                } label: {
-                    Label { Text("Sort") } icon: { Image(systemName: "arrow.up.arrow.down") }
-                }
-                Button { router.push(.add(text: nil)) } label: { Image(systemName: "plus") }
-                    .accessibilityLabel(Text("Add a word"))
-            }
+        .navigationBarBackButtonHidden(selecting)
+        .toolbar { if selecting { selectToolbar } else { browseToolbar } }
+        .sheet(isPresented: $bulkTagging) {
+            BulkTagSheet(count: selectedRows.count, available: tags, counts: tagCounts, onAdd: addTags)
+        }
+        .alert(Text("Delete \(selectedRows.count) words?"), isPresented: $confirmBulkDelete) {
+            Button("Delete \(selectedRows.count) words", role: .destructive, action: deleteSelected)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("They are removed with their review history on all your devices.")
         }
         .task(id: query) { await observe() }
         .sheet(isPresented: $showTagFilter) {
@@ -103,6 +116,113 @@ struct WordsView: View {
     private func setStatus(_ row: WordRow, _ status: EntryStatus) {
         try? store.setStatus([row.id], status)
         env.didChangeWords()
+    }
+
+    // MARK: Toolbars
+
+    @ToolbarContentBuilder
+    private var browseToolbar: some ToolbarContent {
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            Menu {
+                Button { startSelecting(nil) } label: {
+                    Label { Text("Select") } icon: { Image(systemName: "checkmark.circle") }
+                }
+                .disabled(visible.isEmpty)
+                Picker(selection: $query.sort) {
+                    Text("Newest").tag(WordsQuery.Sort.newest)
+                    Text("A–Z").tag(WordsQuery.Sort.alphabetical)
+                    Text("Next due").tag(WordsQuery.Sort.nextDue)
+                } label: {
+                    Label { Text("Sort") } icon: { Image(systemName: "arrow.up.arrow.down") }
+                }
+                .pickerStyle(.menu)
+            } label: {
+                Label { Text("More") } icon: { Image(systemName: "ellipsis.circle") }
+            }
+            Button { router.push(.add(text: nil)) } label: { Image(systemName: "plus") }
+                .accessibilityLabel(Text("Add a word"))
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var selectToolbar: some ToolbarContent {
+        let count = selectedRows.count
+        let allSelected = !visible.isEmpty && count == visible.count
+        ToolbarItem(placement: .topBarLeading) { Button("Cancel", action: stopSelecting) }
+        ToolbarItem(placement: .principal) { Text("\(count) selected").font(.headline) }
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                selection = allSelected ? [] : Set(visible.map(\.id))
+            } label: {
+                allSelected ? Text("Deselect all") : Text("Select all")
+            }
+        }
+        ToolbarItemGroup(placement: .bottomBar) {
+            let resumable = count > 0 && selectedRows.allSatisfy { $0.stage == .known || $0.stage == .paused }
+            Button("Tag") { bulkTagging = true }
+            Spacer()
+            if resumable {
+                Button("Resume learning") { setSelectedStatus(.active) }
+            } else {
+                Button("Known") { setSelectedStatus(.known) }
+                    .accessibilityLabel(Text("I already know this"))
+                Spacer()
+                Button("Pause") { setSelectedStatus(.paused) }
+            }
+            Spacer()
+            Button("Delete", role: .destructive) { confirmBulkDelete = true }
+                .tint(Palette.danger)
+        }
+    }
+
+    // MARK: Select mode
+
+    private func selectableRow(_ row: WordRow) -> some View {
+        let isSelected = selection.contains(row.id)
+        return Button {
+            if isSelected { selection.remove(row.id) } else { selection.insert(row.id) }
+        } label: {
+            HStack(spacing: Spacing.m) {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(isSelected ? Palette.accent : Palette.border)
+                    .accessibilityHidden(true)
+                WordRowView(row: row)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private func startSelecting(_ first: ToriID?) {
+        selection = first.map { [$0] } ?? []
+        withAnimation { selecting = true }
+    }
+
+    private func stopSelecting() {
+        withAnimation { selecting = false }
+        selection = []
+    }
+
+    /// Bulk actions are one store transaction each (§14.3); the mode ends after every action.
+    private func setSelectedStatus(_ status: EntryStatus) {
+        try? store.setStatus(selectedRows.map(\.id), status)
+        env.didChangeWords()
+        stopSelecting()
+    }
+
+    private func addTags(_ names: [String]) {
+        try? store.tag(selectedRows.map(\.id), names: names)
+        env.didChangeWords()
+        stopSelecting()
+    }
+
+    /// One Undo window for the whole batch (B2), like a single delete.
+    private func deleteSelected() {
+        let ids = selectedRows.map(\.id)
+        guard !ids.isEmpty else { return }
+        deletion.schedule(ids, message: "\(ids.count) words deleted")
+        stopSelecting()
     }
 
     // MARK: Chips and count
@@ -189,6 +309,42 @@ extension StageMarker.Kind {
         case .known: .known
         case .paused: .paused
         }
+    }
+}
+
+/// Bulk Tag (B1 → the T1 picker): only adds the chosen tags (UQ-10).
+private struct BulkTagSheet: View {
+    let count: Int
+    let available: [TagRow]
+    let counts: [ToriID: Int]
+    let onAdd: ([String]) -> Void
+    @State private var names: [String] = []
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    TagEditor(tags: $names, available: available, counts: counts)
+                } footer: {
+                    Text("Adds tags to \(count) words. Tags they already have stay.")
+                }
+            }
+            .navigationTitle(Text("Add tags"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Add") {
+                        onAdd(names)
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                    .disabled(names.isEmpty)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
     }
 }
 

@@ -29,7 +29,16 @@ let project = Project(
                 "UIBackgroundModes": ["fetch"],
             ]),
             sources: ["App/**"],
-            resources: ["App/**/*.xcstrings"],
+            // §8.3: the full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app
+            // installs the full file when present, else the sample (Debug/CI). Release fails without the full file.
+            resources: ["App/**/*.xcstrings", "Resources/dictionary*.sqlite"],
+            scripts: [
+                .pre(script: """
+                    if [ "$CONFIGURATION" = "Release" ] && [ ! -f "$SRCROOT/Resources/dictionary.sqlite" ]; then
+                      echo "error: Resources/dictionary.sqlite missing; run tools/dictionary/fetch.sh"; exit 1
+                    fi
+                    """, name: "Require full dictionary in Release", basedOnDependencyAnalysis: false),
+            ],
             dependencies: [
                 .target(name: "ToriwordsShare"),
                 .target(name: "ToriwordsWidget"),

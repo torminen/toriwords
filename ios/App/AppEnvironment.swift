@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import ToriCore
+import ToriDictionary
 import ToriEnrichment
 import ToriShared
 import ToriStore
@@ -17,7 +18,7 @@ import UIKit
 /// Slot for the dictionary step: copy the bundled `dictionary.sqlite` into the App Group when its version changed
 /// (§8.3) and open it. Returns nil when no dictionary is available.
 @MainActor protocol DictionaryInstalling: AnyObject {
-    func installIfNeeded(into group: AppGroup?) throws -> (any DictionaryLookup)?
+    func installIfNeeded(into group: AppGroup?) async throws -> (any DictionaryLookup)?
 }
 
 /// Slot for reminders (step 9d). The Review reminder offer calls `enableDailyReminder`; commits call `refresh`.
@@ -68,7 +69,9 @@ final class AppEnvironment {
 
     // Slots wired by later steps.
     @ObservationIgnored var sync: (any SyncCoordinating)?
-    @ObservationIgnored var dictionaryInstaller: (any DictionaryInstalling)?
+    @ObservationIgnored var dictionaryInstaller: (any DictionaryInstalling)? = AppDictionaryInstaller()
+    /// The installed dictionary (search, autocomplete); nil until launch installed it or when none is bundled.
+    var dictionary: BundledDictionary? { (dictionaryInstaller as? AppDictionaryInstaller)?.dictionary }
     @ObservationIgnored var reminders: (any ReminderScheduling)?
 
     /// The open Review session, so going to the background commits its undoable answer (§7.8).
@@ -96,7 +99,7 @@ final class AppEnvironment {
             }.value
             if outcome == .freshInstall { sync?.purgeLeftoverTokens() }
             // 4: dictionary into the App Group.
-            let dictionary = try? dictionaryInstaller?.installIfNeeded(into: appGroup)
+            let dictionary = try? await dictionaryInstaller?.installIfNeeded(into: appGroup)
             // 5: inbox import, then pending enrichment, then sync.
             if let appGroup { _ = try? store.importInbox(appGroup.inbox) }
             let enrichment = EnrichmentOrchestrator(store: store, dictionary: dictionary,
@@ -104,8 +107,11 @@ final class AppEnvironment {
             self.store = store
             self.enrichment = enrichment
             phase = .ready
+            let dictionaryChanged = (dictionaryInstaller as? AppDictionaryInstaller)?.versionChanged == true
             Task {
-                _ = try? await enrichment.runPending()
+                // §8.3: after a version change `unavailable` Entries get another chance (also runs pending).
+                if dictionaryChanged { _ = try? await enrichment.updateDictionary(dictionary) }
+                else { _ = try? await enrichment.runPending() }
                 await sync?.syncIfSignedIn()
             }
             scheduleAppGroupRefresh(delay: .zero)

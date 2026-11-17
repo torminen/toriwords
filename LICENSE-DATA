@@ -1,0 +1,29 @@
+Toriwords dictionary data — licence notice
+==========================================
+
+This notice covers the dictionary database built by tools/dictionary/ and distributed as
+`dictionary.sqlite` (GitHub Release assets `dictionary-<version>`, bundled in the Toriwords apps) and
+`ios/Resources/dictionary-sample.sqlite`. It does not cover the source code of this repository (see LICENSE).
+
+Sources
+- English Wiktionary (https://en.wiktionary.org) and Russian Wiktionary (https://ru.wiktionary.org),
+  © Wiktionary contributors, licensed under the Creative Commons Attribution-ShareAlike 4.0
+  International licence (CC BY-SA 4.0). Page histories list the authors.
+- Machine-readable extraction by wiktextract (https://github.com/tatuylonen/wiktextract),
+  published by kaikki.org (https://kaikki.org). Tatu Ylonen: "Wiktextract: Wiktionary as
+  Machine-Readable Structured Data", LREC 2022, pp. 1317–1325.
+- Word frequency ranks from wordfreq (https://github.com/rspeer/wordfreq), data CC BY-SA 4.0.
+
+Changes
+The data was modified: filtered (English entries only; obsolete/archaic/rare-only senses, proper names
+without a Russian translation, etymology, inflection tables, audio and non-Russian translations removed),
+merged (Russian Wiktionary definitions joined to English Wiktionary entries), normalised (Unicode NFC,
+quotes and dashes mapped to ASCII, wiki markup and Russian stress marks removed) and ranked. The exact
+inputs (URLs, dump dates, SHA-256) are recorded in each database's `meta` table and in
+tools/dictionary/build-report.md; the build script is tools/dictionary/.
+
+Licence
+The dictionary database is an adaptation and is licensed under CC BY-SA 4.0:
+https://creativecommons.org/licenses/by-sa/4.0/
+You may share and adapt it, including commercially, if you give appropriate credit, indicate changes,
+and distribute your contributions under the same licence. No warranties are given.

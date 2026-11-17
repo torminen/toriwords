@@ -1,0 +1,25 @@
+{
+  "dictionary_version": "2026.11.1",
+  "inputs": {
+    "enwikt": {
+      "url": "https://kaikki.org/dictionary/English/words/kaikki.org-dictionary-English-words.jsonl.gz",
+      "file": "enwikt-en.jsonl.gz",
+      "size": 534258591,
+      "sha256": "a7be58b68d6edc4170f523337ae63a03acbc5a31baca5df2d8a972eeb4fbef01",
+      "wiki": "enwiktionary",
+      "dump_date": "2026-10-01",
+      "extracted": "2026-10-30",
+      "wiktextract": "19f9a30 6f96ddf"
+    },
+    "ruwikt": {
+      "url": "https://kaikki.org/ruwiktionary/%D0%90%D0%BD%D0%B3%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B8%D0%B9/kaikki.org-dictionary-%D0%90%D0%BD%D0%B3%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B8%D0%B9.jsonl.gz",
+      "file": "ruwikt-en.jsonl.gz",
+      "size": 9641425,
+      "sha256": "da04c81d832baee235bec82844720ae720f9f17ab55a2434d6b94ed426b6a3a3",
+      "wiki": "ruwiktionary",
+      "dump_date": "2026-11-01",
+      "extracted": "2026-11-02",
+      "wiktextract": "19f9a30 6f96ddf"
+    }
+  }
+}

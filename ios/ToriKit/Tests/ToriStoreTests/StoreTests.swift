@@ -485,3 +485,19 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     try s.store.deleteEntries([e])
     #expect(try s.store.read { try $0.cardEntry(card) } == nil)
 }
+
+@Test func addQueriesFindSavedWordsAndCountTags() throws {
+    let s = try TestStore()
+    let a = try s.store.capture(CaptureInput(term: "Mortgage", capturedAt: t0, tags: ["Home", "money"]))
+    let b = try s.store.capture(CaptureInput(term: "mortgage rate", capturedAt: t0, tags: ["money"]))
+    _ = try s.store.capture(CaptureInput(term: "more", capturedAt: t0))
+    let c = try s.store.capture(CaptureInput(term: "mortal", capturedAt: t0, tags: ["money"]))
+    try s.store.deleteEntries([c])
+    #expect(try s.store.read { try $0.vocabularyMatches(prefix: "MORT") }.map(\.id) == [a, b])
+    #expect(try s.store.read { try $0.vocabularyMatches(prefix: " ") }.isEmpty)
+    #expect(try s.store.read { try $0.entryID(matching: " mortgage. ") } == a)
+    #expect(try s.store.read { try $0.entryID(matching: "mortal") } == nil)
+    let tags = try s.store.read { try $0.allTags() }
+    let counts = try s.store.read { try $0.tagCounts() }
+    #expect(Dictionary(uniqueKeysWithValues: tags.map { ($0.name, counts[$0.id] ?? 0) }) == ["Home": 1, "money": 2])
+}

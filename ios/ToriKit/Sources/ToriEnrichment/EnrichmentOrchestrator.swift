@@ -42,6 +42,17 @@ public actor EnrichmentOrchestrator {
         return Suggestions.build(headwords: headwords, dictVersion: dictionary?.version, machine: machine)
     }
 
+    /// IPA of the first dictionary headword for the text (Add preview, §6.2 item 7).
+    public func ipa(for text: String) -> String? {
+        lookup(text).lazy.compactMap(\.ipa).first
+    }
+
+    /// "In this sentence: …" help on Add (P1, §6.2 item 5): only when on-device translation is ready; never stored.
+    public func contextHelp(for sentence: String) async -> String? {
+        guard let translator, await translator.isReady() else { return nil }
+        return try? await translator.translate(sentence)
+    }
+
     /// Fills every pending Entry once. Re-entrant calls while running are coalesced into one more pass.
     @discardableResult
     public func runPending() async throws -> RunSummary {

@@ -210,7 +210,7 @@ private struct CardFront: View {
                 Spacer()
                 HStack(alignment: .firstTextBaseline, spacing: Spacing.s) {
                     Text(verbatim: content.word).font(Typography.cardWord).multilineTextAlignment(.center)
-                    SpeakerButton(model: model, text: content.word, sentence: content.frontSentence?.text)
+                    SpeakButton(content.word, sentence: content.frontSentence?.text)
                 }
                 sentence(.highlight)
                 Spacer()
@@ -270,7 +270,7 @@ private struct CardBack: View {
                 HStack(alignment: .firstTextBaseline) {
                     Text(verbatim: content.word).font(Typography.cardWord)
                     Spacer()
-                    SpeakerButton(model: model, text: content.word, sentence: content.backSentence?.text)
+                    SpeakButton(content.word, sentence: content.backSentence?.text)
                 }
                 let detail = [content.ipa, content.partOfSpeech].compactMap { $0 }.filter { !$0.isEmpty }
                 if !detail.isEmpty {
@@ -287,7 +287,7 @@ private struct CardBack: View {
                     HStack(alignment: .firstTextBaseline) {
                         SentenceText(s.text, highlight: s.highlight).font(Typography.body)
                         Spacer()
-                        SpeakerButton(model: model, text: s.text, sentence: nil)
+                        SpeakButton(s.text)
                             .accessibilityLabel(Text("Play sentence"))
                     }
                     if let source = s.source {
@@ -298,40 +298,6 @@ private struct CardBack: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .scrollBounceBehavior(.basedOnSize)
-    }
-}
-
-/// ▶: tap speaks `text`; long-press speaks the sentence (§9). Without an English voice it looks disabled and a tap
-/// explains how to add one.
-private struct SpeakerButton: View {
-    let model: ReviewModel
-    let text: String
-    let sentence: String?
-    @State private var showNoVoice = false
-
-    var body: some View {
-        Image(systemName: "play.fill")
-            .foregroundStyle(model.hasEnglishVoice ? Palette.accent : Palette.textSecondary.opacity(0.5))
-            .frame(width: 44, height: 44)
-            .contentShape(Rectangle())
-            .onTapGesture { play(text) }
-            .onLongPressGesture { if let sentence { play(sentence) } }
-            .accessibilityElement()
-            .accessibilityLabel(Text("Play pronunciation"))
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAction { play(text) }
-            .accessibilityActions {
-                if let sentence { Button("Play sentence") { play(sentence) } }
-            }
-            .alert(Text("No English voice"), isPresented: $showNoVoice) {
-                Button("OK") {}
-            } message: {
-                Text("To hear words, download an English voice in Settings → Accessibility → Spoken Content → Voices → English.")
-            }
-    }
-
-    private func play(_ s: String) {
-        if model.hasEnglishVoice { model.speak(s, .tap) } else { showNoVoice = true }
     }
 }
 

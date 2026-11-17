@@ -12,6 +12,7 @@ struct ToriwordsApp: App {
             RootView()
                 .environment(env)
                 .environment(env.router)
+                .environment(env.deletion)
                 .tint(Palette.accent)
                 .onOpenURL { env.open($0) }
         }
@@ -40,6 +41,7 @@ struct RootView: View {
                         HomeView(store: store)
                             .navigationDestination(for: Route.self) { RouteView(route: $0) }
                     }
+                    .overlay(alignment: .bottom) { UndoToast().animation(.default, value: env.deletion.current) }
                     .fullScreenCover(isPresented: $router.isReviewPresented) {
                         ReviewView(store: store)
                     }

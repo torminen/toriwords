@@ -45,6 +45,11 @@ Runners run one test argument per case id and print it in the test name.
   (they differ in IDN, percent-encoding and port handling). Punycode = RFC 3492 per host label that contains non-ASCII, after lowercasing.
   Parameter names are matched case-sensitively; an empty query after removal drops the `?`.
 - **Capture closers** after `. ! ? …`: `" ' ” ’ » ) ]`.
+- **Capture speaker label** (per line): optional spaces/tabs, 1–3 words separated by spaces/tabs, `:`, then a "space" or the
+  line end; trailing spaces/tabs are removed too. A word is a run of code points that are neither `:` nor "space";
+  "space" = the whitespace list plus the space separators above.
+- **Capture annotations:** a left-to-right scan; `[` or `(` followed by one or more letters (L*) or U+0020 and the matching
+  `]` / `)` is removed. A removed span is not rescanned; anything else is kept as is.
 
 ## Unicode ≤ 13
 

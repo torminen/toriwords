@@ -4,7 +4,7 @@ highlight offsets/lengths are UTF-16 code units of the stored sentence."""
 import re
 import unicodedata
 
-from .text import WHITESPACE, collapse, is_punct, is_ws, match_key
+from .text import SPACE_SEPARATORS, WHITESPACE, collapse, is_punct, is_ws, match_key
 
 MAX_CHARS = 5000
 MAX_SENTENCE = 500
@@ -14,9 +14,9 @@ CLOSERS = "\"'”’»)]"
 ELLIPSIS = "…"
 
 _TAG = re.compile(r"<[^<>]*>")
-_ANNOTATION_LETTERS = r"[^\W\d_]"  # any letter (\p{L})
-_ANNOTATION = re.compile(rf"\[(?:{_ANNOTATION_LETTERS}| )+\]|\((?:{_ANNOTATION_LETTERS}| )+\)")
-_SPEAKER = re.compile(r"^[ \t]*(?:[^\s:]+[ \t]+){0,2}[^\s:]+:(?=\s|$)[ \t]*")
+# "Space" for speaker labels: WHITESPACE plus the Zs space separators (explicit lists, see text.py).
+_SP = re.escape(WHITESPACE + SPACE_SEPARATORS)
+_SPEAKER = re.compile(rf"^[ \t]*(?:[^{_SP}:]+[ \t]+){{0,2}}[^{_SP}:]+:(?=[{_SP}]|$)[ \t]*")
 _LINE_BREAK = re.compile(r"\r\n|\r|\n")
 
 
@@ -31,10 +31,28 @@ def is_latin_letter(c: str) -> bool:
             or 0x1E00 <= o <= 0x1EFF)
 
 
+def _strip_annotations(text: str) -> str:
+    """Removes [..] and (..) whose content is one or more letters (general category L*) or U+0020.
+    Left-to-right scan; a removed span is not rescanned (same as a regex substitution)."""
+    out, i, n = [], 0, len(text)
+    while i < n:
+        close = {"[": "]", "(": ")"}.get(text[i])
+        if close:
+            j = i + 1
+            while j < n and (text[j] == " " or unicodedata.category(text[j]).startswith("L")):
+                j += 1
+            if j > i + 1 and j < n and text[j] == close:
+                i = j + 1
+                continue
+        out.append(text[i])
+        i += 1
+    return "".join(out)
+
+
 def clean(text: str) -> tuple[str, list[int]]:
     """Returns the cleaned text and the positions where a line break joined two lines."""
     text = _TAG.sub("", text)
-    text = _ANNOTATION.sub("", text)
+    text = _strip_annotations(text)
     lines = [collapse(_SPEAKER.sub("", line)) for line in _LINE_BREAK.split(text)]
     out, breaks = "", []
     for line in lines:

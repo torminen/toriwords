@@ -41,7 +41,8 @@ final class Device {
     let link: HubLink
     let offset: ScenarioClock
 
-    init(name: String, hub: Hub, clock: ScenarioClock, offsetMs: Int64) async throws {
+    init(name: String, hub: Hub, clock: ScenarioClock, offsetMs: Int64,
+         sleep: @escaping @Sendable (Int64) async throws -> Void = { _ in throw CancellationError() }) async throws {
         self.name = name
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
@@ -52,7 +53,7 @@ final class Device {
         try store.launch(deviceMarker: dir.appendingPathComponent("marker"), displayName: name, purgeKeychain: {})
         link = HubLink(hub)
         engine = SyncEngine(.init(store: store, transport: link, sessionStore: InMemorySessionStore(), appVersion: "1.0.0",
-                                  deviceID: try store.thisDeviceID()!, now: now, sleep: { _ in throw CancellationError() },
+                                  deviceID: try store.thisDeviceID()!, now: now, sleep: sleep,
                                   jitter: { 0.5 }))
         try await engine.start()
     }

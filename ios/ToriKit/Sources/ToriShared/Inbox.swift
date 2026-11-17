@@ -15,9 +15,12 @@ public struct InboxFile: Codable, Hashable, Sendable {
     public struct Source: Codable, Hashable, Sendable {
         public var url: String?
         public var title: String?
-        public init(url: String? = nil, title: String? = nil) {
+        /// "Safari" only when the Safari preprocessing result was present (§4 `source.app`, CH-23); else absent.
+        public var app: String?
+        public init(url: String? = nil, title: String? = nil, app: String? = nil) {
             self.url = url
             self.title = title
+            self.app = app
         }
     }
 

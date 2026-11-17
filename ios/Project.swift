@@ -11,6 +11,11 @@ let settings = Settings.settings(
     ]
 )
 
+/// App Group shared by the app, the Share Extension and the widget (doc 36 §2.2).
+let appGroupEntitlements: Entitlements = .dictionary([
+    "com.apple.security.application-groups": .array([.string("$(TORI_APP_GROUP_ID)")]),
+])
+
 let project = Project(
     name: "Toriwords",
     settings: settings,
@@ -32,7 +37,17 @@ let project = Project(
                 "ToriGoogleReversedClientID": "$(TORI_GOOGLE_REVERSED_CLIENT_ID)",
             ]),
             sources: ["App/**"],
-            resources: ["App/**/*.xcstrings"],
+            // §8.3: the full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app
+            // installs the full file when present, else the sample (Debug/CI). Release fails without the full file.
+            resources: ["App/**/*.xcstrings", "Resources/dictionary*.sqlite"],
+            entitlements: appGroupEntitlements,
+            scripts: [
+                .pre(script: """
+                    if [ "$CONFIGURATION" = "Release" ] && [ ! -f "$SRCROOT/Resources/dictionary.sqlite" ]; then
+                      echo "error: Resources/dictionary.sqlite missing; run tools/dictionary/fetch.sh"; exit 1
+                    fi
+                    """, name: "Require full dictionary in Release", basedOnDependencyAnalysis: false),
+            ],
             dependencies: [
                 .target(name: "ToriwordsShare"),
                 .target(name: "ToriwordsWidget"),
@@ -60,11 +75,16 @@ let project = Project(
                         "NSExtensionActivationRule": [
                             "NSExtensionActivationSupportsText": true,
                             "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
+                            // Safari runs ExtensionPreprocessing.js for web pages (§5.1, P1).
+                            "NSExtensionActivationSupportsWebPageWithMaxCount": 1,
                         ],
+                        "NSExtensionJavaScriptPreprocessingFile": "ExtensionPreprocessing",
                     ],
                 ],
             ]),
-            sources: ["ShareExtension/**"],
+            sources: ["ShareExtension/**/*.swift"],
+            resources: ["ShareExtension/ExtensionPreprocessing.js", "ShareExtension/*.xcstrings"],
+            entitlements: appGroupEntitlements,
             dependencies: [
                 .external(name: "ToriCore"),
                 .external(name: "ToriShared"),
@@ -82,7 +102,9 @@ let project = Project(
                 "CFBundleDisplayName": "ToriWords",
                 "NSExtension": ["NSExtensionPointIdentifier": "com.apple.widgetkit-extension"],
             ]),
-            sources: ["WidgetExtension/**"],
+            sources: ["WidgetExtension/**/*.swift"],
+            resources: ["WidgetExtension/*.xcstrings"],
+            entitlements: appGroupEntitlements,
             dependencies: [
                 .external(name: "ToriCore"),
                 .external(name: "ToriShared"),

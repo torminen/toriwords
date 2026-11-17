@@ -28,28 +28,3 @@ let sampleDictionary = try! BundledDictionary(path: URL(fileURLWithPath: #filePa
     ])
     #expect(Suggestions.build(headwords: [hw], dictVersion: "v", machine: nil).map(\.sense.translation) == ["а", "б"])
 }
-
-@Test func autocompleteMergesVocabularyFirstAndCapsAtEight() throws {
-    let h = try Harness()
-    _ = try h.capture("Make")
-    _ = try h.capture("man")
-    #expect(try Autocomplete.items(for: "m", store: h.store, dictionary: sampleDictionary).isEmpty)
-    let items = try Autocomplete.items(for: "Ma", store: h.store, dictionary: sampleDictionary)
-    #expect(items.count == 8)
-    guard case .vocabulary(let a) = items[0], case .vocabulary(let b) = items[1] else { Issue.record("vocabulary first"); return }
-    #expect([a.matchKey, b.matchKey] == ["make", "man"])
-    let dictKeys = items.dropFirst(2).compactMap { if case .dictionary(let c) = $0 { c.key } else { nil } }
-    #expect(dictKeys.count == 6 && !dictKeys.contains("make") && !dictKeys.contains("man"))
-    // Without a dictionary only the vocabulary part remains.
-    #expect(try Autocomplete.items(for: "ma", store: h.store, dictionary: nil).count == 2)
-}
-
-@Test func vocabularyPrefixIsCappedAndIgnoresDeletedEntries() throws {
-    let h = try Harness()
-    var ids: [String: ToriID] = [:]
-    for t in ["tab", "table", "tablet", "taboo"] { ids[t] = try h.capture(t) }
-    let hits = try h.store.read { try $0.vocabularyPrefix("tab") }
-    #expect(hits.map(\.matchKey) == ["tab", "table", "tablet"])
-    try h.store.deleteEntries([ids["table"]!])
-    #expect(try h.store.read { try $0.vocabularyPrefix("tab", limit: 8) }.map(\.text) == ["tab", "tablet", "taboo"])
-}

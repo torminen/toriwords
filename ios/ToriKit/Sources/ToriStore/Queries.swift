@@ -59,6 +59,8 @@ public struct EntryDetail: Hashable, Sendable {
         public var partOfSpeech: String?
         /// The user edited the translation (rank 1).
         public var translationByUser: Bool
+        /// Provenance of the translation (`wiktionary` shows the Wiktionary mark).
+        public var translationSource: SenseSource?
     }
 
     public struct Context: Hashable, Sendable {
@@ -293,7 +295,8 @@ extension StoreReader {
             """, arguments: [canonical]).map { r in
             let clocks = JSONText.decode([String: FieldClock].self, r["field_clocks"]) ?? [:]
             return EntryDetail.Sense(id: r["id"], translation: r["translation"], definition: r["definition"],
-                                     partOfSpeech: r["part_of_speech"], translationByUser: clocks["translation"]?.u == 1)
+                                     partOfSpeech: r["part_of_speech"], translationByUser: clocks["translation"]?.u == 1,
+                                     translationSource: (r["translation_src"] as String?).flatMap(SenseSource.init(rawValue:)))
         }
         let contexts = try Row.fetchAll(db, sql: """
             SELECT c.id, c.sentence, c.highlight_offset, c.highlight_length, c.captured_at, so.id AS source_id, so.title, so.url

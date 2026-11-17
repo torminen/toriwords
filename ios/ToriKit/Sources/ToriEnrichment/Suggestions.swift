@@ -17,7 +17,7 @@ public enum Suggestions {
         var seen = Set<String>()
         var out: [Suggestion] = []
         for hw in headwords {
-            for sense in hw.senses.sorted(by: { $0.ordinal < $1.ordinal }) {
+            for sense in hw.senses.sorted(by: { ($0.ordinal ?? .max) < ($1.ordinal ?? .max) }) {
                 for ru in sense.translationsRu {
                     let text = ru.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard !text.isEmpty, seen.insert(TextKey.translationKey(text)).inserted else { continue }

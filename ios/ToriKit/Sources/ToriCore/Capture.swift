@@ -147,7 +147,7 @@ public enum Capture {
         return i > 0 && terminals.contains(s[i - 1])
     }
 
-    static func isLatinLetter(_ c: Unicode.Scalar) -> Bool {
+    public static func isLatinLetter(_ c: Unicode.Scalar) -> Bool {
         switch c.value {
         case 0x41...0x5A, 0x61...0x7A, 0x1E00...0x1EFF: true
         case 0xD7, 0xF7: false

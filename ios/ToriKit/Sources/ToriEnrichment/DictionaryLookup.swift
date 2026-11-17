@@ -28,13 +28,14 @@ public struct DictionaryHeadword: Hashable, Sendable {
 }
 
 public struct DictionarySense: Hashable, Sendable {
-    /// `sense.ordinal`, stable within a build; stored as `dict_sense_ordinal`.
-    public var ordinal: Int
+    /// `sense.ordinal`, stable within a build; stored as `dict_sense_ordinal`. nil = the headword's RU variants that are
+    /// not tied to a sense (`translation_ru.sense_id` NULL, e.g. every ruwiktionary variant); listed after the senses.
+    public var ordinal: Int?
     public var glossEn: String?
     /// `translation_ru.text` tied to this sense, ordered by `rank` (not yet deduplicated).
     public var translationsRu: [String]
 
-    public init(ordinal: Int, glossEn: String?, translationsRu: [String]) {
+    public init(ordinal: Int?, glossEn: String?, translationsRu: [String]) {
         self.ordinal = ordinal
         self.glossEn = glossEn
         self.translationsRu = translationsRu

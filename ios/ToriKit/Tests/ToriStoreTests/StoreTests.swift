@@ -586,3 +586,42 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     #expect(Set(merged.senses.compactMap(\.translation)) == ["цвет", "окраска"])
     #expect(try s.store.read { try $0.words(WordsQuery()) }.count == 1)
 }
+
+// MARK: Bulk actions (Words select mode, §14.3)
+
+@Test func bulkStatusAppliesToEverySelectedEntry() throws {
+    let s = try TestStore()
+    let a = try s.store.capture(CaptureInput(term: "alpha", capturedAt: t0, senses: [.tr("а")]))
+    let b = try s.store.capture(CaptureInput(term: "beta", capturedAt: t0, senses: [.tr("б")]))
+    let c = try s.store.capture(CaptureInput(term: "gamma", capturedAt: t0, senses: [.tr("г")]))
+    func stages() throws -> [ToriID: WordStage] {
+        Dictionary(uniqueKeysWithValues: try s.store.read { try $0.words(WordsQuery()) }.map { ($0.id, $0.stage) })
+    }
+    try s.store.setStatus([a, b], .paused)
+    #expect(try stages() == [a: .paused, b: .paused, c: .new])
+    try s.store.setStatus([a, b, c], .known)
+    #expect(try stages() == [a: .known, b: .known, c: .known])
+    try s.store.setStatus([a, c], .active)
+    #expect(try stages() == [a: .new, b: .known, c: .new])
+}
+
+@Test func bulkTagOnlyAddsAndKeepsExistingTags() throws {
+    let s = try TestStore()
+    let a = try s.store.capture(CaptureInput(term: "alpha", capturedAt: t0, tags: ["Home", "reading"]))
+    let b = try s.store.capture(CaptureInput(term: "beta", capturedAt: t0))
+    try s.store.tag([a, b], names: ["home", "Work"])
+    func tags(_ e: ToriID) throws -> [String] { try #require(try s.store.read { try $0.entry(e) }).tags.map(\.name).sorted() }
+    #expect(try tags(a) == ["Home", "Work", "reading"])
+    #expect(try tags(b) == ["Home", "Work"])
+    #expect(try s.store.read { try $0.allTags() }.count == 3)
+}
+
+@Test func bulkDeleteRemovesOnlyTheSelection() throws {
+    let s = try TestStore()
+    let a = try s.store.capture(CaptureInput(term: "alpha", capturedAt: t0))
+    let b = try s.store.capture(CaptureInput(term: "beta", capturedAt: t0))
+    let c = try s.store.capture(CaptureInput(term: "gamma", capturedAt: t0))
+    try s.store.deleteEntries([a, c])
+    #expect(try s.store.read { try $0.words(WordsQuery()) }.map(\.id) == [b])
+    #expect(try s.store.read { try $0.entry(a) } == nil)
+}

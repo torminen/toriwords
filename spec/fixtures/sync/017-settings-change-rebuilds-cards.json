@@ -1,0 +1,126 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §7.6, §21.6",
+  "cases": [
+    {
+      "id": "017-settings-change-rebuilds-cards",
+      "title": "New scheduler settings from another device rebuild the Cards",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 86400,
+          "device": "A",
+          "op": "review",
+          "entry": "run",
+          "rating": "remembered"
+        },
+        {
+          "t": 86410,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 86411,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 86412,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 86413,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 86500,
+          "device": "B",
+          "op": "setSettings",
+          "desiredRetention": 0.8,
+          "newWordsPerDay": 5
+        },
+        {
+          "t": 86600,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 86601,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 86602,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 86603,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "settings": {
+              "newWordsPerDay": 5,
+              "desiredRetention": 0.8
+            },
+            "words": [
+              {
+                "text": "run",
+                "reviews": 1
+              }
+            ]
+          },
+          "B": {
+            "settings": {
+              "newWordsPerDay": 5,
+              "desiredRetention": 0.8
+            },
+            "words": [
+              {
+                "text": "run",
+                "reviews": 1
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "Convergence compares the Card caches (stability, due day, params_id) on both devices."
+    }
+  ]
+}

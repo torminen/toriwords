@@ -1,0 +1,124 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.7 EntryTag membership",
+  "cases": [
+    {
+      "id": "014-untag-after-tag-merge",
+      "title": "Untag after two tags merged clears every EntryTag of the pair",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "tag",
+          "entry": "run",
+          "name": "Verbs"
+        },
+        {
+          "t": 200,
+          "device": "B",
+          "op": "tag",
+          "entry": "run",
+          "name": "verbs"
+        },
+        {
+          "t": 300,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 301,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 302,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 303,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 400,
+          "device": "A",
+          "op": "untag",
+          "entry": "run",
+          "name": "verbs"
+        },
+        {
+          "t": 500,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 501,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 502,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 503,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "tags": []
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "tags": []
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

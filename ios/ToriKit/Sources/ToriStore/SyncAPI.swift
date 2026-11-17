@@ -5,7 +5,10 @@ import ToriCore
 /// `sync_state` keys (doc 36 §4.2).
 public enum SyncStateKey: String, CaseIterable, Sendable {
     case cursor, hlc, accountId, lastSyncedAccountId, pendingAccountChoice, adoptedAccountId, lastServerTime, lastSyncAt,
-         signInBaseline, lastProvider
+         signInBaseline, lastProvider,
+         /// JSON `{appVersion, ids}`: records the server rejected (`invalid_record` / `too_large`), excluded from pushes
+         /// until the app version changes (§11.9).
+         excludedRecords
 }
 
 /// One outbox row (doc 36 §11.4). `field == "*"` = the whole record; `_deleted` / `_mergedInto` = envelope changes.
@@ -20,6 +23,11 @@ public struct OutboxRow: Hashable, Sendable {
 public struct PushBatch: Sendable {
     public var records: [SyncRecord]
     public var rows: [OutboxRow]
+
+    public init(records: [SyncRecord], rows: [OutboxRow]) {
+        self.records = records
+        self.rows = rows
+    }
 }
 
 public struct PulledPageResult: Sendable, Equatable {
@@ -45,7 +53,9 @@ extension ToriStore {
 
     /// Up to `maxRecords` records from the outbox: `*` rows carry every synced field, others only the listed fields;
     /// envelope fields (`owner`, `deleted`, `mergedInto`, `schema`, `type`) always.
-    public func pendingPush(maxRecords: Int = 500) throws -> PushBatch { try db.read { try Outbox.batch($0, maxRecords: maxRecords) } }
+    public func pendingPush(maxRecords: Int = 500, excluding: Set<ToriID> = []) throws -> PushBatch {
+        try db.read { try Outbox.batch($0, maxRecords: maxRecords, excluding: excluding) }
+    }
 
     /// Deletes the rows of acked records whose clock still equals the sent one (rows re-written meanwhile stay).
     public func acknowledge(_ rows: [OutboxRow], acked: Set<ToriID>) throws {
@@ -76,6 +86,45 @@ extension ToriStore {
             let result = try Apply.page(tx, records)
             try SyncStateStore.set(tx.db, .cursor, cursor)
             return result
+        }
+    }
+
+    /// §12.4 step 2 / §12.5 "Add": persist the account and mark every record pending, one transaction.
+    /// `adopted` = the account the local data was adopted into ("Add"); clears `pendingAccountChoice`.
+    public func beginSyncing(account: String, adopted: Bool) throws {
+        try write { tx in
+            try SyncStateStore.set(tx.db, .accountId, account)
+            try SyncStateStore.set(tx.db, .pendingAccountChoice, nil)
+            if adopted { try SyncStateStore.set(tx.db, .adoptedAccountId, account) }
+            try Outbox.markAll(tx)
+        }
+    }
+
+    /// Sign-out, session loss, account deletion (§12.3, §12.7): `accountId`, cursor, `adoptedAccountId`,
+    /// `pendingAccountChoice` and the outbox gone; data and `lastSyncedAccountId` kept.
+    public func enterLocalOnly() throws { try db.write(Account.signedOutState) }
+
+    /// The device holds synced user records beyond the deterministic defaults (LanguagePair, Settings, Device) — §12.4.
+    public func hasUserRecordsBeyondDefaults() throws -> Bool {
+        try db.read { db in
+            for type in RecordType.all where ![RecordType.languagePair, .settings, .device].contains(type) {
+                if try Bool.fetchOne(db, sql: "SELECT EXISTS (SELECT 1 FROM \(type.name))") == true { return true }
+            }
+            return false
+        }
+    }
+
+    /// Live canonical Entries with every Entry ID of their merge group (merge summary, §12.6).
+    public func liveEntryGroups() throws -> [ToriID: Set<ToriID>] {
+        try db.read { db in
+            var groups: [ToriID: Set<ToriID>] = [:]
+            for row in try Row.fetchAll(db, sql: """
+                SELECT m.id, m.canonical_id FROM entry m JOIN entry c ON c.id = m.canonical_id
+                WHERE c.deleted = 0 AND c.merged_into IS NULL
+                """) {
+                groups[row["canonical_id"], default: []].insert(row["id"])
+            }
+            return groups
         }
     }
 

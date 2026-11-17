@@ -1,0 +1,66 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §12.4, §12.6",
+  "cases": [
+    {
+      "id": "001-first-sign-in-backs-up",
+      "title": "First sign-in uploads local words to an empty account",
+      "start": 1762776000000,
+      "devices": {
+        "A": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "translations": [
+                  "бежать"
+                ],
+                "reviews": 0
+              }
+            ],
+            "account": {
+              "state": "synced",
+              "signedIn": "alice",
+              "lastSynced": "alice",
+              "pendingChoice": false,
+              "outbox": 0
+            },
+            "notices": [
+              "backedUp"
+            ]
+          }
+        },
+        "hub": {
+          "alice": {
+            "entries": {
+              "live": 1,
+              "deleted": 0,
+              "merged": 0
+            }
+          }
+        }
+      }
+    }
+  ]
+}

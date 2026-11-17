@@ -1,0 +1,141 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.5 step 2",
+  "cases": [
+    {
+      "id": "027-clock-skew-recovery-restamps",
+      "title": "After the device clock is fixed, the clock-ahead check re-stamps and pushes",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "setClock",
+          "offsetSec": 7200
+        },
+        {
+          "t": 110,
+          "device": "A",
+          "op": "editField",
+          "entry": "run",
+          "field": "note",
+          "value": "ahead"
+        },
+        {
+          "t": 120,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 200,
+          "device": "A",
+          "op": "setClock",
+          "offsetSec": 0
+        },
+        {
+          "t": 210,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 220,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 300,
+          "device": "B",
+          "op": "editField",
+          "entry": "run",
+          "field": "note",
+          "value": "later on B"
+        },
+        {
+          "t": 400,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 401,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 402,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 403,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "note": "later on B"
+              }
+            ],
+            "account": {
+              "state": "synced",
+              "signedIn": "alice",
+              "lastSynced": "alice",
+              "pendingChoice": false,
+              "outbox": 0
+            }
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "note": "later on B"
+              }
+            ],
+            "account": {
+              "state": "synced",
+              "signedIn": "alice",
+              "lastSynced": "alice",
+              "pendingChoice": false,
+              "outbox": 0
+            }
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "The re-stamped clock is the real time of the sync, so B's later edit wins."
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.7, §12.6",
+  "cases": [
+    {
+      "id": "006-duplicate-capture-merged-silently",
+      "title": "The same word captured on two devices merges into one, nothing asked",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "take off",
+          "translations": [
+            "взлететь"
+          ],
+          "as": "a"
+        },
+        {
+          "t": 5,
+          "device": "B",
+          "op": "capture",
+          "term": "Take off",
+          "translations": [
+            "снять"
+          ],
+          "as": "b"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 31,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 32,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 33,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "Take off",
+                "translations": [
+                  "взлететь",
+                  "снять"
+                ]
+              }
+            ],
+            "notices": [
+              "backedUp"
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "Take off",
+                "translations": [
+                  "взлететь",
+                  "снять"
+                ]
+              }
+            ],
+            "notices": [
+              "mergeSummary:0/0/1"
+            ]
+          }
+        },
+        "hub": {
+          "alice": {
+            "entries": {
+              "live": 1,
+              "deleted": 0,
+              "merged": 1
+            }
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "Survivor = smallest ID (A's, captured first); text: both rank 1, the later clock (B's) wins; Senses with different translation keys are both kept, survivor's own first. The rank-0 mergedInto written by the post-pull merge is pushed by the next cycle."
+    }
+  ]
+}

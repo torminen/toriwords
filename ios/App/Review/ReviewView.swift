@@ -19,6 +19,8 @@ struct ReviewView: View {
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: Route.self) { RouteView(route: $0) }
         }
+        // The cover hides the root stack's toast, so the Undo for deletes made in Review shows here.
+        .overlay(alignment: .bottom) { UndoToast().animation(.default, value: env.deletion.current) }
         .task {
             guard model == nil else { return }
             let m = ReviewModel(store: store, env: env)

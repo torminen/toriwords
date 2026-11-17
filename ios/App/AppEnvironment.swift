@@ -85,8 +85,8 @@ final class AppEnvironment {
     /// The installed dictionary (search, autocomplete); nil until launch installed it or when none is bundled.
     var dictionary: BundledDictionary? { (dictionaryInstaller as? AppDictionaryInstaller)?.dictionary }
     @ObservationIgnored var reminders: (any ReminderScheduling)?
-    /// ToriDictionary searches for Add / Entry; replaced by the real adapter when ToriDictionary is merged.
-    @ObservationIgnored var dictionarySearch: any DictionarySearching = NoDictionarySearch()
+    /// Dictionary searches for Add / Entry over `dictionary` (set by the installer at launch); empty while it is nil.
+    var dictionarySearch: DictionarySearch { DictionarySearch(dictionary) }
 
     /// The open Review session, so going to the background commits its undoable answer (§7.8).
     @ObservationIgnored weak var activeReview: ReviewModel?

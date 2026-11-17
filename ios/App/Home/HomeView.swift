@@ -7,6 +7,7 @@ import ToriUI
 struct HomeView: View {
     @Environment(Router.self) private var router
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(PendingDeletion.self) private var deletion
     @State private var model: HomeModel
 
     init(store: ToriStore) { _model = State(initialValue: HomeModel(store: store)) }
@@ -20,7 +21,8 @@ struct HomeView: View {
                         FirstRunCard { router.push(.add(text: nil)) }
                     } else {
                         DueTodayBlock(snapshot: s)
-                        recentlyAdded(s.recent)
+                        // Rows pending deletion are hidden during the Undo window (§5.7).
+                        recentlyAdded(s.recent.filter { !deletion.hidden.contains($0.id) })
                     }
                 }
             }

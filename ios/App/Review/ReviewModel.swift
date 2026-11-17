@@ -134,9 +134,10 @@ final class ReviewModel {
         showCurrent()
     }
 
+    /// Delete with the shared Undo toast (§5.7). Undo keeps the word, but its cards stay out of this session.
     func delete() {
         guard case .card(let c) = screen else { return }
-        perform { try store.deleteEntries([c.card.entry]) }
+        env.deletion.schedule([c.card.entry], word: c.word)
         session.remove(entry: c.card.entry)
         showCurrent()
     }

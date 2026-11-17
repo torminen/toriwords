@@ -7,7 +7,7 @@ spec is doc 34 and the UI spec is doc 35.
 
 | Tool | Version | Pinned in |
 |---|---|---|
-| Xcode | 26.x or later with the iOS 26 SDK (CI uses 26.4) | `.github/workflows/ios.yml` (`XCODE_VERSION`) |
+| Xcode | 27.x (iOS 27 SDK; deployment target iOS 26) | `.github/workflows/ios.yml` (`XCODE_VERSION`) |
 | Tuist | see file | `ios/.tuist-version` |
 | Swift on Linux (ToriKit tests only) | see file | repo-root `.swift-version` |
 | uv + Python 3.12 (fixtures, dictionary tools) | — | `tools/*/pyproject.toml` |

@@ -1,6 +1,17 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ +%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ +%2$lld"
+          }
+        }
+      }
+    },
     "%lld cards reviewed · %lld remembered · %lld new words": {
       "extractionState": "manual",
       "localizations": {
@@ -151,6 +162,59 @@
         }
       }
     },
+    "%lld words": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слово"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слов"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld word"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld words"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld words from this device, %lld from your account, %lld in both.": {
       "extractionState": "manual",
       "localizations": {
@@ -268,6 +332,165 @@
         }
       }
     },
+    "%lld words · A–Z": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слово · А–Я"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова · А–Я"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слов · А–Я"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова · А–Я"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld word · A–Z"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld words · A–Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words · newest first": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слово · сначала новые"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова · сначала новые"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слов · сначала новые"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова · сначала новые"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld word · newest first"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld words · newest first"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words · next due first": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слово · по дате повторения"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова · по дате повторения"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слов · по дате повторения"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова · по дате повторения"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld word · next due first"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld words · next due first"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "About": {
       "extractionState": "manual",
       "localizations": {
@@ -323,6 +546,17 @@
         }
       }
     },
+    "Add": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить"
+          }
+        }
+      }
+    },
     "Add a word": {
       "extractionState": "manual",
       "localizations": {
@@ -341,6 +575,50 @@
           "stringUnit": {
             "state": "translated",
             "value": "Добавить слово…"
+          }
+        }
+      }
+    },
+    "Add meaning": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить значение"
+          }
+        }
+      }
+    },
+    "Add sentence": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить предложение"
+          }
+        }
+      }
+    },
+    "Add tag": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить тег"
+          }
+        }
+      }
+    },
+    "Add tags to words in Add or when editing a word.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавляйте теги при добавлении слова или при его редактировании."
           }
         }
       }
@@ -398,6 +676,17 @@
         }
       }
     },
+    "Add to my words": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить в мои слова"
+          }
+        }
+      }
+    },
     "Add words to export them.": {
       "extractionState": "manual",
       "localizations": {
@@ -427,6 +716,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Добавить первое слово"
+          }
+        }
+      }
+    },
+    "Add “%@”": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить «%@»"
+          }
+        }
+      }
+    },
+    "All": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все"
           }
         }
       }
@@ -471,6 +782,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Все ваши слова, история повторений и теги будут удалены с этого устройства. Это нельзя отменить."
+          }
+        }
+      }
+    },
+    "Already in your vocabulary": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уже в вашем словаре"
           }
         }
       }
@@ -548,6 +870,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Произносить при показе ответа"
+          }
+        }
+      }
+    },
+    "A–Z": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "А–Я"
+          }
+        }
+      }
+    },
+    "Back": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Назад"
           }
         }
       }
@@ -695,6 +1039,17 @@
         }
       }
     },
+    "Clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сбросить"
+          }
+        }
+      }
+    },
     "Close": {
       "extractionState": "manual",
       "localizations": {
@@ -728,6 +1083,17 @@
         }
       }
     },
+    "Continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить"
+          }
+        }
+      }
+    },
     "Couldn't sign in. Try again.": {
       "extractionState": "manual",
       "localizations": {
@@ -750,6 +1116,17 @@
         }
       }
     },
+    "Create tag “%@”": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Создать тег «%@»"
+          }
+        }
+      }
+    },
     "Daily reminder": {
       "extractionState": "manual",
       "localizations": {
@@ -768,6 +1145,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Данные"
+          }
+        }
+      }
+    },
+    "Definition": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Определение"
           }
         }
       }
@@ -812,6 +1200,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Удалить аккаунт, оставить слова на этом устройстве"
+          }
+        }
+      }
+    },
+    "Delete tag “%@”?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить тег «%@»?"
+          }
+        }
+      }
+    },
+    "Delete word": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить слово"
           }
         }
       }
@@ -871,6 +1281,39 @@
         }
       }
     },
+    "Discard": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не сохранять"
+          }
+        }
+      }
+    },
+    "Discard changes?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отменить изменения?"
+          }
+        }
+      }
+    },
+    "Discard this word?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не сохранять это слово?"
+          }
+        }
+      }
+    },
     "Done": {
       "extractionState": "manual",
       "localizations": {
@@ -922,6 +1365,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Изменить"
+          }
+        }
+      }
+    },
+    "English → Russian": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Английский → русский"
           }
         }
       }
@@ -1023,6 +1477,17 @@
         }
       }
     },
+    "Fill in the blank": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вставить пропущенное слово"
+          }
+        }
+      }
+    },
     "Fill in the missing word": {
       "extractionState": "manual",
       "localizations": {
@@ -1030,6 +1495,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вставьте пропущенное слово"
+          }
+        }
+      }
+    },
+    "Filter by tag": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фильтр по тегам"
           }
         }
       }
@@ -1056,6 +1532,17 @@
         }
       }
     },
+    "Hide %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скрыть %@"
+          }
+        }
+      }
+    },
     "I already know this": {
       "extractionState": "manual",
       "localizations": {
@@ -1063,6 +1550,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Я это уже знаю"
+          }
+        }
+      }
+    },
+    "IPA": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Транскрипция (IPA)"
           }
         }
       }
@@ -1078,6 +1576,81 @@
         }
       }
     },
+    "In this sentence: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В этом предложении: %@"
+          }
+        }
+      }
+    },
+    "In your vocabulary": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В вашем словаре"
+          }
+        }
+      }
+    },
+    "It is removed from %lld words. The words stay.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Тег будет убран из %lld слова. Сами слова останутся."
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Тег будет убран из %lld слов. Сами слова останутся."
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Тег будет убран из %lld слов. Сами слова останутся."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Тег будет убран из %lld слова. Сами слова останутся."
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "It is removed from %lld word. The word stays."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "It is removed from %lld words. The words stay."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "It is removed with its review history on all your devices.": {
       "extractionState": "manual",
       "localizations": {
@@ -1085,6 +1658,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Слово и история его повторений будут удалены на всех ваших устройствах."
+          }
+        }
+      }
+    },
+    "Keep editing": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить редактирование"
           }
         }
       }
@@ -1128,7 +1712,7 @@
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Обучение"
+            "value": "Изучение"
           }
         }
       }
@@ -1155,6 +1739,50 @@
         }
       }
     },
+    "Meanings": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Значения"
+          }
+        }
+      }
+    },
+    "Merge": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Объединить"
+          }
+        }
+      }
+    },
+    "Merge combines meanings, sentences, tags and review history into one word.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "При объединении значения, предложения, теги и история повторений соединятся в одном слове."
+          }
+        }
+      }
+    },
+    "Merge “%@” into “%@”?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Объединить «%1$@» с «%2$@»?"
+          }
+        }
+      }
+    },
     "More": {
       "extractionState": "manual",
       "localizations": {
@@ -1166,6 +1794,17 @@
         }
       }
     },
+    "Name": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Название"
+          }
+        }
+      }
+    },
     "New words per day": {
       "extractionState": "manual",
       "localizations": {
@@ -1173,6 +1812,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Новых слов в день"
+          }
+        }
+      }
+    },
+    "Newest": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сначала новые"
+          }
+        }
+      }
+    },
+    "Next due": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "По дате повторения"
           }
         }
       }
@@ -1263,6 +1924,39 @@
         }
       }
     },
+    "No suggestions: the word is not in the dictionary, and on-device translation isn't available. Type a translation (optional).": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вариантов нет: слова нет в словаре, а перевод на устройстве недоступен. Введите перевод (необязательно)."
+          }
+        }
+      }
+    },
+    "No tags yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тегов пока нет"
+          }
+        }
+      }
+    },
+    "No tags yet. Add tags to words in Add or when editing a word.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тегов пока нет. Добавляйте теги при добавлении слова или при его редактировании."
+          }
+        }
+      }
+    },
     "No translation found": {
       "extractionState": "manual",
       "localizations": {
@@ -1274,6 +1968,17 @@
         }
       }
     },
+    "No translation found — add your own": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевод не найден — добавьте свой"
+          }
+        }
+      }
+    },
     "No translation yet": {
       "extractionState": "manual",
       "localizations": {
@@ -1281,6 +1986,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Перевода пока нет"
+          }
+        }
+      }
+    },
+    "No words match “%@”": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет слов по запросу «%@»"
           }
         }
       }
@@ -1318,6 +2034,17 @@
         }
       }
     },
+    "Not reviewed until it has a translation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не повторяется, пока нет перевода."
+          }
+        }
+      }
+    },
     "Not signed in": {
       "extractionState": "manual",
       "localizations": {
@@ -1325,6 +2052,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вход не выполнен"
+          }
+        }
+      }
+    },
+    "Note": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Заметка"
           }
         }
       }
@@ -1406,6 +2144,17 @@
         }
       }
     },
+    "Open word": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть слово"
+          }
+        }
+      }
+    },
     "Opens words that need a translation.": {
       "extractionState": "manual",
       "localizations": {
@@ -1428,6 +2177,17 @@
         }
       }
     },
+    "Part of speech": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Часть речи"
+          }
+        }
+      }
+    },
     "Pause": {
       "extractionState": "manual",
       "localizations": {
@@ -1435,6 +2195,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пауза"
+          }
+        }
+      }
+    },
+    "Phrases": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фразы"
           }
         }
       }
@@ -1534,6 +2305,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Недавно добавленные"
+          }
+        }
+      }
+    },
+    "Related to “%@”": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Связано с «%@»"
+          }
+        }
+      }
+    },
+    "Related words": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Связанные слова"
           }
         }
       }
@@ -1668,6 +2461,17 @@
         }
       }
     },
+    "Remove tag %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Убрать тег %@"
+          }
+        }
+      }
+    },
     "Removing them also deletes words added since sign-in.": {
       "extractionState": "manual",
       "localizations": {
@@ -1675,6 +2479,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вместе с ними удалятся и слова, добавленные после входа."
+          }
+        }
+      }
+    },
+    "Rename tag": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переименовать тег"
+          }
+        }
+      }
+    },
+    "Renames the tag.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переименовывает тег."
           }
         }
       }
@@ -1697,6 +2523,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Восстановление…"
+          }
+        }
+      }
+    },
+    "Resume learning": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить изучение"
           }
         }
       }
@@ -1734,6 +2571,72 @@
         }
       }
     },
+    "Russian → English": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Русский → английский"
+          }
+        }
+      }
+    },
+    "Save": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранить"
+          }
+        }
+      }
+    },
+    "Save adds newly checked meanings and the sentence.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "При сохранении добавятся отмеченные новые значения и предложение."
+          }
+        }
+      }
+    },
+    "Save adds the sentence and meanings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "При сохранении добавятся предложение и значения."
+          }
+        }
+      }
+    },
+    "Save as": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранить как"
+          }
+        }
+      }
+    },
+    "Saved": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранено"
+          }
+        }
+      }
+    },
     "Say it in English": {
       "extractionState": "manual",
       "localizations": {
@@ -1745,6 +2648,50 @@
         }
       }
     },
+    "Search words, translations, sentences": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поиск по словам, переводам, предложениям"
+          }
+        }
+      }
+    },
+    "Sentence": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Предложение"
+          }
+        }
+      }
+    },
+    "Sentence (optional)": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Предложение (необязательно)"
+          }
+        }
+      }
+    },
+    "Sentences": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Предложения"
+          }
+        }
+      }
+    },
     "Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -1752,6 +2699,59 @@
           "stringUnit": {
             "state": "translated",
             "value": "Настройки"
+          }
+        }
+      }
+    },
+    "Show %lld words": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Показать %lld слово"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Показать %lld слова"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Показать %lld слов"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Показать %lld слова"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Show %lld word"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Show %lld words"
+                }
+              }
+            }
           }
         }
       }
@@ -1844,6 +2844,28 @@
         }
       }
     },
+    "Sort": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сортировка"
+          }
+        }
+      }
+    },
+    "Source (optional)": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Источник (необязательно)"
+          }
+        }
+      }
+    },
     "Source code": {
       "extractionState": "manual",
       "localizations": {
@@ -1884,6 +2906,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Статус"
+          }
+        }
+      }
+    },
+    "Suggested meanings": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Предлагаемые значения"
           }
         }
       }
@@ -1965,6 +2998,17 @@
         }
       }
     },
+    "Tag": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тег"
+          }
+        }
+      }
+    },
     "Tags": {
       "extractionState": "manual",
       "localizations": {
@@ -1976,6 +3020,17 @@
         }
       }
     },
+    "Tap the word to save": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нажмите на слово, чтобы сохранить его"
+          }
+        }
+      }
+    },
     "The ToriWords name, logo and app icon are not covered by this licence.": {
       "extractionState": "manual",
       "localizations": {
@@ -1983,6 +3038,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Название, логотип и значок ToriWords не подпадают под эту лицензию."
+          }
+        }
+      }
+    },
+    "The text is kept as the sentence.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Текст сохранится как предложение."
           }
         }
       }
@@ -2027,6 +3093,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Это не резервная копия ToriWords"
+          }
+        }
+      }
+    },
+    "This word was deleted on another device": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это слово удалено на другом устройстве"
           }
         }
       }
@@ -2119,6 +3196,17 @@
         }
       }
     },
+    "Try again": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Повторить"
+          }
+        }
+      }
+    },
     "Try again later.": {
       "extractionState": "manual",
       "localizations": {
@@ -2141,6 +3229,17 @@
         }
       }
     },
+    "Type a translation (optional)": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Введите перевод (необязательно)"
+          }
+        }
+      }
+    },
     "Type it — tap “Add a word…” above": {
       "extractionState": "manual",
       "localizations": {
@@ -2148,6 +3247,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Введите его — нажмите «Добавить слово…» вверху"
+          }
+        }
+      }
+    },
+    "Type the English word or phrase": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Введите английское слово или фразу"
           }
         }
       }
@@ -2192,6 +3302,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Американский английский"
+          }
+        }
+      }
+    },
+    "Undo": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отменить"
           }
         }
       }
@@ -2337,6 +3458,17 @@
         }
       }
     },
+    "Word or phrase": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слово или фраза"
+          }
+        }
+      }
+    },
     "Words": {
       "extractionState": "manual",
       "localizations": {
@@ -2410,6 +3542,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Работает офлайн: словарь встроен."
+          }
+        }
+      }
+    },
+    "You have all related words": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все связанные слова уже у вас"
+          }
+        }
+      }
+    },
+    "You marked this as known": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вы отметили это слово как известное"
+          }
+        }
+      }
+    },
+    "You paused this word": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вы поставили это слово на паузу"
           }
         }
       }
@@ -2784,6 +3949,39 @@
         }
       }
     },
+    "“%@” already exists": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» уже существует"
+          }
+        }
+      }
+    },
+    "“%@” deleted": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» удалено"
+          }
+        }
+      }
+    },
+    "“%@” is already in your vocabulary": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» уже есть в вашем словаре"
+          }
+        }
+      }
+    },
     "← Forgot": {
       "extractionState": "manual",
       "localizations": {
@@ -2791,6 +3989,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "← Забыл"
+          }
+        }
+      }
+    },
+    "✓ In vocabulary": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "✓ В словаре"
           }
         }
       }

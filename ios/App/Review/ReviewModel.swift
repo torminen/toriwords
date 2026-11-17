@@ -103,7 +103,7 @@ final class ReviewModel {
     func flip() {
         guard case .card(let c) = screen, !isFlipped else { return }
         isFlipped = true
-        if env.settings.autoPlayOnReveal { speak(c.word, .autoPlay) }
+        if env.settings.autoPlayOnReveal { env.speak(c.word, .autoPlay) }
     }
 
     func grade(_ rating: Rating) {
@@ -162,12 +162,6 @@ final class ReviewModel {
         }
     }
 
-    func speak(_ text: String, _ trigger: SpeechPlayer.Trigger) {
-        env.speech.accent = env.settings.accent
-        env.speech.speak(text, trigger: trigger)
-    }
-
-    var hasEnglishVoice: Bool { env.speech.hasEnglishVoice }
 
     // MARK: Internals
 

@@ -47,11 +47,10 @@ struct RouteView: View {
     @ViewBuilder
     private func destination(_ store: ToriStore) -> some View {
         switch route {
-        // TODO(9b): Add, Words, Entry read/edit.
-        case .add: PlaceholderScreen(title: "Add", step: "9b")
-        case .words: PlaceholderScreen(title: "Words", step: "9b")
-        case .entry: PlaceholderScreen(title: "Word", step: "9b")
-        case .entryEdit: PlaceholderScreen(title: "Edit", step: "9b")
+        case .add(let text): AddView(store: store, initialText: text)
+        case .words(let q): WordsView(store: store, query: q)
+        case .entry(let id): EntryView(store: store, id: id)
+        case .entryEdit(let id): EntryView(store: store, id: id, editOnly: true)
         case .progress: ProgressScreen(store: store)
         case .settings: SettingsView(store: store)
         case .newWordsPerDay: NewWordsPerDayView(store: store)
@@ -61,23 +60,8 @@ struct RouteView: View {
         case .account: AccountView(store: store)
         case .data: DataView(store: store)
         case .export: ExportView(store: store)
-        case .tags: PlaceholderScreen(title: "Tags", step: "9b")
+        case .tags: TagsView(store: store)
         case .about: AboutView()
         }
-    }
-}
-
-/// TODO(9b/9c): temporary destination until the screen's step lands. Not localised on purpose.
-private struct PlaceholderScreen: View {
-    let title: String
-    let step: String
-
-    var body: some View {
-        Text(verbatim: "\(title) — step \(step)")
-            .foregroundStyle(Palette.textSecondary)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Palette.background)
-            .navigationTitle(Text(verbatim: title))
-            .navigationBarTitleDisplayMode(.inline)
     }
 }

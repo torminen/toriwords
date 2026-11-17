@@ -513,3 +513,76 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     try s.store.setNewWordsPerDay(-1)
     #expect(try s.store.read { try $0.newWordsPerDay() } == 0)
 }
+
+@Test func addQueriesFindSavedWordsAndCountTags() throws {
+    let s = try TestStore()
+    let a = try s.store.capture(CaptureInput(term: "Mortgage", capturedAt: t0, tags: ["Home", "money"]))
+    let b = try s.store.capture(CaptureInput(term: "mortgage rate", capturedAt: t0, tags: ["money"]))
+    _ = try s.store.capture(CaptureInput(term: "more", capturedAt: t0))
+    let c = try s.store.capture(CaptureInput(term: "mortal", capturedAt: t0, tags: ["money"]))
+    try s.store.deleteEntries([c])
+    #expect(try s.store.read { try $0.vocabularyMatches(prefix: "MORT") }.map(\.id) == [a, b])
+    #expect(try s.store.read { try $0.vocabularyMatches(prefix: " ") }.isEmpty)
+    #expect(try s.store.read { try $0.entryID(matching: " mortgage. ") } == a)
+    #expect(try s.store.read { try $0.entryID(matching: "mortal") } == nil)
+    let tags = try s.store.read { try $0.allTags() }
+    let counts = try s.store.read { try $0.tagCounts() }
+    #expect(Dictionary(uniqueKeysWithValues: tags.map { ($0.name, counts[$0.id] ?? 0) }) == ["Home": 1, "money": 2])
+}
+
+// MARK: Entry edit mode
+
+@Test func entryDraftDetectsChangesIgnoringBlankRows() throws {
+    let s = try TestStore()
+    let e = try s.store.capture(CaptureInput(term: "bank", capturedAt: t0, senses: [.tr("банк")], sentence: "A bank."))
+    let detail = try #require(try s.store.read { try $0.entry(e) })
+    var d = EntryDraft(detail)
+    #expect(!d.hasChanges(from: detail))
+    d.meanings.append(.init())
+    d.sentences.append(.init(text: "  "))
+    #expect(!d.hasChanges(from: detail))
+    d.note = "money"
+    #expect(d.hasChanges(from: detail))
+    d.text = " ... "
+    #expect(!d.canSave)
+}
+
+@Test func entryDraftSaveAppliesEditsInOrder() throws {
+    let s = try TestStore()
+    let e = try s.store.capture(CaptureInput(term: "bank", capturedAt: t0, senses: [.tr("банк"), .tr("берег"), .tr("отмель")],
+                                             sentence: "A river bank.", tags: ["money", "nature"]))
+    let detail = try #require(try s.store.read { try $0.entry(e) })
+    var d = EntryDraft(detail)
+    d.text = "Bank"
+    d.ipa = " /bæŋk/ "
+    d.meanings.remove(at: 2)                       // delete "отмель"
+    d.meanings[1].translation = "берег реки"       // edit
+    d.meanings.insert(.init(translation: "крен"), at: 0) // add at the top
+    d.sentences.removeAll()
+    d.sentences.append(.init(text: "The bank was closed.", source: "News"))
+    d.tags = ["Money", "travel"]
+    #expect(try s.store.save(d, original: detail) == .saved)
+    let after = try #require(try s.store.read { try $0.entry(e) })
+    #expect(after.text == "Bank" && after.ipa == "/bæŋk/")
+    #expect(after.senses.map(\.translation) == ["крен", "банк", "берег реки"])
+    #expect(after.senses[0].translationSource == .user && after.senses[1].translationSource == .wiktionary)
+    #expect(after.contexts.map(\.sentence) == ["The bank was closed."])
+    #expect(after.contexts[0].highlight == Capture.Highlight(offset: 4, length: 4) && after.contexts[0].sourceTitle == "News")
+    #expect(after.tags.map(\.name) == ["money", "travel"])
+}
+
+@Test func entryDraftDuplicateTextWritesNothingUntilMergeConfirmed() throws {
+    let s = try TestStore()
+    let a = try s.store.capture(CaptureInput(term: "colour", capturedAt: t0, senses: [.tr("цвет")]))
+    let b = try s.store.capture(CaptureInput(term: "color", capturedAt: t0 + 1, senses: [.tr("окраска")]))
+    let detail = try #require(try s.store.read { try $0.entry(b) })
+    var d = EntryDraft(detail)
+    d.text = "Colour"
+    d.note = "spelling"
+    #expect(try s.store.save(d, original: detail) == .duplicate(of: a))
+    #expect(try s.store.read { try $0.entry(b) }?.note == nil)
+    #expect(try s.store.save(d, original: detail, mergeIfDuplicate: true) == .saved)
+    let merged = try #require(try s.store.read { try $0.entry(b) })
+    #expect(Set(merged.senses.compactMap(\.translation)) == ["цвет", "окраска"])
+    #expect(try s.store.read { try $0.words(WordsQuery()) }.count == 1)
+}

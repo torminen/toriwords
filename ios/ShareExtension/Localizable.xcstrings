@@ -57,6 +57,17 @@
         }
       }
     },
+    "Phrases": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фразы"
+          }
+        }
+      }
+    },
     "Resume learning": {
       "extractionState": "manual",
       "localizations": {
@@ -86,6 +97,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Сохранение добавит это предложение и источник."
+          }
+        }
+      }
+    },
+    "Save as": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранить как"
           }
         }
       }

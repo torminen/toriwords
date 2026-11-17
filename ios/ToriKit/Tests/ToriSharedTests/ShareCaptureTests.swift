@@ -93,3 +93,41 @@ import ToriCore
     #expect(saved.tipShown && saved.sourceTitle == nil && saved.offered(now: 100 + CaptureSticky.offerWindowMs).tags == ["work"])
     #expect(!CaptureSticky.afterSave(now: 1, sourceTitle: "x", tags: [], previous: nil).tipShown)
 }
+
+@Test func baseFormIsPreselectedAndCapturedFormStaysAvailable() throws {
+    var d = CaptureDraft(SharePayload(text: "took", sentence: "The plane took off late."))
+    d.setOffers(baseForm: "take", phrases: [])
+    #expect(d.savedAs == "take" && d.entryText == "take" && d.term == "took")
+    let id = ToriID("0193a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b")!
+    let f = try #require(d.inboxFile(captureId: id, capturedAt: 1, utcOffsetMin: 0, payload: SharePayload(), sourceTitle: nil,
+                                     tags: [], chosenSenses: [], typedTranslation: nil, resume: false))
+    // The sentence keeps the captured span highlighted.
+    #expect(f.term == "take" && f.sentence == "The plane took off late." && f.highlight == Capture.Highlight(offset: 10, length: 4))
+    d.saveAs(nil)
+    #expect(d.entryText == "took")
+    d.saveAs("bogus")
+    #expect(d.savedAs == nil)
+}
+
+@Test func phraseOffersArePickedExplicitlyAndResetOnANewPick() throws {
+    var d = CaptureDraft(SharePayload(text: "She looked after her little brother all summer long."))
+    let i = try #require(d.chips.firstIndex(of: "looked"))
+    d.tapChip(i); d.tapChip(i + 1)
+    d.setOffers(baseForm: nil, phrases: ["look after", "Looked after", "look after"])
+    #expect(d.phrases == ["look after"] && d.savedAs == nil && d.entryText == "looked after")
+    d.saveAs("look after")
+    #expect(d.entryText == "look after" && d.sentence != nil)
+    d.tapChip(i + 3)
+    #expect(d.phrases.isEmpty)
+    #expect(d.savedAs == nil)
+    #expect(d.entryText == "little")
+}
+
+@Test func offersEqualToTheCapturedTextAreDropped() {
+    var d = CaptureDraft(SharePayload(text: "Run"))
+    d.setOffers(baseForm: "run", phrases: [])
+    #expect(d.baseForm == nil && d.entryText == "Run")
+    var empty = CaptureDraft(SharePayload())
+    empty.setOffers(baseForm: "take", phrases: ["take off"])
+    #expect(empty.baseForm == nil && empty.phrases.isEmpty && empty.entryText == nil)
+}

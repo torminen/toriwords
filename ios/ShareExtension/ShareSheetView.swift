@@ -16,6 +16,7 @@ struct ShareSheetView: View {
                 if model.showTip { tip }
                 textSection
                 if model.term != nil {
+                    offersSection
                     hintSection
                     translationSection
                 }
@@ -55,7 +56,7 @@ struct ShareSheetView: View {
         if model.draft.isSentenceSource {
             Section {
                 ChipFlow(chips: model.draft.chips, selection: model.draft.selection, tap: model.tapChip)
-                if let term = model.term { heading(term) }
+                if let term = model.entryText { heading(term) }
             } header: {
                 Text("Tap the word to save")
             }
@@ -70,6 +71,40 @@ struct ShareSheetView: View {
                 if let ipa = model.ipa { Text(verbatim: "/\(ipa)/").foregroundStyle(Palette.textSecondary) }
                 TextField("Sentence (optional)", text: $sentence, axis: .vertical)
                     .onChange(of: sentence) { _, new in model.editSentence(new) }
+            }
+        }
+    }
+
+    /// Dictionary offers for the captured text, as on the app's Add screen: "Save as" base form (preselected) or
+    /// the captured form; contained phrases are opt-in chips. The sentence keeps the captured text.
+    @ViewBuilder private var offersSection: some View {
+        let d = model.draft
+        if let term = d.term, d.baseForm != nil || !d.phrases.isEmpty {
+            Section {
+                if let base = d.baseForm {
+                    Picker(selection: Binding(get: { d.entryText ?? term }, set: { model.saveAs($0) })) {
+                        Text(verbatim: base).tag(base)
+                        Text(verbatim: term).tag(term)
+                    } label: {
+                        Text("Save as")
+                    }
+                    .pickerStyle(.segmented)
+                }
+                if !d.phrases.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: Spacing.s) {
+                            ForEach(d.phrases, id: \.self) { phrase in
+                                let on = d.savedAs == phrase
+                                Button(phrase) { model.saveAs(on ? nil : phrase) }
+                                    .buttonStyle(.bordered).controlSize(.small)
+                                    .tint(on ? Palette.accent : Palette.textSecondary)
+                                    .accessibilityAddTraits(on ? .isSelected : [])
+                            }
+                        }
+                    }
+                }
+            } header: {
+                if d.baseForm == nil { Text("Phrases") }
             }
         }
     }

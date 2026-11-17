@@ -49,6 +49,8 @@ final class ShareModel {
     }
 
     var term: String? { draft.term }
+    /// The text Save stores: the captured term or the dictionary offer chosen for it (base form / phrase).
+    var entryText: String? { draft.entryText }
     var isNonLatin: Bool { !draft.cleaned.text.isEmpty && !draft.cleaned.isSaveable }
     var canSave: Bool { draft.canSave && !saved }
     var hasDictionary: Bool { dictionary != nil }
@@ -56,14 +58,23 @@ final class ShareModel {
     func editText(_ text: String) { draft.editText(text); refresh() }
     func tapChip(_ i: Int) { draft.tapChip(i); refresh() }
     func editSentence(_ text: String) { draft.editSentence(text) }
+    /// Picks a dictionary offer as the saved text (nil = the captured text); variants follow the saved text.
+    func saveAs(_ text: String?) { draft.saveAs(text); lookUp() }
 
     func toggle(_ v: Variant) {
         if picked.contains(v) { picked.remove(v) } else { picked.insert(v) }
     }
 
-    /// New term: dictionary variants (first preselected) and the duplicate hint.
+    /// New term (the draft dropped its offers): base form / contained phrases (doc 36 §6.2), then the lookup.
     private func refresh() {
-        guard let term = draft.term else {
+        let r = draft.term.flatMap { try? dictionary?.resolve($0) }
+        draft.setOffers(baseForm: r?.baseForms.first?.headword.text, phrases: r?.containedPhrases.map(\.text) ?? [])
+        lookUp()
+    }
+
+    /// New saved text: dictionary variants (first preselected) and the duplicate hint.
+    private func lookUp() {
+        guard let term = draft.entryText else {
             (ipa, variants, picked, existing, lookedUp) = (nil, [], [], nil, nil)
             return
         }

@@ -71,6 +71,12 @@ public struct CaptureDraft: Equatable, Sendable {
     public private(set) var sentence: String?
     public private(set) var highlight: Capture.Highlight?
     private var sentenceTyped = false
+    /// Dictionary offers for the captured text (P1, §6.2, Product §5.1 item 9): its base form ("took" → "take") and
+    /// the dictionary phrases inside it ("looked after" → "look after"). Set by the sheet after each lookup.
+    public private(set) var baseForm: String?
+    public private(set) var phrases: [String] = []
+    /// The offer chosen as the saved text; nil = the captured text. The sentence and highlight keep the captured span.
+    public private(set) var savedAs: String?
 
     public init(_ payload: SharePayload) {
         cleaned = Capture.clean(payload.text ?? "")
@@ -89,6 +95,27 @@ public struct CaptureDraft: Equatable, Sendable {
         return cleaned.text.isEmpty ? nil : cleaned.text
     }
 
+    /// What Save stores as the Entry text.
+    public var entryText: String? { term == nil ? nil : savedAs ?? term }
+
+    /// Offers for the current term. Offers equal to the captured text (match key) are dropped; a base form is
+    /// preselected (PD-14 default), a phrase only when the user picks it.
+    public mutating func setOffers(baseForm: String?, phrases: [String]) {
+        let key = term.map(TextKey.matchKey)
+        func useful(_ s: String) -> Bool { key != nil && TextKey.matchKey(s) != key }
+        self.baseForm = baseForm.flatMap { useful($0) ? $0 : nil }
+        var seen = Set<String>()
+        self.phrases = phrases.filter { useful($0) && seen.insert(TextKey.matchKey($0)).inserted }
+        savedAs = self.baseForm
+    }
+
+    /// Picks an offer as the saved text, or the captured text with nil (or any text that is not an offer).
+    public mutating func saveAs(_ text: String?) {
+        savedAs = text.flatMap { t in ([baseForm].compactMap { $0 } + phrases).first { $0 == t } }
+    }
+
+    private mutating func clearOffers() { (baseForm, phrases, savedAs) = (nil, [], nil) }
+
     /// False with no Latin letter ("ToriWords saves English words and phrases") or nothing picked.
     public var canSave: Bool { cleaned.isSaveable && term != nil }
 
@@ -96,6 +123,7 @@ public struct CaptureDraft: Equatable, Sendable {
     public mutating func editText(_ text: String) {
         cleaned = Capture.clean(text)
         reset()
+        clearOffers()
         if let s = sentence, sentenceTyped { highlight = Capture.typedHighlight(sentence: s, entryText: cleaned.text) }
         else if isSentenceSource { sentence = nil; highlight = nil }
     }
@@ -104,6 +132,7 @@ public struct CaptureDraft: Equatable, Sendable {
     /// the single picked chip unpicks; any other chip starts a new pick.
     public mutating func tapChip(_ i: Int) {
         guard chips.indices.contains(i) else { return }
+        clearOffers()
         if let r = selection {
             if r == i...i { selection = nil }
             else if i == r.lowerBound - 1 { selection = i...r.upperBound }
@@ -163,7 +192,7 @@ public struct CaptureDraft: Equatable, Sendable {
     public func inboxFile(captureId: ToriID, capturedAt: Int64, utcOffsetMin: Int, payload: SharePayload,
                           sourceTitle: String?, tags: [String], chosenSenses: [InboxFile.ChosenSense],
                           typedTranslation: String?, resume: Bool) -> InboxFile? {
-        guard canSave, let term else { return nil }
+        guard canSave, let term = entryText else { return nil }
         let title = sourceTitle.flatMap(Self.nonBlank)
         let source = (payload.url != nil || title != nil)
             ? InboxFile.Source(url: payload.url, title: title, app: payload.fromSafari ? "Safari" : nil) : nil

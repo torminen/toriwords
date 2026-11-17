@@ -1,0 +1,708 @@
+# Placeholder coverage list for the AQ-14 check (doc 36 §8.1). NOT the owner's real content.
+# Words: the 500 most frequent alphabetic English tokens from wordfreq 3.1.1 (top_n_list("en"),
+# 2+ letters, contraction fragments and two names removed). Phrases: 200 common phrasal verbs and idioms.
+# Format (also for coverage/owner.txt, which replaces this file when present): one item per line,
+# UTF-8; text after '#' is a comment; blank lines are ignored; an item whose match key contains a
+# space counts as a phrase, otherwise as a word.
+
+the
+to
+and
+of
+in
+is
+for
+that
+you
+it
+on
+with
+this
+was
+be
+as
+are
+have
+at
+he
+not
+by
+but
+from
+my
+or
+we
+an
+your
+all
+so
+his
+they
+me
+if
+one
+can
+will
+just
+like
+about
+up
+out
+what
+has
+when
+more
+do
+no
+were
+who
+had
+their
+there
+her
+which
+time
+get
+been
+would
+she
+new
+people
+how
+some
+also
+them
+now
+other
+its
+our
+than
+good
+only
+after
+first
+him
+into
+know
+see
+two
+make
+over
+think
+any
+then
+could
+back
+these
+want
+because
+go
+well
+said
+way
+most
+much
+very
+where
+even
+should
+may
+here
+need
+really
+did
+right
+work
+year
+years
+being
+day
+too
+going
+before
+off
+why
+made
+still
+take
+got
+many
+never
+those
+life
+say
+world
+down
+great
+through
+last
+while
+best
+such
+love
+man
+home
+long
+look
+something
+use
+same
+used
+both
+every
+am
+come
+part
+state
+three
+around
+between
+always
+better
+find
+help
+high
+little
+old
+since
+another
+does
+own
+things
+under
+during
+game
+thing
+give
+house
+place
+school
+again
+next
+each
+without
+against
+end
+found
+must
+show
+big
+feel
+sure
+team
+ever
+family
+keep
+might
+please
+put
+money
+free
+second
+someone
+away
+left
+number
+city
+days
+lot
+name
+night
+play
+until
+company
+doing
+few
+let
+real
+called
+different
+having
+set
+thought
+done
+however
+getting
+god
+government
+group
+looking
+public
+top
+women
+business
+care
+start
+system
+times
+week
+already
+anything
+case
+nothing
+person
+today
+change
+enough
+everything
+full
+live
+making
+point
+read
+told
+yet
+bad
+four
+hard
+mean
+once
+support
+tell
+including
+music
+power
+seen
+states
+stop
+water
+based
+believe
+call
+head
+men
+national
+small
+took
+white
+came
+far
+job
+side
+though
+try
+went
+yes
+actually
+american
+later
+less
+line
+order
+party
+run
+says
+service
+country
+open
+season
+shit
+thank
+children
+everyone
+general
+trying
+united
+using
+area
+black
+following
+law
+makes
+together
+war
+whole
+car
+face
+five
+kind
+maybe
+per
+president
+story
+working
+course
+games
+health
+hope
+important
+least
+means
+news
+within
+able
+book
+early
+friends
+information
+local
+oh
+post
+thanks
+video
+young
+ago
+others
+social
+talk
+court
+fact
+given
+guys
+half
+hand
+level
+mind
+often
+single
+become
+body
+coming
+control
+death
+food
+guy
+hours
+office
+pay
+problem
+south
+true
+almost
+fuck
+history
+known
+large
+lost
+research
+room
+several
+started
+taking
+university
+win
+wrong
+along
+anyone
+else
+girl
+matter
+pretty
+remember
+air
+bit
+friend
+hit
+needs
+nice
+playing
+probably
+saying
+understand
+yeah
+class
+close
+comes
+idea
+international
+looks
+past
+possible
+wanted
+cause
+due
+happy
+human
+members
+months
+move
+question
+series
+wait
+woman
+ask
+community
+data
+late
+leave
+north
+saw
+special
+watch
+either
+fucking
+future
+light
+low
+million
+morning
+police
+short
+stay
+taken
+age
+buy
+deal
+rather
+reason
+red
+report
+soon
+third
+turn
+whether
+among
+check
+development
+form
+further
+heart
+minutes
+myself
+services
+yourself
+act
+although
+asked
+child
+fire
+fun
+living
+major
+media
+phone
+players
+art
+behind
+building
+easy
+gonna
+market
+near
+non
+plan
+political
+quite
+six
+talking
+west
+works
+according
+available
+education
+final
+former
+front
+kids
+list
+ready
+sometimes
+son
+street
+bring
+college
+current
+example
+experience
+heard
+
+add up
+back down
+back up
+blow up
+break down
+break in
+break out
+break up
+bring about
+bring back
+bring up
+burn out
+call back
+call off
+calm down
+carry on
+carry out
+catch up
+check in
+check out
+cheer up
+clean up
+come across
+come back
+come in
+come on
+come out
+come up
+come up with
+count on
+cut back
+cut down
+cut off
+deal with
+do without
+drop by
+drop off
+drop out
+end up
+fall apart
+fall behind
+fall through
+figure out
+fill in
+fill out
+find out
+get along
+get away
+get back
+get by
+get in
+get off
+get on
+get out
+get over
+get rid of
+get up
+give away
+give back
+give in
+give up
+go ahead
+go away
+go back
+go off
+go on
+go out
+go over
+go through
+grow up
+hand in
+hang on
+hang out
+hang up
+hold on
+hold up
+keep on
+keep up
+kick off
+knock out
+lay off
+leave out
+let down
+log in
+look after
+look for
+look forward to
+look into
+look out
+look up
+make out
+make up
+mess up
+move on
+pass away
+pass out
+pay back
+pick up
+point out
+put away
+put off
+put on
+put out
+put up with
+run into
+run out
+run out of
+set off
+set up
+settle down
+show off
+show up
+shut down
+sign up
+sit down
+slow down
+sort out
+stand out
+stand up
+stay up
+take after
+take care of
+take off
+take on
+take over
+take up
+think over
+throw away
+try on
+turn down
+turn off
+turn on
+turn out
+turn up
+wake up
+warm up
+watch out
+wear out
+work out
+write down
+a piece of cake
+at all
+at least
+at once
+after all
+all of a sudden
+as a matter of fact
+as far as I know
+as soon as possible
+be about to
+better late than never
+break a leg
+by the way
+call it a day
+change one's mind
+cut corners
+every now and then
+for good
+get the hang of
+give it a shot
+hit the hay
+hit the road
+in a nutshell
+in charge of
+in the long run
+in time
+it's up to you
+keep in mind
+keep an eye on
+let alone
+make sense
+make sure
+miss the boat
+no wonder
+on purpose
+on the other hand
+once in a blue moon
+out of the blue
+over the moon
+piece of cake
+pull someone's leg
+rule of thumb
+see eye to eye
+so far
+sooner or later
+take it easy
+the last straw
+under the weather
+up to date
+spill the beans
+bite the bullet
+cost an arm and a leg
+under way
+by heart
+from scratch
+in advance
+in common
+in fact
+in general
+on time

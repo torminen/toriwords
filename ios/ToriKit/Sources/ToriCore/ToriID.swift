@@ -103,3 +103,20 @@ extension UInt8 {
 extension String {
     func leftPadded(_ width: Int) -> String { String(repeating: "0", count: max(0, width - count)) + self }
 }
+
+/// Encoded as the lowercase hyphenated string (wire and file format).
+extension ToriID: Codable {
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.singleValueContainer()
+        let s = try c.decode(String.self)
+        guard let id = ToriID(s) else {
+            throw DecodingError.dataCorruptedError(in: c, debugDescription: "not a UUID: \(s)")
+        }
+        self = id
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.singleValueContainer()
+        try c.encode(description)
+    }
+}

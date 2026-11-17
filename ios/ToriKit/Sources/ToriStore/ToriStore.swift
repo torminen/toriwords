@@ -21,6 +21,7 @@ public final class ToriStore: Sendable {
     }
 
     /// One write transaction with clock stamping and post-write maintenance.
+    @discardableResult
     func write<T>(_ body: (Tx) throws -> T) throws -> T {
         try db.write { db in
             let tx = try Tx(db: db, now: clock())

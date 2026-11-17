@@ -58,7 +58,7 @@ extension ToriStore {
     }
 
     /// Sign-in / "Add to this account": every synced record pending as `*` (§12.5).
-    public func markAllPending() throws { try db.write(Outbox.markAll) }
+    public func markAllPending() throws { try write(Outbox.markAll) }
 
     public func clearOutbox() throws { try db.write { try $0.execute(sql: "DELETE FROM pending_changes") } }
 

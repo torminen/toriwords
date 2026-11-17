@@ -11,5 +11,6 @@ TORI_URL_SCHEME = toriwords
 TORI_GOOGLE_CLIENT_ID = REPLACE_ME.apps.googleusercontent.com
 TORI_GOOGLE_REVERSED_CLIENT_ID = com.googleusercontent.apps.REPLACE_ME
 
-// Backend base URL; empty until a backend exists (sync stays off).
+// Backend base URL (https only); empty until a backend exists (sync stays off).
+// `//` starts an xcconfig comment: write it as https:/$()/api.example.com
 TORI_API_BASE_URL =

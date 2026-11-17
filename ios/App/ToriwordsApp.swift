@@ -7,12 +7,16 @@ struct ToriwordsApp: App {
     @State private var env = AppEnvironment()
 
     var body: some Scene {
+        let env = env
         WindowGroup {
             RootView()
                 .environment(env)
                 .environment(env.router)
                 .tint(Palette.accent)
+                .onOpenURL { env.open($0) }
         }
+        // Registered at launch by SwiftUI; expiration cancels the task (§10.4).
+        .backgroundTask(.appRefresh(AppConfig.backgroundRefreshTaskID)) { await env.backgroundRefresh() }
     }
 }
 

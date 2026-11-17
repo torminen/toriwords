@@ -28,3 +28,36 @@ let sampleDictionary = try! BundledDictionary(path: URL(fileURLWithPath: #filePa
     ])
     #expect(Suggestions.build(headwords: [hw], dictVersion: "v", machine: nil).map(\.sense.translation) == ["а", "б"])
 }
+
+// MARK: DictionarySearch (Add / Entry adapter)
+
+@Test func searchCompletesAndReversesRussianFromTwoLetters() {
+    let search = DictionarySearch(sampleDictionary)
+    let rows = search.complete("Ma", limit: 8)
+    #expect(rows.count == 8 && rows.allSatisfy { TextKey.matchKey($0.text).hasPrefix("ma") && $0.entry == nil })
+    #expect(search.reverse("б", limit: 8).isEmpty)
+    let ru = search.reverse("бег", limit: 8)
+    #expect(ru.first?.text == "run" && ru.first?.translation?.hasPrefix("бег") == true)
+    #expect(DictionarySearch(nil).complete("ma", limit: 8).isEmpty && DictionarySearch(nil).reverse("бег", limit: 8).isEmpty)
+}
+
+@Test func searchOffersBaseFormAndContainedPhrases() {
+    let search = DictionarySearch(sampleDictionary)
+    #expect(search.baseForm(of: "Took") == "take")
+    #expect(search.baseForm(of: "take") == nil)
+    #expect(search.baseForm(of: "took off") == nil)
+    #expect(search.containedPhrases(in: "She looked after her brother.") == ["look after"])
+    #expect(DictionarySearch(nil).baseForm(of: "took") == nil)
+}
+
+@Test func relatedRowsAddWithDictionaryProvenance() throws {
+    let search = DictionarySearch(sampleDictionary)
+    let related = search.related(to: "Actually", limit: 8)
+    #expect(!related.isEmpty && related.count <= 8)
+    #expect(search.related(to: "zzzz", limit: 8).isEmpty && DictionarySearch(nil).related(to: "actually", limit: 8).isEmpty)
+    let row = try #require(related.first { $0.translation != nil })
+    let sense = try #require(search.primarySense(of: row))
+    #expect(sense.translation == row.translation && sense.definition != nil)
+    #expect(sense.source == .wiktionary && sense.dictVersion == sampleDictionary.version
+            && sense.dictHeadwordKey == TextKey.matchKey(row.text))
+}

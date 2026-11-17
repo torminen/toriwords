@@ -82,8 +82,8 @@ final class AppEnvironment {
     @ObservationIgnored var sync: (any SyncCoordinating)?
     @ObservationIgnored var dictionaryInstaller: (any DictionaryInstalling)?
     @ObservationIgnored var reminders: (any ReminderScheduling)?
-    /// ToriDictionary searches for Add / Entry; replaced by the real adapter when ToriDictionary is merged.
-    @ObservationIgnored var dictionarySearch: any DictionarySearching = NoDictionarySearch()
+    /// Dictionary searches for Add / Entry over `dictionary` (set by the installer at launch); empty while it is nil.
+    var dictionarySearch: DictionarySearch { DictionarySearch(dictionary) }
 
     /// The open Review session, so going to the background commits its undoable answer (§7.8).
     @ObservationIgnored weak var activeReview: ReviewModel?

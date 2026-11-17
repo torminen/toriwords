@@ -32,7 +32,8 @@ struct RelatedWords: View {
         }
         .task(id: word) { load() }
         .sheet(item: $preview) { item in
-            RelatedPreview(item: item, isSaved: saved.contains(TextKey.matchKey(item.text))) { add(item) }
+            RelatedPreview(item: item, definition: env.dictionarySearch.primarySense(of: item)?.definition,
+                           isSaved: saved.contains(TextKey.matchKey(item.text))) { add(item) }
         }
     }
 
@@ -77,7 +78,8 @@ struct RelatedWords: View {
     /// One-tap add with the primary translation and no sentence; source "Suggested from '<word>'" (proposal, AQ-19).
     private func add(_ item: Completion) {
         guard let store = env.store else { return }
-        let senses = item.translation.map { [NewSense(translation: $0, definition: item.definition, partOfSpeech: item.partOfSpeech, source: .wiktionary)] } ?? []
+        // Rank-1 dictionary variant with its provenance (version, headword key, sense); none → enrichment fills it.
+        let senses = env.dictionarySearch.primarySense(of: item).map { [$0] } ?? []
         _ = try? store.capture(CaptureInput(term: item.text, capturedAt: Now.ms, origin: "typed", senses: senses,
                                             source: SourceInput(kind: .suggested, title: word)))
         env.didChangeWords()
@@ -93,6 +95,7 @@ extension Completion: @retroactive Identifiable {
 /// Tapping a related word: word with ▶, part of speech, translation, Add to my words, Close (proposal).
 private struct RelatedPreview: View {
     let item: Completion
+    let definition: String?
     let isSaved: Bool
     let add: () -> Void
     @Environment(\.dismiss) private var dismiss
@@ -107,7 +110,7 @@ private struct RelatedPreview: View {
                 Text(verbatim: pos).font(Typography.secondary).foregroundStyle(Palette.textSecondary)
             }
             if let t = item.translation { Text(verbatim: t).font(Typography.heading) }
-            if let d = item.definition { Text(verbatim: d).font(Typography.body).foregroundStyle(Palette.textSecondary) }
+            if let d = definition { Text(verbatim: d).font(Typography.body).foregroundStyle(Palette.textSecondary) }
             Spacer(minLength: Spacing.l)
             if isSaved {
                 Badge("✓ In vocabulary", fill: Palette.successFill)

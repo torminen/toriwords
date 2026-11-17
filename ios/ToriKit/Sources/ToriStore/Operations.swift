@@ -291,7 +291,7 @@ extension ToriStore {
     // MARK: Settings
 
     public func setNewWordsPerDay(_ n: Int) throws {
-        try write { tx in try tx.set(.settings, .settings, ["new_words_per_day": .int(Int64(min(max(n, 0), 50)))], rank: .user) }
+        try write { tx in try tx.set(.settings, .settings, ["new_words_per_day": .int(Int64(min(max(n, Self.newWordsPerDayRange.lowerBound), Self.newWordsPerDayRange.upperBound)))], rank: .user) }
     }
 
     /// A new parameter set triggers a full replay rebuild (§7.6).

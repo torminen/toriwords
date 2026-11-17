@@ -26,6 +26,13 @@ extension SyncCoordinating {
     func backgroundRefresh() async {}
 }
 
+/// What About and Translation show from the bundled dictionary (doc 36 §8.4): `meta.dictionary_version` and
+/// `meta.licence_text`. `BundledDictionary` conforms (AboutView.swift).
+protocol DictionaryAttribution {
+    var version: String { get }
+    var licenceText: String { get }
+}
+
 /// Slot for the dictionary step: copy the bundled `dictionary.sqlite` into the App Group when its version changed
 /// (§8.3) and open it. Returns nil when no dictionary is available.
 @MainActor protocol DictionaryInstalling: AnyObject {
@@ -72,6 +79,8 @@ final class AppEnvironment {
     private(set) var phase: Phase = .launching
     private(set) var store: ToriStore?
     private(set) var enrichment: EnrichmentOrchestrator?
+    /// The installed dictionary; About and Translation read its version and licence (`DictionaryAttribution`).
+    private(set) var dictionary: (any DictionaryLookup)?
     let router = Router()
     let settings = DeviceSettings()
     let speech: SpeechPlayer
@@ -133,6 +142,7 @@ final class AppEnvironment {
             let dictionary = try? await dictionaryInstaller?.installIfNeeded(into: appGroup)
             // 5: inbox import, then pending enrichment, then sync.
             if let appGroup { _ = try? store.importInbox(appGroup.inbox) }
+            self.dictionary = dictionary
             syncCoordinator.attach(store: store)
             let enrichment = EnrichmentOrchestrator(store: store, dictionary: dictionary,
                                                     translator: AppleTranslator(bridge: translationBridge))
@@ -242,7 +252,10 @@ final class AppEnvironment {
     // MARK: After a write
 
     /// After a review commit: debounced snapshot + vocab index (§7.8, 2 s) and reminders.
-    func didCommitAnswer() {
+    func didCommitAnswer() { didChangeData() }
+
+    /// After any bulk write (restore, remove all data): same refresh as after an answer.
+    func didChangeData() {
         scheduleAppGroupRefresh(delay: .seconds(2))
     }
 

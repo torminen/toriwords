@@ -486,6 +486,34 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     #expect(try s.store.read { try $0.cardEntry(card) } == nil)
 }
 
+@Test func exportFileNamesUseTheLocalDay() {
+    let date = Date(timeIntervalSince1970: Double(t0) / 1000) // 2025-11-10 12:00 UTC
+    #expect(ExportFile.name(.backup, at: date, timeZone: TimeZone(identifier: "UTC")!) == "ToriWords-backup-2025-11-10.json")
+    #expect(ExportFile.name(.csv, at: date, timeZone: TimeZone(identifier: "Pacific/Kiritimati")!) == "ToriWords-2025-11-11.csv")
+}
+
+@Test func csvExportCarriesAttributionOnlyWithWiktionaryText() throws {
+    let s = try TestStore()
+    _ = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [NewSense(translation: "бежать", source: .user)]))
+    let plain = String(decoding: try ExportFile.data(.csv, from: s.store, attribution: "Wiktionary, CC BY-SA", utcOffsetMin: 0), as: UTF8.self)
+    #expect(!plain.contains("Wiktionary"))
+
+    _ = try s.store.capture(CaptureInput(term: "go", capturedAt: t0, senses: [NewSense(translation: "идти", source: .wiktionary)]))
+    let csv = String(decoding: try ExportFile.data(.csv, from: s.store, attribution: "Wiktionary, CC BY-SA", utcOffsetMin: 0), as: UTF8.self)
+    #expect(csv.hasSuffix("\r\n\"Wiktionary, CC BY-SA\"\r\n"))
+
+    let backup = try JSONDecoder().decode(Backup.self, from: ExportFile.data(.backup, from: s.store, attribution: "W", utcOffsetMin: 0))
+    #expect(backup.attribution == "W")
+}
+
+@Test func newWordsPerDayIsClampedToTheSettingRange() throws {
+    let s = try TestStore()
+    try s.store.setNewWordsPerDay(99)
+    #expect(try s.store.read { try $0.newWordsPerDay() } == ToriStore.newWordsPerDayRange.upperBound)
+    try s.store.setNewWordsPerDay(-1)
+    #expect(try s.store.read { try $0.newWordsPerDay() } == 0)
+}
+
 @Test func addQueriesFindSavedWordsAndCountTags() throws {
     let s = try TestStore()
     let a = try s.store.capture(CaptureInput(term: "Mortgage", capturedAt: t0, tags: ["Home", "money"]))

@@ -65,11 +65,14 @@ final class AppEnvironment {
     let speech: SpeechPlayer
     let translationBridge = TranslationBridge()
     let appGroup = AppGroup.shared
+    let deletion = PendingDeletion()
 
     // Slots wired by later steps.
     @ObservationIgnored var sync: (any SyncCoordinating)?
     @ObservationIgnored var dictionaryInstaller: (any DictionaryInstalling)?
     @ObservationIgnored var reminders: (any ReminderScheduling)?
+    /// ToriDictionary searches for Add / Entry; replaced by the real adapter when ToriDictionary is merged.
+    @ObservationIgnored var dictionarySearch: any DictionarySearching = NoDictionarySearch()
 
     /// The open Review session, so going to the background commits its undoable answer (§7.8).
     @ObservationIgnored weak var activeReview: ReviewModel?
@@ -103,6 +106,8 @@ final class AppEnvironment {
                                                     translator: AppleTranslator(bridge: translationBridge))
             self.store = store
             self.enrichment = enrichment
+            deletion.store = store
+            deletion.didDelete = { [weak self] in self?.didChangeWords() }
             phase = .ready
             Task {
                 _ = try? await enrichment.runPending()
@@ -128,6 +133,7 @@ final class AppEnvironment {
     /// Background: commit the undoable answer, flush the App Group files, checkpoint the WAL (§3, §7.8).
     func didEnterBackground() {
         activeReview?.commitPending()
+        deletion.commit()
         translationBridge.cancelAll()
         speech.stop()
         appGroupRefresh?.cancel()
@@ -139,6 +145,18 @@ final class AppEnvironment {
 
     /// After a review commit: debounced snapshot + vocab index (§7.8, 2 s) and reminders.
     func didCommitAnswer() {
+        scheduleAppGroupRefresh(delay: .seconds(2))
+        Task { await reminders?.refresh() }
+    }
+
+    /// Speaks with the per-device accent (§9).
+    func speak(_ text: String, _ trigger: SpeechPlayer.Trigger) {
+        speech.accent = settings.accent
+        speech.speak(text, trigger: trigger)
+    }
+
+    /// After an add, edit, status change or delete: the widget snapshot and the Share Extension's vocab index follow.
+    func didChangeWords() {
         scheduleAppGroupRefresh(delay: .seconds(2))
         Task { await reminders?.refresh() }
     }

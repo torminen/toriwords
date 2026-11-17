@@ -7,13 +7,17 @@ public struct Completion: Hashable, Sendable {
     public var text: String
     public var partOfSpeech: String?
     public var translation: String?
+    /// English gloss (related-word preview).
+    public var definition: String?
     /// Set when the word is already saved; tapping the row opens that Entry.
     public var entry: ToriID?
 
-    public init(text: String, partOfSpeech: String? = nil, translation: String? = nil, entry: ToriID? = nil) {
+    public init(text: String, partOfSpeech: String? = nil, translation: String? = nil, definition: String? = nil,
+                entry: ToriID? = nil) {
         self.text = text
         self.partOfSpeech = partOfSpeech
         self.translation = translation
+        self.definition = definition
         self.entry = entry
     }
 }

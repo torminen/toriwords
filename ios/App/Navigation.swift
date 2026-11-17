@@ -38,12 +38,13 @@ final class Router {
 /// Destination for every `Route`, shared by the Home stack and the Review cover's own stack.
 struct RouteView: View {
     let route: Route
+    @Environment(AppEnvironment.self) private var env
 
     var body: some View {
         switch route {
-        // TODO(9b): Add, Words, Entry read/edit.
-        case .add: PlaceholderScreen(title: "Add", step: "9b")
-        case .words: PlaceholderScreen(title: "Words", step: "9b")
+        case .add(let text): if let store = env.store { AddView(store: store, initialText: text) }
+        case .words(let q): if let store = env.store { WordsView(store: store, query: q) }
+        // TODO(9b): Entry read/edit, Tags.
         case .entry: PlaceholderScreen(title: "Word", step: "9b")
         case .entryEdit: PlaceholderScreen(title: "Edit", step: "9b")
         // TODO(9c): Progress, Settings and drill-ins, Account, Data, Export, Tags, About.

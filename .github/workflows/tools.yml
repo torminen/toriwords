@@ -1,0 +1,61 @@
+name: Tools (Python)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/**"
+      - "spec/fixtures/**"
+      - ".github/workflows/tools.yml"
+  pull_request:
+    paths:
+      - "tools/**"
+      - "spec/fixtures/**"
+      - ".github/workflows/tools.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  fixtures:
+    name: fixtures (validate + pytest)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tools/fixtures
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: tools/fixtures/uv.lock
+      - run: uv sync --locked
+      - name: Validate spec/fixtures (schemas, case ids, Unicode ≤ 13)
+        run: uv run python validate.py
+      - name: pytest (incl. generated scheduler fixtures are not stale)
+        run: uv run pytest
+
+  dictionary:
+    name: dictionary tools (pytest, sample data only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tools/dictionary
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: tools/dictionary/uv.lock
+      - run: uv sync --locked
+      # No full build: that downloads the pinned Wiktionary dumps (GBs). Tests use tests/data and the committed sample.
+      - run: uv run pytest

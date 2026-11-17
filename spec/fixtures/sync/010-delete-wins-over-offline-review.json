@@ -1,0 +1,86 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.7 (S4), §11.6 step 3",
+  "cases": [
+    {
+      "id": "010-delete-wins-over-offline-review",
+      "title": "A delete beats an offline review; the late ReviewLog is dropped",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "delete",
+          "entry": "run"
+        },
+        {
+          "t": 200,
+          "device": "B",
+          "op": "review",
+          "entry": "run",
+          "rating": "remembered"
+        },
+        {
+          "t": 300,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 301,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 302,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 303,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": []
+          },
+          "B": {
+            "words": []
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

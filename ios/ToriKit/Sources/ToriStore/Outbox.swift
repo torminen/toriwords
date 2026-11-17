@@ -4,9 +4,11 @@ import ToriCore
 
 /// Outbox reads and bookkeeping (§11.4, §11.5).
 enum Outbox {
-    static func batch(_ db: Database, maxRecords: Int) throws -> PushBatch {
-        let ids = try Row.fetchAll(db, sql: "SELECT record_id, MIN(type) AS type FROM pending_changes GROUP BY record_id ORDER BY record_id LIMIT ?",
-                                   arguments: [maxRecords])
+    static func batch(_ db: Database, maxRecords: Int, excluding: Set<ToriID>) throws -> PushBatch {
+        let ids = try Row.fetchAll(db, sql: """
+            SELECT record_id, MIN(type) AS type FROM pending_changes WHERE record_id NOT IN \(Database.placeholders(excluding.count))
+            GROUP BY record_id ORDER BY record_id LIMIT ?
+            """, arguments: idArgs(excluding) + [maxRecords])
         var records: [SyncRecord] = [], rows: [OutboxRow] = []
         for r in ids {
             let id: ToriID = r["record_id"]

@@ -1,0 +1,115 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.7",
+  "cases": [
+    {
+      "id": "024-merge-by-edit-propagates",
+      "title": "A confirmed merge by edit reaches the other device",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "a"
+        },
+        {
+          "t": 5,
+          "device": "A",
+          "op": "capture",
+          "term": "runn",
+          "translations": [
+            "мчаться"
+          ],
+          "as": "b"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "mergeByEdit",
+          "entry": "b",
+          "text": "run"
+        },
+        {
+          "t": 200,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 201,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 202,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 203,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "translations": [
+                  "бежать",
+                  "мчаться"
+                ]
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "translations": [
+                  "бежать",
+                  "мчаться"
+                ]
+              }
+            ]
+          }
+        },
+        "hub": {
+          "alice": {
+            "entries": {
+              "live": 1,
+              "deleted": 0,
+              "merged": 1
+            }
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

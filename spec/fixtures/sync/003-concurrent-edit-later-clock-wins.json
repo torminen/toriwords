@@ -1,0 +1,99 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.3",
+  "cases": [
+    {
+      "id": "003-concurrent-edit-later-clock-wins",
+      "title": "The same field edited offline on two devices: the later edit wins",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "editField",
+          "entry": "run",
+          "field": "note",
+          "value": "A's note"
+        },
+        {
+          "t": 200,
+          "device": "B",
+          "op": "editField",
+          "entry": "run",
+          "field": "note",
+          "value": "B's note"
+        },
+        {
+          "t": 300,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 301,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 302,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 303,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "note": "B's note"
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "note": "B's note"
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.8",
+  "cases": [
+    {
+      "id": "028-unknown-fields-round-trip",
+      "title": "Fields from a newer app version survive an old client's edits",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 50,
+          "op": "upgradeSchema",
+          "account": "alice",
+          "records": [
+            {
+              "id": "run",
+              "type": "entry",
+              "schema": 2,
+              "fields": {
+                "gender": {
+                  "v": "n",
+                  "u": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "t": 60,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 70,
+          "device": "B",
+          "op": "editField",
+          "entry": "run",
+          "field": "note",
+          "value": "old client"
+        },
+        {
+          "t": 80,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 90,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "note": "old client",
+                "extra": {
+                  "gender": "n"
+                }
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "note": "old client",
+                "extra": {
+                  "gender": "n"
+                }
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

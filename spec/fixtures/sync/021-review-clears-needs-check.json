@@ -1,0 +1,96 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §6.4, §11.3",
+  "cases": [
+    {
+      "id": "021-review-clears-needs-check",
+      "title": "Answering on another device clears 'Check translation' everywhere",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "as": "run"
+        },
+        {
+          "t": 5,
+          "device": "A",
+          "op": "enrich",
+          "entry": "run",
+          "translation": "бежать"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 86400,
+          "device": "B",
+          "op": "review",
+          "entry": "run",
+          "rating": "remembered"
+        },
+        {
+          "t": 86410,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 86411,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 86412,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 86413,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "needsCheck": false,
+                "reviews": 1
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "needsCheck": false,
+                "reviews": 1
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

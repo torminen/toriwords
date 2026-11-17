@@ -476,3 +476,12 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     #expect(try s.store.syncState(.accountId) == nil && s.store.pendingRecordCount() == 0)
     #expect(try s.store.thisDeviceID() != nil)
 }
+
+@Test func cardEntryResolvesLiveEntriesOnly() throws {
+    let s = try TestStore()
+    let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
+    let card = ToriID.card(entry: e, direction: .recall)
+    #expect(try s.store.read { try $0.cardEntry(card) } == e)
+    try s.store.deleteEntries([e])
+    #expect(try s.store.read { try $0.cardEntry(card) } == nil)
+}

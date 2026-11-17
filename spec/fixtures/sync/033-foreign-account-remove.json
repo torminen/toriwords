@@ -1,0 +1,119 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §12.5",
+  "cases": [
+    {
+      "id": "033-foreign-account-remove",
+      "title": "Another account's words: 'Remove' needs the network, then replaces local data",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "B",
+          "op": "capture",
+          "term": "swim",
+          "translations": [
+            "плавать"
+          ],
+          "as": "swim"
+        },
+        {
+          "t": 5,
+          "device": "B",
+          "op": "signIn",
+          "account": "bob"
+        },
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "A",
+          "op": "signOut"
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "signIn",
+          "account": "bob"
+        },
+        {
+          "t": 35,
+          "device": "A",
+          "op": "network",
+          "online": false
+        },
+        {
+          "t": 36,
+          "device": "A",
+          "op": "accountChoice",
+          "choice": "remove"
+        },
+        {
+          "t": 37,
+          "device": "A",
+          "op": "network",
+          "online": true
+        },
+        {
+          "t": 38,
+          "device": "A",
+          "op": "accountChoice",
+          "choice": "remove"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "swim",
+                "translations": [
+                  "плавать"
+                ]
+              }
+            ],
+            "account": {
+              "state": "synced",
+              "signedIn": "bob",
+              "lastSynced": "bob",
+              "pendingChoice": false,
+              "outbox": 0
+            },
+            "notices": [
+              "backedUp",
+              "accountPrompt:1",
+              "removeNeedsNetwork"
+            ]
+          }
+        },
+        "hub": {
+          "bob": {
+            "entries": {
+              "live": 1,
+              "deleted": 0,
+              "merged": 0
+            }
+          }
+        }
+      }
+    }
+  ]
+}

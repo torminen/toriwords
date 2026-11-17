@@ -293,6 +293,13 @@ extension StoreReader {
                            createdAt: row["created_at"] ?? 0, senses: senses, contexts: contexts, tags: try tags(of: canonical), cards: cards)
     }
 
+    /// The live canonical Entry a canonical Card belongs to; nil when the Card or its Entry is gone (Review, §7.8).
+    public func cardEntry(_ card: ToriID) throws -> ToriID? {
+        try ToriID.fetchOne(db, sql: """
+            SELECT e.id FROM card c JOIN entry e ON e.id = c.canonical_entry_id WHERE c.id = ? AND \(Self.liveEntry)
+            """, arguments: [card])
+    }
+
     /// Live canonical Tags the Entry is a member of (OR of `present`), by tag key.
     public func tags(of entry: ToriID) throws -> [TagRow] {
         try Row.fetchAll(db, sql: """

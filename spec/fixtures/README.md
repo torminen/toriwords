@@ -14,7 +14,7 @@ fixture disagree, the fixture wins and the doc is fixed.
 | `merge/` | `field-comparator`, `envelope` | Comparator and envelope merge incl. partial push (§11.3, §22.1) |
 | `capture/` | `clean`, `extract`, `typed-highlight` | Capture text rules (§5.2) |
 | `scheduler/` | `fsrs-step`, `fsrs-replay`, `day-boundary`, `queue-*`, `snapshot` | FSRS-6, replay, 04:00 day, daily queue, widget snapshot (§7, §10.1). **Generated**, see below |
-| `sync/` | `001–034` | Multi-device scenarios (§11–12) — added with the sync step |
+| `sync/` | `001–034` | Multi-device scenarios: merge, purge, accounts, clock skew (§11–12, §21). See [Sync scenarios](#sync-scenarios) |
 | `schema/` | `<kind>.schema.json` | JSON Schema 2020-12, one per fixture kind |
 | `known-deviations.json` | | Must be `[]` before release; no per-platform skips |
 
@@ -50,6 +50,65 @@ Runners run one test argument per case id and print it in the test name.
   "space" = the whitespace list plus the space separators above.
 - **Capture annotations:** a left-to-right scan; `[` or `(` followed by one or more letters (L*) or U+0020 and the matching
   `]` / `)` is removed. A removed span is not rescanned; anything else is kept as is.
+
+## Sync scenarios
+
+Kind `sync-scenario`, one case per file. A case starts at `start` (Unix ms). It names its `devices`, each with a fresh
+store, and runs `steps` in order. Each step has `t` (seconds after start, strictly increasing), which is also the clock
+of the device that runs it. Devices talk to one in-memory hub that implements the §21 merge, the `seq` cursor and the
+merge-group purge. Words and records are named by **aliases** (`as` on `capture`, `entry` on other ops), never by IDs.
+
+Ops: `capture`, `editField` (`text|note|ipa|translation`), `enrich` (an automatic `translation`/`ipa`), `review`,
+`exclude`, `resume`, `delete`, `tag`, `untag`, `mergeByEdit`, `setSettings`, `signIn` (optional page `limit`),
+`accountChoice` (`add|remove|cancel`), `signOut`, `deleteAccount`, `sync`, `pullOnly`, `pushOnly`, `network`
+(`online`), `setClock` (`offsetSec`) and `upgradeSchema`. `upgradeSchema` has no device: it writes records of a newer app
+version (`schema`, unknown fields or types) straight into the hub.
+
+`expected` describes the final logical state:
+
+- `devices.<name>.words`: the exact set of live words. Only the listed keys of each word are compared.
+- `devices.<name>.settings`, `account` (`state`, `signedIn`, `lastSynced`, `pendingChoice`, `outbox` rows) and
+  `notices` (in order).
+- `hub.<account>`: Entry counts (`live`, `deleted`, `merged`), `purged` aliases and per-type record counts.
+- `converged`: these devices hold identical synced and derived rows. Device-local columns and hidden children of
+  deleted words are left out.
+
+| Id | Scenario | Doc 36 |
+|---|---|---|
+| `001` | First sign-in uploads local words to an empty account | §12.4, §12.6 |
+| `002` | A new device signs in and gets everything by a full pull | §11.5, §21.6 |
+| `003` | The same field edited offline on two devices: the later edit wins | §11.3 |
+| `004` | A user value beats a later automatic value of the same field (rank first) | §11.3 |
+| `005` | Edits of different fields on two devices are both kept | §11.3 |
+| `006` | The same word captured on two devices merges into one, nothing asked | §11.7, §12.6 |
+| `007` | Duplicate words with the same translation keep one Sense | §11.7 |
+| `008` | Answers given on two devices to duplicate words are all kept | §11.7 step 5, §7.6 |
+| `009` | A delete on one device beats an offline edit on another | §11.7 (S4) |
+| `010` | A delete beats an offline review; the late ReviewLog is dropped | §11.7 (S4), §11.6 step 3 |
+| `011` | Deleting a word that was merged elsewhere deletes the merged word | §11.6 step 4, §11.7 |
+| `012` | Children pulled before their Entry (page size 1) resolve when the parent arrives | §11.6, §4.3 |
+| `013` | The same tag created on two devices becomes one tag | §11.7 |
+| `014` | Untag after two tags merged clears every EntryTag of the pair | §11.7 EntryTag membership |
+| `015` | Untag of one EntryTag does not remove a concurrent tag merged into the same pair | §11.7 EntryTag membership |
+| `016` | Answers to the same Card on two devices are replayed in time order | §7.6 |
+| `017` | New scheduler settings from another device rebuild the Cards | §7.6, §21.6 |
+| `018` | Signing in to another account with no live words removes silently | §12.4, §12.5 (N = 0) |
+| `019` | Automatic fills on two devices write one Sense; the later wins | §6.4, §11.2 |
+| `020` | A user-edited translation survives a later automatic fill | §11.3, §6.4 |
+| `021` | Answering on another device clears 'Check translation' everywhere | §6.4, §11.3 |
+| `022` | Signing back in to the last-synced account asks nothing | §12.4 |
+| `023` | Exclude, resume and a note on different devices all arrive | §11.3 |
+| `024` | A confirmed merge by edit reaches the other device | §11.7 |
+| `025` | An edit of a merged loser made elsewhere reaches the survivor | §11.6 step 5 |
+| `026` | A push with clocks > 1 h ahead is rejected; the rows stay pending | §11.3, §11.9 |
+| `027` | After the device clock is fixed, the clock-ahead check re-stamps and pushes | §11.5 step 2 |
+| `028` | Fields from a newer app version survive an old client's edits | §11.8 |
+| `029` | A record type from a newer app is skipped on pull and kept on the server | §11.8 |
+| `030` | Another account's words: Cancel pauses sync, nothing is uploaded | §12.4, §12.5 |
+| `031` | A merges X into Y while B deletes X: the whole group is purged on the server | §21.4, §22.2 |
+| `032` | Another account's words: 'Add' uploads them and merges with the account | §12.5 |
+| `033` | Another account's words: 'Remove' needs the network, then replaces local data | §12.5 |
+| `034` | First sign-in with local words into an account with words shows the merge summary | §12.6 |
 
 ## Unicode ≤ 13
 

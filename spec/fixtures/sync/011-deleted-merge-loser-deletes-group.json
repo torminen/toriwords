@@ -1,0 +1,108 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.6 step 4, §11.7",
+  "cases": [
+    {
+      "id": "011-deleted-merge-loser-deletes-group",
+      "title": "Deleting a word that was merged elsewhere deletes the merged word",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "a"
+        },
+        {
+          "t": 5,
+          "device": "B",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бег"
+          ],
+          "as": "b"
+        },
+        {
+          "t": 8,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 30,
+          "device": "B",
+          "op": "delete",
+          "entry": "b"
+        },
+        {
+          "t": 40,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 50,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 60,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 70,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 80,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": []
+          },
+          "B": {
+            "words": []
+          }
+        },
+        "hub": {
+          "alice": {
+            "entries": {
+              "live": 0,
+              "deleted": 2,
+              "merged": 0
+            },
+            "purged": [
+              "a",
+              "b"
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "A merged B's 'run' into its own (smaller ID). B, unaware, deleted its record; the tombstone lands on a merge group member, so the client writes the tombstone on the survivor (rank 0, outbox) and pushes it next cycle."
+    }
+  ]
+}

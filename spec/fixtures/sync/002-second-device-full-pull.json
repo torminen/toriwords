@@ -1,0 +1,95 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.5, §21.6",
+  "cases": [
+    {
+      "id": "002-second-device-full-pull",
+      "title": "A new device signs in and gets everything by a full pull",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "sentence": "I run every day.",
+          "as": "run"
+        },
+        {
+          "t": 1,
+          "device": "A",
+          "op": "capture",
+          "term": "walk",
+          "translations": [
+            "идти"
+          ],
+          "as": "walk"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "translations": [
+                  "бежать"
+                ],
+                "contexts": [
+                  "I run every day."
+                ]
+              },
+              {
+                "text": "walk",
+                "translations": [
+                  "идти"
+                ]
+              }
+            ],
+            "account": {
+              "state": "synced",
+              "signedIn": "alice",
+              "lastSynced": "alice",
+              "pendingChoice": false,
+              "outbox": 0
+            },
+            "notices": []
+          },
+          "A": {
+            "notices": [
+              "backedUp"
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

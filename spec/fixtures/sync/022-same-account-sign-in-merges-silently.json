@@ -1,0 +1,86 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §12.4",
+  "cases": [
+    {
+      "id": "022-same-account-sign-in-merges-silently",
+      "title": "Signing back in to the last-synced account asks nothing",
+      "start": 1762776000000,
+      "devices": {
+        "A": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "A",
+          "op": "signOut"
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "capture",
+          "term": "walk",
+          "translations": [
+            "идти"
+          ],
+          "as": "walk"
+        },
+        {
+          "t": 40,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run"
+              },
+              {
+                "text": "walk"
+              }
+            ],
+            "account": {
+              "state": "synced",
+              "signedIn": "alice",
+              "lastSynced": "alice",
+              "pendingChoice": false,
+              "outbox": 0
+            },
+            "notices": [
+              "backedUp"
+            ]
+          }
+        },
+        "hub": {
+          "alice": {
+            "entries": {
+              "live": 2,
+              "deleted": 0,
+              "merged": 0
+            }
+          }
+        }
+      }
+    }
+  ]
+}

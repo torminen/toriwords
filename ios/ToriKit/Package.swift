@@ -39,6 +39,7 @@ let package = Package(
         .testTarget(name: "ToriStoreTests", dependencies: ["ToriStore", "ToriTestSupport", grdb]),
         .testTarget(name: "ToriSyncTests", dependencies: ["ToriSync", "ToriTestSupport"]),
         .testTarget(name: "ToriEnrichmentTests", dependencies: ["ToriEnrichment", "ToriTestSupport"]),
+        .testTarget(name: "ToriUITests", dependencies: ["ToriUI", "ToriCore"]),
     ],
     swiftLanguageModes: [.v6]
 )

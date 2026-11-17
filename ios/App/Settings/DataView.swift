@@ -30,7 +30,7 @@ struct DataView: View {
             }
             Section {
                 Button("Remove all data from this device", role: .destructive) {
-                    removal = Removal(signedIn: env.syncOrLocal.status.state != .localOnly,
+                    removal = Removal(signedIn: (env.syncCoordinator.model.status?.state ?? .localOnly) != .localOnly,
                                       unsynced: (try? store.pendingRecordCount()) ?? 0)
                 }
             }
@@ -92,7 +92,7 @@ struct DataView: View {
     private func removeAll() {
         Task {
             // Signing out first stops sync; then the wipe (it also clears the auth keys of sync_state).
-            try? await env.sync?.signOut()
+            try? await env.syncCoordinator.signOut()
             try? store.removeAllDataFromDevice(signOut: {})
             env.didChangeData()
         }

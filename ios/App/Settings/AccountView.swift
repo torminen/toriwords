@@ -1,3 +1,4 @@
+import AuthenticationServices
 import SwiftUI
 import ToriStore
 import ToriSync
@@ -7,9 +8,11 @@ import ToriUI
 /// Prompts and summaries are alerts; the engine's one-time `notices` are shown here in order.
 struct AccountView: View {
     @Environment(AppEnvironment.self) private var env
+    @Environment(\.colorScheme) private var colorScheme
     let store: ToriStore
 
-    @State private var lastProvider: SignInProvider?
+    @State private var lastProvider: String?
+    @State private var apple = AppleSignIn()
     @State private var busy = false
     @State private var failure: LocalizedStringResource?
     @State private var signOutNote: Int?
@@ -17,19 +20,17 @@ struct AccountView: View {
     /// Tapping the paused Status row reopens the "Words from another account" prompt.
     @State private var reopenedPrompt: Int?
 
-    private var sync: any SyncCoordinating { env.syncOrLocal }
+    private var sync: SyncCoordinator { env.syncCoordinator }
 
     var body: some View {
-        let status = sync.status
+        let status = sync.model.status
         List {
-            if status.state == .localOnly { signedOut } else { signedIn(status) }
+            if let status, status.state != .localOnly { signedIn(status) } else { signedOut(available: status != nil) }
         }
         .navigationTitle(Text("Account"))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(busy)
-        .task(id: status.state) {
-            lastProvider = (try? store.syncState(.lastProvider)).flatMap { $0 }.flatMap(SignInProvider.init(rawValue:))
-        }
+        .task(id: status?.state) { lastProvider = (try? store.syncState(.lastProvider)) ?? nil }
         .alert(Text("Something went wrong"), isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) {
             Button("OK") {}
         } message: {
@@ -56,26 +57,40 @@ struct AccountView: View {
 
     // MARK: Signed out (S2)
 
+    /// `available == false`: no backend configured in this build, so no sign-in buttons.
     @ViewBuilder
-    private var signedOut: some View {
+    private func signedOut(available: Bool) -> some View {
         Section {
             Text("Your words are stored on this device. Sign in to back them up and sync between your devices. Optional.")
                 .font(Typography.body)
-            Button { signIn(.apple) } label: {
-                Label { Text("Sign in with Apple") } icon: { Image(systemName: "apple.logo") }
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.toriPrimary(tint: .black))
-            .listRowSeparator(.hidden)
-            Button { signIn(.google) } label: { Text("Sign in with Google").frame(maxWidth: .infinity) }
-                .buttonStyle(.toriSecondary)
+            if available {
+                SignInWithAppleButton(.signIn, onRequest: apple.prepare) { result in
+                    signIn { try apple.credential(from: result) }
+                }
+                .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+                .frame(height: 50)
+                .clipShape(RoundedRectangle(cornerRadius: Radius.button, style: .continuous))
                 .listRowSeparator(.hidden)
+                if let google = sync.google {
+                    Button {
+                        signIn { try await GoogleSignIn(config: google, anchor: Self.anchor).signIn() }
+                    } label: { Text("Sign in with Google").frame(maxWidth: .infinity) }
+                        .buttonStyle(.toriSecondary)
+                        .listRowSeparator(.hidden)
+                }
+            }
         } footer: {
-            VStack(alignment: .leading, spacing: Spacing.s) {
-                Text("Apple and Google sign-ins are separate accounts. Use the same one on all your devices.")
-                if let lastProvider { Text("Last time this device used: \(Text(ProviderName.of(lastProvider)))") }
+            if available {
+                VStack(alignment: .leading, spacing: Spacing.s) {
+                    Text("Apple and Google sign-ins are separate accounts. Use the same one on all your devices.")
+                    if let name = ProviderName.of(lastProvider) { Text("Last time this device used: \(Text(name))") }
+                }
             }
         }
+    }
+
+    private static func anchor() -> ASPresentationAnchor {
+        UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.first ?? ASPresentationAnchor()
     }
 
     // MARK: Signed in (S3, S3b, S4)
@@ -83,7 +98,7 @@ struct AccountView: View {
     @ViewBuilder
     private func signedIn(_ status: SyncStatus) -> some View {
         Section {
-            LabeledContent { Text(lastProvider.map(ProviderName.of) ?? "—") } label: { Text("Signed in with") }
+            LabeledContent { Text(ProviderName.of(lastProvider) ?? "—") } label: { Text("Signed in with") }
             if case .paused(let n) = status.state {
                 Button { reopenedPrompt = n } label: {
                     VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -111,12 +126,13 @@ struct AccountView: View {
 
     // MARK: Actions
 
-    private func signIn(_ provider: SignInProvider) {
+    /// Results (merge summary, account prompt) arrive as `status.notices`.
+    private func signIn(_ credential: @escaping () async throws -> SignInCredential) {
         busy = true
         Task {
             defer { busy = false }
-            do { try await sync.signIn(with: provider) }
-            catch is CancellationError {}
+            do { _ = try await sync.signIn(try await credential()) }
+            catch SignInError.cancelled {}
             catch { failure = "Couldn't sign in. Try again." }
         }
     }
@@ -151,42 +167,39 @@ struct AccountView: View {
     }
 }
 
-enum ProviderName {
-    static func of(_ provider: SignInProvider) -> LocalizedStringResource {
-        provider == .apple ? "Apple" : "Google"
-    }
-}
-
 /// The engine's one-time notices (`SyncStatus.notices`, first one shown) as alerts, plus the reopened account prompt.
 private struct NoticeAlerts: ViewModifier {
-    let sync: any SyncCoordinating
+    let sync: SyncCoordinator
     @Binding var reopenedPrompt: Int?
     let resolve: (AccountChoice) -> Void
 
     private var notice: SyncNotice? {
         if let n = reopenedPrompt { return .accountPrompt(words: n) }
-        return sync.status.notices.first
+        return sync.model.status?.notices.first
     }
 
+    /// Called once per alert by the binding when it goes away (after any button action).
     private func close() {
-        if reopenedPrompt != nil { reopenedPrompt = nil } else { sync.dismissNotice() }
+        if reopenedPrompt != nil { reopenedPrompt = nil } else { Task { await sync.dismissNotice() } }
     }
 
     func body(content: Content) -> some View {
         content.alert(title, isPresented: Binding(get: { notice != nil }, set: { if !$0 { close() } })) {
             switch notice {
             case .accountPrompt(let n):
-                Button("Add these \(n) words to this account") { close(); resolve(.add) }
-                Button("Remove all \(n) words from this device", role: .destructive) { close(); resolve(.remove) }
-                Button("Cancel", role: .cancel) { close() }
+                Button("Add these \(n) words to this account") { resolve(.add) }
+                Button("Remove all \(n) words from this device", role: .destructive) { resolve(.remove) }
+                Button("Cancel", role: .cancel) {}
             case .removeNeedsNetwork:
                 // OK reopens the prompt (Product §5.8).
                 Button("OK") {
-                    close()
-                    if case .paused(let n) = sync.status.state { reopenedPrompt = n }
+                    // After the binding's close() for this notice.
+                    Task { @MainActor in
+                        if case .paused(let n) = sync.model.status?.state { reopenedPrompt = n }
+                    }
                 }
             default:
-                Button("OK") { close() }
+                Button("OK") {}
             }
         } message: {
             message

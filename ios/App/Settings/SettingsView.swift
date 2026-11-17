@@ -14,11 +14,11 @@ struct SettingsView: View {
 
     @State private var newWordsPerDay: Int?
     @State private var translation: LanguageAvailability.Status?
-    @State private var notificationsDenied = false
     @State private var editingTime = false
 
     var body: some View {
         @Bindable var settings = env.settings
+        let reminder = env.reminderScheduler
         List {
             Section {
                 DrillRow(title: Text("New words per day"), value: newWordsPerDay.map { Text(verbatim: "\($0)") }) {
@@ -27,9 +27,10 @@ struct SettingsView: View {
             } header: { Text("Learning") }
 
             Section {
-                Toggle(isOn: Binding(get: { settings.reminderEnabled }, set: setReminder)) { Text("Daily reminder") }
-                    .disabled(env.reminders == nil)
-                if settings.reminderEnabled {
+                Toggle(isOn: Binding(get: { reminder.isEnabled }, set: { on in Task { await reminder.setEnabled(on) } })) {
+                    Text("Daily reminder")
+                }
+                if reminder.isEnabled {
                     Button { withAnimation { editingTime.toggle() } } label: {
                         LabeledContent { Text(reminderDate, style: .time) } label: { Text("Time").foregroundStyle(Palette.text) }
                     }
@@ -40,7 +41,7 @@ struct SettingsView: View {
                             .labelsHidden()
                     }
                 }
-                if notificationsDenied {
+                if reminder.isEnabled && reminder.isDenied {
                     VStack(alignment: .leading, spacing: Spacing.xs) {
                         Text("Notifications are off for ToriWords").font(Typography.secondary)
                         Button("Open iOS Settings ›", action: openAppSettings)
@@ -58,7 +59,7 @@ struct SettingsView: View {
                     router.push(.translation)
                 }
                 DrillRow(title: Text("Language"), value: Text(verbatim: AppLanguage.currentName)) { router.push(.language) }
-                DrillRow(title: Text("Account"), value: Text(AccountStatusText.rowValue(env.syncOrLocal.status))) {
+                DrillRow(title: Text("Account"), value: Text(AccountStatusText.rowValue(env.syncCoordinator.model.status))) {
                     router.push(.account)
                 }
                 DrillRow(title: Text("Data"), value: nil) { router.push(.data) }
@@ -69,32 +70,20 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task(id: scenePhase == .active) {
             translation = await AppleTranslator.availability()
-            notificationsDenied = await env.reminders?.notificationsDenied() ?? false
+            await env.reminderScheduler.refresh()
             let values = store.observe { try $0.newWordsPerDay() }
             do { for try await n in values { newWordsPerDay = n } } catch {}
         }
     }
 
     private var reminderDate: Date {
-        Calendar.current.date(bySettingHour: env.settings.reminderHour, minute: env.settings.reminderMinute,
+        Calendar.current.date(bySettingHour: env.reminderScheduler.hour, minute: env.reminderScheduler.minute,
                               second: 0, of: Date()) ?? Date()
-    }
-
-    private func setReminder(_ on: Bool) {
-        guard let reminders = env.reminders else { return }
-        Task {
-            if on {
-                await reminders.enableDailyReminder(hour: env.settings.reminderHour, minute: env.settings.reminderMinute)
-            } else {
-                await reminders.disableDailyReminder()
-            }
-            notificationsDenied = await reminders.notificationsDenied()
-        }
     }
 
     private func setReminderTime(_ date: Date) {
         let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
-        Task { await env.reminders?.enableDailyReminder(hour: parts.hour ?? 19, minute: parts.minute ?? 0) }
+        Task { await env.reminderScheduler.setTime(hour: parts.hour ?? 19, minute: parts.minute ?? 0) }
     }
 }
 

@@ -38,26 +38,31 @@ final class Router {
 /// Destination for every `Route`, shared by the Home stack and the Review cover's own stack.
 struct RouteView: View {
     let route: Route
+    @Environment(AppEnvironment.self) private var env
 
     var body: some View {
+        if let store = env.store { destination(store) }
+    }
+
+    @ViewBuilder
+    private func destination(_ store: ToriStore) -> some View {
         switch route {
         // TODO(9b): Add, Words, Entry read/edit.
         case .add: PlaceholderScreen(title: "Add", step: "9b")
         case .words: PlaceholderScreen(title: "Words", step: "9b")
         case .entry: PlaceholderScreen(title: "Word", step: "9b")
         case .entryEdit: PlaceholderScreen(title: "Edit", step: "9b")
-        // TODO(9c): Progress, Settings and drill-ins, Account, Data, Export, Tags, About.
-        case .progress: PlaceholderScreen(title: "Progress", step: "9c")
-        case .settings: PlaceholderScreen(title: "Settings", step: "9c")
-        case .newWordsPerDay: PlaceholderScreen(title: "New words per day", step: "9c")
-        case .accent: PlaceholderScreen(title: "Accent", step: "9c")
-        case .translation: PlaceholderScreen(title: "Translation", step: "9c")
-        case .language: PlaceholderScreen(title: "Language", step: "9c")
-        case .account: PlaceholderScreen(title: "Account", step: "9c")
-        case .data: PlaceholderScreen(title: "Data", step: "9c")
-        case .export: PlaceholderScreen(title: "Export", step: "9c")
+        case .progress: ProgressScreen(store: store)
+        case .settings: SettingsView(store: store)
+        case .newWordsPerDay: NewWordsPerDayView(store: store)
+        case .accent: AccentView()
+        case .translation: TranslationView()
+        case .language: LanguageView()
+        case .account: AccountView(store: store)
+        case .data: DataView(store: store)
+        case .export: ExportView(store: store)
         case .tags: PlaceholderScreen(title: "Tags", step: "9b")
-        case .about: PlaceholderScreen(title: "About", step: "9c")
+        case .about: AboutView()
         }
     }
 }

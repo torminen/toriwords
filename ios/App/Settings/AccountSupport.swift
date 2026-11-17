@@ -1,4 +1,4 @@
-import Foundation
+import SwiftUI
 import Observation
 import ToriSync
 
@@ -30,6 +30,26 @@ enum AccountStatusText {
         case .localOnly: "Not signed in"
         case .paused: "Sync paused"
         default: "Signed in"
+        }
+    }
+}
+
+extension AccountStatusText {
+    /// Account → Status (doc 36 §11.10).
+    static func status(_ status: SyncStatus) -> Text {
+        if status.clockWarning { return Text("Check your device time") }
+        switch status.state {
+        case .localOnly: return Text("Not signed in")
+        case .firstSync, .syncing: return Text("Syncing…")
+        case .synced:
+            guard let at = status.lastSyncAt else { return Text("Synced") }
+            let date = Date(timeIntervalSince1970: Double(at) / 1000)
+            return Text("Synced \(date.formatted(.relative(presentation: .named)))")
+        case .waitingForNetwork: return Text("Waiting for network")
+        case .unreachable: return Text("Can't reach the server")
+        case .clockSkew: return Text("Check your device time")
+        case .updateRequired: return Text("Update the app to sync")
+        case .paused(let n): return Text("Sync paused: choose what to do with \(n) words")
         }
     }
 }

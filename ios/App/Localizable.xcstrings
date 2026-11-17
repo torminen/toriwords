@@ -23,6 +23,59 @@
         }
       }
     },
+    "%lld new words a day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld new word a day"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld new words a day"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld новое слово в день"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld новых слова в день"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld новых слов в день"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld новых слова в день"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld to review": {
       "extractionState": "manual",
       "localizations": {
@@ -41,6 +94,70 @@
           "stringUnit": {
             "state": "translated",
             "value": "Повторить: %1$lld · Новых: %2$lld"
+          }
+        }
+      }
+    },
+    "%lld unsynced changes will be lost.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld unsynced change will be lost."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld unsynced changes will be lost."
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld несинхронизированное изменение будет потеряно."
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld несинхронизированных изменения будут потеряны."
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld несинхронизированных изменений будут потеряны."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld несинхронизированных изменения будут потеряны."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words from this device, %lld from your account, %lld in both.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "С этого устройства: %1$lld, из аккаунта: %2$lld, совпало: %3$lld."
           }
         }
       }
@@ -98,6 +215,114 @@
         }
       }
     },
+    "%lld words were deleted earlier and were not restored.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld word was deleted earlier and was not restored."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld words were deleted earlier and were not restored."
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слово было удалено раньше и не восстановлено."
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова были удалены раньше и не восстановлены."
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слов были удалены раньше и не восстановлены."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld слова были удалены раньше и не восстановлены."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "About": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "О приложении"
+          }
+        }
+      }
+    },
+    "Accent": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Акцент"
+          }
+        }
+      }
+    },
+    "Account": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Аккаунт"
+          }
+        }
+      }
+    },
+    "Account deleted": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Аккаунт удалён"
+          }
+        }
+      }
+    },
+    "Activity": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Активность"
+          }
+        }
+      }
+    },
     "Add a word": {
       "extractionState": "manual",
       "localizations": {
@@ -116,6 +341,70 @@
           "stringUnit": {
             "state": "translated",
             "value": "Добавить слово…"
+          }
+        }
+      }
+    },
+    "Add these %lld words to this account": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Add this word to this account"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Add these %lld words to this account"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Добавить %lld слово в этот аккаунт"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Добавить %lld слова в этот аккаунт"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Добавить %lld слов в этот аккаунт"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Добавить %lld слова в этот аккаунт"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Add words to export them.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавьте слова, чтобы их экспортировать."
           }
         }
       }
@@ -175,6 +464,127 @@
         }
       }
     },
+    "All your words, review history and tags are deleted from this device. This can't be undone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все ваши слова, история повторений и теги будут удалены с этого устройства. Это нельзя отменить."
+          }
+        }
+      }
+    },
+    "Already known": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уже знаю"
+          }
+        }
+      }
+    },
+    "App language": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Язык приложения"
+          }
+        }
+      }
+    },
+    "Apple": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple"
+          }
+        }
+      }
+    },
+    "Apple Translation is not available on this device. The built-in dictionary still suggests translations.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевод Apple недоступен на этом устройстве. Встроенный словарь по-прежнему предлагает переводы."
+          }
+        }
+      }
+    },
+    "Apple and Google sign-ins are separate accounts. Use the same one on all your devices.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вход через Apple и через Google — это разные аккаунты. Используйте один и тот же на всех устройствах."
+          }
+        }
+      }
+    },
+    "Attribution": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Источники данных"
+          }
+        }
+      }
+    },
+    "Auto-play on reveal": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Произносить при показе ответа"
+          }
+        }
+      }
+    },
+    "Backed up": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Резервная копия создана"
+          }
+        }
+      }
+    },
+    "Backup (JSON)": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Резервная копия (JSON)"
+          }
+        }
+      }
+    },
+    "Backup restored": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Резервная копия восстановлена"
+          }
+        }
+      }
+    },
     "Build your vocabulary": {
       "extractionState": "manual",
       "localizations": {
@@ -182,6 +592,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пополняйте словарный запас"
+          }
+        }
+      }
+    },
+    "Bundled": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Встроенный"
+          }
+        }
+      }
+    },
+    "Can't reach the server": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер недоступен"
           }
         }
       }
@@ -197,6 +629,17 @@
         }
       }
     },
+    "Captured": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавлено"
+          }
+        }
+      }
+    },
     "Card %lld of %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -204,6 +647,50 @@
           "stringUnit": {
             "state": "translated",
             "value": "Карточка %1$lld из %2$lld"
+          }
+        }
+      }
+    },
+    "Change in iOS Settings ›": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Изменить в Настройках iOS ›"
+          }
+        }
+      }
+    },
+    "Changes the interface only. Your words, sentences and translations stay as they are.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Меняет только интерфейс. Ваши слова, предложения и переводы остаются как есть."
+          }
+        }
+      }
+    },
+    "Check your device time": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверьте время на устройстве"
+          }
+        }
+      }
+    },
+    "Choose a .json file exported from ToriWords. Nothing was changed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выберите файл .json, экспортированный из ToriWords. Ничего не изменилось."
           }
         }
       }
@@ -219,6 +706,72 @@
         }
       }
     },
+    "Connect to the internet to delete your account. Nothing was changed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключитесь к интернету, чтобы удалить аккаунт. Ничего не изменилось."
+          }
+        }
+      }
+    },
+    "Connect to the internet to remove these words. Nothing was changed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключитесь к интернету, чтобы удалить эти слова. Ничего не изменилось."
+          }
+        }
+      }
+    },
+    "Couldn't sign in. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось войти. Попробуйте ещё раз."
+          }
+        }
+      }
+    },
+    "Counts words, not cards: each new word brings its cards. Applies on all your devices.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Считаются слова, а не карточки: у каждого нового слова свои карточки. Действует на всех ваших устройствах."
+          }
+        }
+      }
+    },
+    "Daily reminder": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ежедневное напоминание"
+          }
+        }
+      }
+    },
+    "Data": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Данные"
+          }
+        }
+      }
+    },
     "Delete": {
       "extractionState": "manual",
       "localizations": {
@@ -226,6 +779,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Удалить"
+          }
+        }
+      }
+    },
+    "Delete account": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить аккаунт"
+          }
+        }
+      }
+    },
+    "Delete account and remove my words from this device": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить аккаунт и мои слова с этого устройства"
+          }
+        }
+      }
+    },
+    "Delete account, keep my words on this device": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить аккаунт, оставить слова на этом устройстве"
           }
         }
       }
@@ -241,6 +827,50 @@
         }
       }
     },
+    "Deleting your account needs an internet connection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для удаления аккаунта нужно подключение к интернету."
+          }
+        }
+      }
+    },
+    "Dictionary (Wiktionary)": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Словарь (Викисловарь)"
+          }
+        }
+      }
+    },
+    "Dictionary data": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Данные словаря"
+          }
+        }
+      }
+    },
+    "Dictionary data from Wiktionary, CC BY-SA": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Данные словаря из Викисловаря, CC BY-SA"
+          }
+        }
+      }
+    },
     "Done": {
       "extractionState": "manual",
       "localizations": {
@@ -248,6 +878,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Готово"
+          }
+        }
+      }
+    },
+    "Download": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузить"
           }
         }
       }
@@ -285,6 +926,103 @@
         }
       }
     },
+    "English → Russian translation runs on this iPhone once its language data is downloaded. Tap Download, or add English and Russian in iOS Settings → Apps → Translate → Downloaded Languages. The dictionary works without it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевод с английского на русский работает прямо на iPhone, когда загружены языковые данные. Нажмите «Загрузить» или добавьте английский и русский в Настройках iOS → Приложения → Перевод → Загруженные языки. Словарь работает и без этого."
+          }
+        }
+      }
+    },
+    "Everything, including review history. Use it to restore.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Всё, включая историю повторений. Из неё можно восстановить данные."
+          }
+        }
+      }
+    },
+    "Export": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Экспорт"
+          }
+        }
+      }
+    },
+    "Export %lld words": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Export %lld word"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Export %lld words"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Экспортировать %lld слово"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Экспортировать %lld слова"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Экспортировать %lld слов"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Экспортировать %lld слова"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Files with dictionary data include the Wiktionary attribution (CC BY-SA).": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Файлы с данными словаря содержат указание на Викисловарь (CC BY-SA)."
+          }
+        }
+      }
+    },
     "Fill in the missing word": {
       "extractionState": "manual",
       "localizations": {
@@ -307,6 +1045,17 @@
         }
       }
     },
+    "Google": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google"
+          }
+        }
+      }
+    },
     "I already know this": {
       "extractionState": "manual",
       "localizations": {
@@ -314,6 +1063,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Я это уже знаю"
+          }
+        }
+      }
+    },
+    "Imported %lld words, %lld merged with existing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Импортировано слов: %1$lld, из них объединено с существующими: %2$lld."
           }
         }
       }
@@ -329,6 +1089,28 @@
         }
       }
     },
+    "Language": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Язык"
+          }
+        }
+      }
+    },
+    "Last time this device used: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В прошлый раз на этом устройстве: %@"
+          }
+        }
+      }
+    },
     "Learn more new words": {
       "extractionState": "manual",
       "localizations": {
@@ -340,6 +1122,39 @@
         }
       }
     },
+    "Learning": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обучение"
+          }
+        }
+      }
+    },
+    "Libraries": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Библиотеки"
+          }
+        }
+      }
+    },
+    "Licences": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лицензии"
+          }
+        }
+      }
+    },
     "More": {
       "extractionState": "manual",
       "localizations": {
@@ -347,6 +1162,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ещё"
+          }
+        }
+      }
+    },
+    "New words per day": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новых слов в день"
           }
         }
       }
@@ -426,6 +1252,17 @@
         }
       }
     },
+    "No internet connection": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет подключения к интернету"
+          }
+        }
+      }
+    },
     "No translation found": {
       "extractionState": "manual",
       "localizations": {
@@ -448,6 +1285,28 @@
         }
       }
     },
+    "Not available": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Недоступно"
+          }
+        }
+      }
+    },
+    "Not downloaded": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не загружено"
+          }
+        }
+      }
+    },
     "Not now": {
       "extractionState": "manual",
       "localizations": {
@@ -455,6 +1314,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Не сейчас"
+          }
+        }
+      }
+    },
+    "Not signed in": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вход не выполнен"
           }
         }
       }
@@ -470,6 +1340,17 @@
         }
       }
     },
+    "Notifications are off for ToriWords": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уведомления для ToriWords выключены"
+          }
+        }
+      }
+    },
     "OK": {
       "extractionState": "manual",
       "localizations": {
@@ -481,6 +1362,28 @@
         }
       }
     },
+    "On-device translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевод на устройстве"
+          }
+        }
+      }
+    },
+    "One row per word. No review history; can't be restored.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Одна строка на слово. Без истории повторений, восстановить из неё нельзя."
+          }
+        }
+      }
+    },
     "Only on days when cards are due. No streaks.": {
       "extractionState": "manual",
       "localizations": {
@@ -488,6 +1391,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Только в дни, когда есть карточки. Без серий."
+          }
+        }
+      }
+    },
+    "Open iOS Settings ›": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть Настройки iOS ›"
           }
         }
       }
@@ -547,6 +1461,72 @@
         }
       }
     },
+    "Preparing backup…": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подготовка резервной копии…"
+          }
+        }
+      }
+    },
+    "Preparing spreadsheet…": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подготовка таблицы…"
+          }
+        }
+      }
+    },
+    "Privacy": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Конфиденциальность"
+          }
+        }
+      }
+    },
+    "Progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прогресс"
+          }
+        }
+      }
+    },
+    "Pronunciation": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Произношение"
+          }
+        }
+      }
+    },
+    "Ready": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Готово"
+          }
+        }
+      }
+    },
     "Recently added": {
       "extractionState": "manual",
       "localizations": {
@@ -591,6 +1571,136 @@
         }
       }
     },
+    "Reminders": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Напоминания"
+          }
+        }
+      }
+    },
+    "Remove": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить"
+          }
+        }
+      }
+    },
+    "Remove all %lld words from this device": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Remove this word from this device"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Remove all %lld words from this device"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Удалить %lld слово с этого устройства"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Удалить все %lld слова с этого устройства"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Удалить все %lld слов с этого устройства"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Удалить все %lld слова с этого устройства"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Remove all data from this device": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить все данные с этого устройства"
+          }
+        }
+      }
+    },
+    "Remove all data from this device?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить все данные с этого устройства?"
+          }
+        }
+      }
+    },
+    "Removing them also deletes words added since sign-in.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вместе с ними удалятся и слова, добавленные после входа."
+          }
+        }
+      }
+    },
+    "Restore from backup": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Восстановить из копии"
+          }
+        }
+      }
+    },
+    "Restoring…": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Восстановление…"
+          }
+        }
+      }
+    },
     "Review": {
       "extractionState": "manual",
       "localizations": {
@@ -598,6 +1708,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Повторить"
+          }
+        }
+      }
+    },
+    "Reviews": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Повторения"
+          }
+        }
+      }
+    },
+    "Reviews per day, last 30 days": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Повторений в день за последние 30 дней"
           }
         }
       }
@@ -624,6 +1756,83 @@
         }
       }
     },
+    "Sign in with Apple": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Войти с Apple"
+          }
+        }
+      }
+    },
+    "Sign in with Google": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Войти с Google"
+          }
+        }
+      }
+    },
+    "Sign out": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйти"
+          }
+        }
+      }
+    },
+    "Sign out?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйти из аккаунта?"
+          }
+        }
+      }
+    },
+    "Signed in": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вход выполнен"
+          }
+        }
+      }
+    },
+    "Signed in with": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вход через"
+          }
+        }
+      }
+    },
+    "Signed out": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вы вышли из аккаунта"
+          }
+        }
+      }
+    },
     "Something went wrong": {
       "extractionState": "manual",
       "localizations": {
@@ -631,6 +1840,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Что-то пошло не так"
+          }
+        }
+      }
+    },
+    "Source code": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Исходный код"
+          }
+        }
+      }
+    },
+    "Spreadsheet (CSV)": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Таблица (CSV)"
           }
         }
       }
@@ -646,6 +1877,171 @@
         }
       }
     },
+    "Status": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Статус"
+          }
+        }
+      }
+    },
+    "Sync now": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Синхронизировать"
+          }
+        }
+      }
+    },
+    "Sync paused": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Синхронизация на паузе"
+          }
+        }
+      }
+    },
+    "Sync paused: choose what to do with %lld words": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Синхронизация на паузе: выберите, что сделать со словами (%lld)"
+          }
+        }
+      }
+    },
+    "Sync paused: choose what to do with %lld words ›": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Синхронизация на паузе: выберите, что сделать со словами (%lld) ›"
+          }
+        }
+      }
+    },
+    "Synced": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Синхронизировано"
+          }
+        }
+      }
+    },
+    "Synced %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Синхронизировано %@"
+          }
+        }
+      }
+    },
+    "Syncing…": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Синхронизация…"
+          }
+        }
+      }
+    },
+    "Tags": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Теги"
+          }
+        }
+      }
+    },
+    "The ToriWords name, logo and app icon are not covered by this licence.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Название, логотип и значок ToriWords не подпадают под эту лицензию."
+          }
+        }
+      }
+    },
+    "This backup was made by a newer version of ToriWords. Update the app to restore it. Nothing was changed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эта копия создана более новой версией ToriWords. Обновите приложение, чтобы её восстановить. Ничего не изменилось."
+          }
+        }
+      }
+    },
+    "This deletes your cloud backup and signs out all devices.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Облачная копия будет удалена, а на всех устройствах будет выполнен выход."
+          }
+        }
+      }
+    },
+    "This device has %lld words: ones from your previous account and any you added since signing in. Removing them deletes all %lld from this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На этом устройстве слов: %1$lld — из прежнего аккаунта и добавленные после входа. При удалении с устройства исчезнут все (%2$lld)."
+          }
+        }
+      }
+    },
+    "This is not a ToriWords backup": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это не резервная копия ToriWords"
+          }
+        }
+      }
+    },
+    "Time": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Время"
+          }
+        }
+      }
+    },
     "To hear words, download an English voice in Settings → Accessibility → Spoken Content → Voices → English.": {
       "extractionState": "manual",
       "localizations": {
@@ -653,6 +2049,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Чтобы слышать слова, загрузите английский голос: Настройки → Универсальный доступ → Устный контент → Голоса → Английский."
+          }
+        }
+      }
+    },
+    "Today": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сегодня"
+          }
+        }
+      }
+    },
+    "Top sources": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Главные источники"
           }
         }
       }
@@ -668,6 +2086,17 @@
         }
       }
     },
+    "Translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевод"
+          }
+        }
+      }
+    },
     "Translation pending": {
       "extractionState": "manual",
       "localizations": {
@@ -675,6 +2104,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Перевод ожидается"
+          }
+        }
+      }
+    },
+    "Translations for new words come from the built-in dictionary first, then from Apple Translation on this iPhone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переводы новых слов берутся сначала из встроенного словаря, затем из Перевода Apple на этом iPhone."
+          }
+        }
+      }
+    },
+    "Try again later.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Попробуйте позже."
           }
         }
       }
@@ -701,6 +2152,50 @@
         }
       }
     },
+    "UK": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UK"
+          }
+        }
+      }
+    },
+    "UK English": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Британский английский"
+          }
+        }
+      }
+    },
+    "US": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "US"
+          }
+        }
+      }
+    },
+    "US English": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Американский английский"
+          }
+        }
+      }
+    },
     "Undo last answer": {
       "extractionState": "manual",
       "localizations": {
@@ -708,6 +2203,83 @@
           "stringUnit": {
             "state": "translated",
             "value": "Отменить последний ответ"
+          }
+        }
+      }
+    },
+    "Update the app": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обновите приложение"
+          }
+        }
+      }
+    },
+    "Update the app to sync": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обновите приложение для синхронизации"
+          }
+        }
+      }
+    },
+    "Version": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Версия"
+          }
+        }
+      }
+    },
+    "Version %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Версия %@"
+          }
+        }
+      }
+    },
+    "Vocabulary": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Словарный запас"
+          }
+        }
+      }
+    },
+    "Vocabulary merged": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Словари объединены"
+          }
+        }
+      }
+    },
+    "Waiting for network": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ожидание сети"
           }
         }
       }
@@ -776,6 +2348,50 @@
         }
       }
     },
+    "Words added": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавлено слов"
+          }
+        }
+      }
+    },
+    "Words added per week, last 8 weeks": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавлено слов в неделю за последние 8 недель"
+          }
+        }
+      }
+    },
+    "Words are spoken with this iPhone's English voice. Applies to this device only.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слова произносит английский голос этого iPhone. Действует только на этом устройстве."
+          }
+        }
+      }
+    },
+    "Words from another account": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слова из другого аккаунта"
+          }
+        }
+      }
+    },
     "Words you add come back for review just before you forget them.": {
       "extractionState": "manual",
       "localizations": {
@@ -794,6 +2410,138 @@
           "stringUnit": {
             "state": "translated",
             "value": "Работает офлайн: словарь встроен."
+          }
+        }
+      }
+    },
+    "You were signed out. Sign in again to continue syncing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вы вышли из аккаунта. Войдите снова, чтобы продолжить синхронизацию."
+          }
+        }
+      }
+    },
+    "Your ToriWords account was deleted on another device. Your words stay on this device only.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваш аккаунт ToriWords удалён на другом устройстве. Слова остаются только на этом устройстве."
+          }
+        }
+      }
+    },
+    "Your account was not deleted. Try again later.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Аккаунт не удалён. Попробуйте позже."
+          }
+        }
+      }
+    },
+    "Your vocabulary is backed up.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваши слова сохранены в резервной копии."
+          }
+        }
+      }
+    },
+    "Your vocabulary is stored on this device and, when you sign in, on the ToriWords server. No analytics, tracking or crash-reporting SDKs; no usage data is collected. Only the crash and performance reports of iOS itself exist, if you allowed them in iOS Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваши слова хранятся на этом устройстве, а после входа — и на сервере ToriWords. Никакой аналитики, отслеживания и SDK для отчётов о сбоях; данные об использовании не собираются. Есть только отчёты о сбоях и производительности самой iOS, если вы разрешили их в Настройках iOS."
+          }
+        }
+      }
+    },
+    "Your words are deleted from this device and you are signed out. They stay in your account.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваши слова будут удалены с этого устройства, а вы выйдете из аккаунта. В аккаунте они сохранятся."
+          }
+        }
+      }
+    },
+    "Your words are stored on this device. Sign in to back them up and sync between your devices. Optional.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваши слова хранятся на этом устройстве. Войдите, чтобы сохранять их копию и синхронизировать между устройствами. Необязательно."
+          }
+        }
+      }
+    },
+    "Your words stay on this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваши слова останутся на этом устройстве."
+          }
+        }
+      }
+    },
+    "Your words stay on this device. %lld unsynced changes will be uploaded next time you sign in.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваши слова останутся на этом устройстве. Несинхронизированные изменения (%lld) будут загружены при следующем входе."
+          }
+        }
+      }
+    },
+    "new words": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "новых слов"
+          }
+        }
+      }
+    },
+    "reviewed": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "повторено"
+          }
+        }
+      }
+    },
+    "still due": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "осталось"
           }
         }
       }

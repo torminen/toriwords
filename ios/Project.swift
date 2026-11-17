@@ -29,6 +29,7 @@ let project = Project(
                 "UIBackgroundModes": ["fetch"],
             ]),
             sources: ["App/**"],
+            resources: ["App/**/*.xcstrings"],
             dependencies: [
                 .target(name: "ToriwordsShare"),
                 .target(name: "ToriwordsWidget"),

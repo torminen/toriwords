@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/hlc-local-write.schema.json",
+  "title": "HLC local write (doc 36 §11.3)",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "const": "hlc-local-write"
+    },
+    "source": {
+      "type": "string"
+    },
+    "node": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "state": {
+            "type": "object",
+            "properties": {
+              "ms": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "counter": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535
+              }
+            },
+            "required": [
+              "ms",
+              "counter"
+            ],
+            "additionalProperties": false
+          },
+          "now": {
+            "type": "integer"
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "object",
+                "properties": {
+                  "ms": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "counter": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  }
+                },
+                "required": [
+                  "ms",
+                  "counter"
+                ],
+                "additionalProperties": false
+              },
+              "clock": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$"
+              }
+            },
+            "required": [
+              "state",
+              "clock"
+            ],
+            "additionalProperties": false
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "now",
+          "expected"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "source",
+    "node",
+    "cases"
+  ],
+  "additionalProperties": false
+}

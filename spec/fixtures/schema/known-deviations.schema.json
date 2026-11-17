@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/known-deviations.schema.json",
+  "title": "Known platform deviations (must be empty before release, doc 36 §15.2)",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "enum": [
+          "ios",
+          "android",
+          "backend"
+        ]
+      },
+      "fixture": {
+        "type": "string"
+      },
+      "caseId": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "reason": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "platform",
+      "fixture",
+      "caseId",
+      "reason"
+    ],
+    "additionalProperties": false
+  }
+}

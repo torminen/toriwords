@@ -1,0 +1,89 @@
+{
+  "kind": "hlc-clock-ahead",
+  "source": "doc 36 §11.5 step 2: if hlc.ms − lastServerTime > 1 h: hlc = {ms: max(lastServerTime, now), counter: 0}, then every pending outbox field gets a new local-write clock (§11.3) in outbox order. expected.state is the state after re-stamping",
+  "node": "0123456789abcdef",
+  "cases": [
+    {
+      "id": "ca-001",
+      "state": {
+        "ms": 1762794000001,
+        "counter": 4
+      },
+      "lastServerTime": 1762790400000,
+      "now": 1762790395000,
+      "pendingFields": 3,
+      "expected": {
+        "reset": true,
+        "state": {
+          "ms": 1762790400000,
+          "counter": 3
+        },
+        "restampedClocks": [
+          "019a6e7ee00000010123456789abcdef",
+          "019a6e7ee00000020123456789abcdef",
+          "019a6e7ee00000030123456789abcdef"
+        ]
+      },
+      "note": "HLC more than 1 h ahead of the last server time; device clock behind it → ms = lastServerTime"
+    },
+    {
+      "id": "ca-002",
+      "state": {
+        "ms": 1762797600000,
+        "counter": 4
+      },
+      "lastServerTime": 1762790400000,
+      "now": 1762790401000,
+      "pendingFields": 2,
+      "expected": {
+        "reset": true,
+        "state": {
+          "ms": 1762790401000,
+          "counter": 2
+        },
+        "restampedClocks": [
+          "019a6e7ee3e800010123456789abcdef",
+          "019a6e7ee3e800020123456789abcdef"
+        ]
+      },
+      "note": "now > lastServerTime → ms = now"
+    },
+    {
+      "id": "ca-003",
+      "state": {
+        "ms": 1762794000000,
+        "counter": 4
+      },
+      "lastServerTime": 1762790400000,
+      "now": 1762790400000,
+      "pendingFields": 2,
+      "expected": {
+        "reset": false,
+        "state": {
+          "ms": 1762794000000,
+          "counter": 4
+        },
+        "restampedClocks": []
+      },
+      "note": "exactly 1 h ahead → no reset"
+    },
+    {
+      "id": "ca-004",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 4
+      },
+      "lastServerTime": 1762790400000,
+      "now": 1762790400000,
+      "pendingFields": 0,
+      "expected": {
+        "reset": false,
+        "state": {
+          "ms": 1762790400000,
+          "counter": 4
+        },
+        "restampedClocks": []
+      }
+    }
+  ]
+}

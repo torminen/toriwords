@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/hlc-clock-ahead.schema.json",
+  "title": "Clock-ahead recovery before push (doc 36 §11.5 step 2)",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "const": "hlc-clock-ahead"
+    },
+    "source": {
+      "type": "string"
+    },
+    "node": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "state": {
+            "type": "object",
+            "properties": {
+              "ms": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "counter": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535
+              }
+            },
+            "required": [
+              "ms",
+              "counter"
+            ],
+            "additionalProperties": false
+          },
+          "lastServerTime": {
+            "type": "integer"
+          },
+          "now": {
+            "type": "integer"
+          },
+          "pendingFields": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "reset": {
+                "type": "boolean"
+              },
+              "state": {
+                "type": "object",
+                "properties": {
+                  "ms": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "counter": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  }
+                },
+                "required": [
+                  "ms",
+                  "counter"
+                ],
+                "additionalProperties": false
+              },
+              "restampedClocks": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{32}$"
+                }
+              }
+            },
+            "required": [
+              "reset",
+              "state",
+              "restampedClocks"
+            ],
+            "additionalProperties": false
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "lastServerTime",
+          "now",
+          "pendingFields",
+          "expected"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "source",
+    "node",
+    "cases"
+  ],
+  "additionalProperties": false
+}

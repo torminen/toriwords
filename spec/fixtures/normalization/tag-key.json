@@ -1,0 +1,13 @@
+{
+  "kind": "text-key",
+  "function": "tagKey",
+  "source": "doc 36 §15.1 Tag key: NFC, lowercase (step 4), whitespace collapsed/trimmed, ё→е; punctuation kept; no quote/dash mapping, no ignorable removal",
+  "cases": [
+    { "id": "tg-001", "input": "C#", "expected": "c#", "note": "C# ≠ C" },
+    { "id": "tg-002", "input": "C", "expected": "c" },
+    { "id": "tg-003", "input": "  Work   Stuff ", "expected": "work stuff" },
+    { "id": "tg-004", "input": "Ёжик", "expected": "ежик", "note": "Ёжик → ежик" },
+    { "id": "tg-005", "input": "“TV”", "expected": "“tv”", "note": "typographic quotes kept" },
+    { "id": "tg-006", "input": "é-mail!", "expected": "é-mail!" }
+  ]
+}

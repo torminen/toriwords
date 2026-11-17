@@ -1,0 +1,87 @@
+{
+  "kind": "hlc-local-write",
+  "source": "doc 36 §11.3 Format and Local write: pt = now(); if pt > ms {ms = pt; counter = 0} else counter += 1; counter > 0xFFFF → ms += 1, counter = 0. Clock = ms (12 hex) ‖ counter (4 hex) ‖ node (16 hex), lowercase",
+  "node": "0123456789abcdef",
+  "cases": [
+    {
+      "id": "lw-001",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 5
+      },
+      "now": 1762790400001,
+      "expected": {
+        "state": {
+          "ms": 1762790400001,
+          "counter": 0
+        },
+        "clock": "019a6e7ee00100000123456789abcdef"
+      },
+      "note": "physical time ahead"
+    },
+    {
+      "id": "lw-002",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 5
+      },
+      "now": 1762790400000,
+      "expected": {
+        "state": {
+          "ms": 1762790400000,
+          "counter": 6
+        },
+        "clock": "019a6e7ee00000060123456789abcdef"
+      },
+      "note": "same ms → counter + 1"
+    },
+    {
+      "id": "lw-003",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 5
+      },
+      "now": 1762790300000,
+      "expected": {
+        "state": {
+          "ms": 1762790400000,
+          "counter": 6
+        },
+        "clock": "019a6e7ee00000060123456789abcdef"
+      },
+      "note": "device clock behind the HLC"
+    },
+    {
+      "id": "lw-004",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 65535
+      },
+      "now": 1762790400000,
+      "expected": {
+        "state": {
+          "ms": 1762790400001,
+          "counter": 0
+        },
+        "clock": "019a6e7ee00100000123456789abcdef"
+      },
+      "note": "counter overflow → ms + 1, counter 0"
+    },
+    {
+      "id": "lw-005",
+      "state": {
+        "ms": 0,
+        "counter": 0
+      },
+      "now": 1762790400000,
+      "expected": {
+        "state": {
+          "ms": 1762790400000,
+          "counter": 0
+        },
+        "clock": "019a6e7ee00000000123456789abcdef"
+      },
+      "note": "fresh state"
+    }
+  ]
+}

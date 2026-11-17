@@ -1,0 +1,32 @@
+{
+  "kind": "text-key",
+  "function": "urlKey",
+  "source": "doc 36 §15.1 URL key. Parsed by an explicit split (scheme ':' '//' authority path ['?' query] ['#' fragment]), never a platform URL parser; NFC and whitespace trim first",
+  "cases": [
+    { "id": "url-001", "input": "HTTPS://Example.COM/Path?a=1#frag", "expected": "https://example.com/Path?a=1", "note": "scheme and host lowercased, path case kept, fragment dropped" },
+    { "id": "url-002", "input": "https://example.com:443/a", "expected": "https://example.com/a", "note": "default https port dropped" },
+    { "id": "url-003", "input": "http://example.com:80/", "expected": "http://example.com/", "note": "default http port dropped" },
+    { "id": "url-004", "input": "http://example.com:443/", "expected": "http://example.com:443/", "note": "443 is not the default for http" },
+    { "id": "url-005", "input": "https://example.com:8080/x", "expected": "https://example.com:8080/x" },
+    { "id": "url-006", "input": "https://example.com/a?utm_source=x&id=5&utm_medium=y", "expected": "https://example.com/a?id=5" },
+    { "id": "url-007", "input": "https://example.com/?fbclid=1&gclid=2&yclid=3&mc_eid=4", "expected": "https://example.com/", "note": "query removed entirely when nothing is left" },
+    { "id": "url-008", "input": "https://example.com/a?b=2&a=1", "expected": "https://example.com/a?b=2&a=1", "note": "other parameters kept in order" },
+    { "id": "url-009", "input": "https://example.com/a/", "expected": "https://example.com/a/", "note": "trailing slash kept" },
+    { "id": "url-010", "input": "https://example.com", "expected": "https://example.com", "note": "no slash added" },
+    { "id": "url-011", "input": "http://example.com/a", "expected": "http://example.com/a", "note": "http ≠ https" },
+    { "id": "url-012", "input": "https://Пример.РФ/путь?q=1", "expected": "https://xn--e1afmkfd.xn--p1ai/путь?q=1", "note": "IDN host lowercased then punycode per label; path kept as given" },
+    { "id": "url-013", "input": "https://bücher.de", "expected": "https://xn--bcher-kva.de" },
+    { "id": "url-014", "input": "https://bücher.de/", "expected": "https://xn--bcher-kva.de/", "note": "NFC before punycode" },
+    { "id": "url-015", "input": "mailto:Someone@Example.com", "expected": "mailto:Someone@Example.com", "note": "non-http kept as is" },
+    { "id": "url-016", "input": "ftp://Example.com/a#x", "expected": "ftp://Example.com/a#x", "note": "non-http kept as is, fragment included" },
+    { "id": "url-017", "input": "  https://example.com/a \n", "expected": "https://example.com/a", "note": "surrounding whitespace trimmed" },
+    { "id": "url-018", "input": "https://example.com/a?UTM_source=x", "expected": "https://example.com/a?UTM_source=x", "note": "parameter names compared case-sensitively" },
+    { "id": "url-019", "input": "https://example.com/a?utm_source=x", "expected": "https://example.com/a" },
+    { "id": "url-020", "input": "https://example.com/a?", "expected": "https://example.com/a", "note": "empty query dropped" },
+    { "id": "url-021", "input": "https://example.com/a#", "expected": "https://example.com/a" },
+    { "id": "url-022", "input": "https://User@Example.com/a", "expected": "https://User@example.com/a", "note": "userinfo kept as given" },
+    { "id": "url-023", "input": "https://example.com/a?utm_x&keep&fbclid", "expected": "https://example.com/a?keep", "note": "parameters without '=' matched by name" },
+    { "id": "url-024", "input": "https://example.com/a?q=utm_source", "expected": "https://example.com/a?q=utm_source", "note": "only parameter names are matched" },
+    { "id": "url-025", "input": "https://example.com/a?x=1#frag?utm_source=y", "expected": "https://example.com/a?x=1" }
+  ]
+}

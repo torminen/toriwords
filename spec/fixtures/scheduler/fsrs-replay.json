@@ -1,0 +1,659 @@
+{
+  "kind": "fsrs-replay",
+  "source": "doc 36 §7.6 replay: sort by (reviewedAt, id as unsigned bytes), skip rating null, review day = dayNumber(reviewedAt, utcOffsetMin), fold §7.3 from new. expected.steps = state after each rated log in replay order",
+  "params": {
+    "w": [
+      0.212,
+      1.2931,
+      2.3065,
+      8.2956,
+      6.4133,
+      0.8334,
+      3.0194,
+      0.001,
+      1.8722,
+      0.1666,
+      0.796,
+      1.4835,
+      0.0614,
+      0.2629,
+      1.6483,
+      0.6014,
+      1.8729,
+      0.5425,
+      0.0912,
+      0.0658,
+      0.1542
+    ],
+    "desiredRetention": 0.9,
+    "maximumInterval": 36500
+  },
+  "cases": [
+    {
+      "id": "rp-001",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "logs": [
+        {
+          "id": "01a11a4f-cd80-7001-8000-000000000001",
+          "reviewedAt": 1791442800000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a1249c-8580-7002-8000-000000000002",
+          "reviewedAt": 1791615600000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a14dcf-6580-7003-8000-000000000003",
+          "reviewedAt": 1792306800000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a1b4ce-9580-7004-8000-000000000004",
+          "reviewedAt": 1794034800000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a1e84e-2d80-7005-8000-000000000005",
+          "reviewedAt": 1794898800000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        }
+      ],
+      "note": "steady Remembered history",
+      "expected": {
+        "steps": [
+          {
+            "logId": "01a11a4f-cd80-7001-8000-000000000001",
+            "reviewDay": 20734,
+            "stability": 2.3065,
+            "difficulty": 2.118103970459015,
+            "lastReviewDay": 20734,
+            "dueDay": 20736,
+            "interval": 2,
+            "reps": 1,
+            "lapses": 0,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a1249c-8580-7002-8000-000000000002",
+            "reviewDay": 20736,
+            "stability": 10.964332335820703,
+            "difficulty": 2.1112142357853942,
+            "lastReviewDay": 20736,
+            "dueDay": 20748,
+            "interval": 11,
+            "reps": 2,
+            "lapses": 0,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a14dcf-6580-7003-8000-000000000003",
+            "reviewDay": 20744,
+            "stability": 38.866587212424676,
+            "difficulty": 2.1043313908464474,
+            "lastReviewDay": 20744,
+            "dueDay": 20787,
+            "interval": 39,
+            "reps": 3,
+            "lapses": 0,
+            "stage": "known_well"
+          },
+          {
+            "logId": "01a1b4ce-9580-7004-8000-000000000004",
+            "reviewDay": 20764,
+            "stability": 99.69845856036893,
+            "difficulty": 2.0974554287524394,
+            "lastReviewDay": 20764,
+            "dueDay": 20865,
+            "interval": 100,
+            "reps": 4,
+            "lapses": 0,
+            "stage": "known_well"
+          },
+          {
+            "logId": "01a1e84e-2d80-7005-8000-000000000005",
+            "reviewDay": 20774,
+            "stability": 130.5173842154569,
+            "difficulty": 2.0905863426205253,
+            "lastReviewDay": 20774,
+            "dueDay": 20911,
+            "interval": 131,
+            "reps": 5,
+            "lapses": 0,
+            "stage": "known_well"
+          }
+        ],
+        "final": {
+          "stability": 130.5173842154569,
+          "difficulty": 2.0905863426205253,
+          "lastReviewDay": 20774,
+          "dueDay": 20911,
+          "interval": 131,
+          "reps": 5,
+          "lapses": 0,
+          "stage": "known_well"
+        }
+      }
+    },
+    {
+      "id": "rp-002",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "logs": [
+        {
+          "id": "01a11a4f-cd80-7006-8000-000000000006",
+          "reviewedAt": 1791442800000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a11a86-bc00-7007-8000-000000000007",
+          "reviewedAt": 1791446400000,
+          "utcOffsetMin": 180,
+          "rating": 1
+        },
+        {
+          "id": "01a11abd-aa80-7008-8000-000000000008",
+          "reviewedAt": 1791450000000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a11f76-2980-7009-8000-000000000009",
+          "reviewedAt": 1791529200000,
+          "utcOffsetMin": 180,
+          "rating": 1
+        },
+        {
+          "id": "01a129c2-e180-700a-8000-00000000000a",
+          "reviewedAt": 1791702000000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a1814e-fd80-700b-8000-00000000000b",
+          "reviewedAt": 1793170800000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        }
+      ],
+      "note": "Forgot and same-day re-shows",
+      "expected": {
+        "steps": [
+          {
+            "logId": "01a11a4f-cd80-7006-8000-000000000006",
+            "reviewDay": 20734,
+            "stability": 2.3065,
+            "difficulty": 2.118103970459015,
+            "lastReviewDay": 20734,
+            "dueDay": 20736,
+            "interval": 2,
+            "reps": 1,
+            "lapses": 0,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a11a86-bc00-7007-8000-000000000007",
+            "reviewDay": 20734,
+            "stability": 0.7750839828558983,
+            "difficulty": 7.394502741279718,
+            "lastReviewDay": 20734,
+            "dueDay": 20734,
+            "interval": null,
+            "reps": 2,
+            "lapses": 1,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a11abd-aa80-7008-8000-000000000008",
+            "reviewDay": 20734,
+            "stability": 0.8281648000472625,
+            "difficulty": 7.382336607835277,
+            "lastReviewDay": 20734,
+            "dueDay": 20735,
+            "interval": 1,
+            "reps": 3,
+            "lapses": 1,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a11f76-2980-7009-8000-000000000009",
+            "reviewDay": 20735,
+            "stability": 0.2719167286125979,
+            "difficulty": 9.12482021240336,
+            "lastReviewDay": 20735,
+            "dueDay": 20735,
+            "interval": null,
+            "reps": 4,
+            "lapses": 2,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a129c2-e180-700a-8000-00000000000a",
+            "reviewDay": 20737,
+            "stability": 1.288943664498359,
+            "difficulty": 9.110923761487795,
+            "lastReviewDay": 20737,
+            "dueDay": 20738,
+            "interval": 1,
+            "reps": 5,
+            "lapses": 2,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a1814e-fd80-700b-8000-00000000000b",
+            "reviewDay": 20754,
+            "stability": 5.908293328150868,
+            "difficulty": 9.097041207023144,
+            "lastReviewDay": 20754,
+            "dueDay": 20760,
+            "interval": 6,
+            "reps": 6,
+            "lapses": 2,
+            "stage": "learning"
+          }
+        ],
+        "final": {
+          "stability": 5.908293328150868,
+          "difficulty": 9.097041207023144,
+          "lastReviewDay": 20754,
+          "dueDay": 20760,
+          "interval": 6,
+          "reps": 6,
+          "lapses": 2,
+          "stage": "learning"
+        }
+      }
+    },
+    {
+      "id": "rp-003",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "logs": [
+        {
+          "id": "01a14dcf-6580-700c-8000-00000000000c",
+          "reviewedAt": 1792306800000,
+          "utcOffsetMin": 180,
+          "rating": null
+        },
+        {
+          "id": "01a152f5-c180-700d-8000-00000000000d",
+          "reviewedAt": 1792393200000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a1581c-1d80-700e-8000-00000000000e",
+          "reviewedAt": 1792479600000,
+          "utcOffsetMin": 180,
+          "rating": null
+        },
+        {
+          "id": "01a1814e-fd80-700f-8000-00000000000f",
+          "reviewedAt": 1793170800000,
+          "utcOffsetMin": 180,
+          "rating": 4
+        },
+        {
+          "id": "01a1ce8e-6180-7010-8000-000000000010",
+          "reviewedAt": 1794466800000,
+          "utcOffsetMin": 180,
+          "rating": 2
+        }
+      ],
+      "note": "imported null ratings are skipped (not counted in reps)",
+      "expected": {
+        "steps": [
+          {
+            "logId": "01a152f5-c180-700d-8000-00000000000d",
+            "reviewDay": 20745,
+            "stability": 2.3065,
+            "difficulty": 2.118103970459015,
+            "lastReviewDay": 20745,
+            "dueDay": 20747,
+            "interval": 2,
+            "reps": 1,
+            "lapses": 0,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a1814e-fd80-700f-8000-00000000000f",
+            "reviewDay": 20754,
+            "stability": 42.92322559669695,
+            "difficulty": 1,
+            "lastReviewDay": 20754,
+            "dueDay": 20799,
+            "interval": 43,
+            "reps": 2,
+            "lapses": 0,
+            "stage": "known_well"
+          },
+          {
+            "logId": "01a1ce8e-6180-7010-8000-000000000010",
+            "reviewDay": 20769,
+            "stability": 75.21126181828852,
+            "difficulty": 4.010608969296839,
+            "lastReviewDay": 20769,
+            "dueDay": 20850,
+            "interval": 75,
+            "reps": 3,
+            "lapses": 0,
+            "stage": "known_well"
+          }
+        ],
+        "final": {
+          "stability": 75.21126181828852,
+          "difficulty": 4.010608969296839,
+          "lastReviewDay": 20769,
+          "dueDay": 20850,
+          "interval": 75,
+          "reps": 3,
+          "lapses": 0,
+          "stage": "known_well"
+        }
+      }
+    },
+    {
+      "id": "rp-004",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "logs": [
+        {
+          "id": "01a1d8db-1980-7013-8000-000000000013",
+          "reviewedAt": 1794639600000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a1b4ce-9580-7011-8000-000000000011",
+          "reviewedAt": 1794034800000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a1bf1b-4d80-7012-8000-000000000012",
+          "reviewedAt": 1794207600000,
+          "utcOffsetMin": 180,
+          "rating": 1
+        }
+      ],
+      "note": "logs given out of order: sorted by (reviewedAt, id)",
+      "expected": {
+        "steps": [
+          {
+            "logId": "01a1b4ce-9580-7011-8000-000000000011",
+            "reviewDay": 20764,
+            "stability": 2.3065,
+            "difficulty": 2.118103970459015,
+            "lastReviewDay": 20764,
+            "dueDay": 20766,
+            "interval": 2,
+            "reps": 1,
+            "lapses": 0,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a1bf1b-4d80-7012-8000-000000000012",
+            "reviewDay": 20766,
+            "stability": 0.6075801062519337,
+            "difficulty": 7.394502741279718,
+            "lastReviewDay": 20766,
+            "dueDay": 20766,
+            "interval": null,
+            "reps": 2,
+            "lapses": 1,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a1d8db-1980-7013-8000-000000000013",
+            "reviewDay": 20771,
+            "stability": 4.598659518526417,
+            "difficulty": 7.382336607835277,
+            "lastReviewDay": 20771,
+            "dueDay": 20777,
+            "interval": 5,
+            "reps": 3,
+            "lapses": 1,
+            "stage": "learning"
+          }
+        ],
+        "final": {
+          "stability": 4.598659518526417,
+          "difficulty": 7.382336607835277,
+          "lastReviewDay": 20771,
+          "dueDay": 20777,
+          "interval": 5,
+          "reps": 3,
+          "lapses": 1,
+          "stage": "learning"
+        }
+      }
+    },
+    {
+      "id": "rp-005",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "logs": [
+        {
+          "id": "01a1b9f4-f180-7014-8000-000000000014",
+          "reviewedAt": 1794121200000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "0192f3c1-0000-7000-8000-0000000000ff",
+          "reviewedAt": 1794466800000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "0192f3c1-0000-7000-8000-000000000001",
+          "reviewedAt": 1794466800000,
+          "utcOffsetMin": 180,
+          "rating": 1
+        }
+      ],
+      "note": "equal reviewedAt: tie broken by id (unsigned bytes), so the Forgot comes first",
+      "expected": {
+        "steps": [
+          {
+            "logId": "01a1b9f4-f180-7014-8000-000000000014",
+            "reviewDay": 20765,
+            "stability": 2.3065,
+            "difficulty": 2.118103970459015,
+            "lastReviewDay": 20765,
+            "dueDay": 20767,
+            "interval": 2,
+            "reps": 1,
+            "lapses": 0,
+            "stage": "learning"
+          },
+          {
+            "logId": "0192f3c1-0000-7000-8000-000000000001",
+            "reviewDay": 20769,
+            "stability": 0.6614165256503188,
+            "difficulty": 7.394502741279718,
+            "lastReviewDay": 20769,
+            "dueDay": 20769,
+            "interval": null,
+            "reps": 2,
+            "lapses": 1,
+            "stage": "learning"
+          },
+          {
+            "logId": "0192f3c1-0000-7000-8000-0000000000ff",
+            "reviewDay": 20769,
+            "stability": 0.7141261520890895,
+            "difficulty": 7.382336607835277,
+            "lastReviewDay": 20769,
+            "dueDay": 20770,
+            "interval": 1,
+            "reps": 3,
+            "lapses": 1,
+            "stage": "learning"
+          }
+        ],
+        "final": {
+          "stability": 0.7141261520890895,
+          "difficulty": 7.382336607835277,
+          "lastReviewDay": 20769,
+          "dueDay": 20770,
+          "interval": 1,
+          "reps": 3,
+          "lapses": 1,
+          "stage": "learning"
+        }
+      }
+    },
+    {
+      "id": "rp-006",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "logs": [
+        {
+          "id": "01a1b9f4-f180-7015-8000-000000000015",
+          "reviewedAt": 1794121200000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        },
+        {
+          "id": "01a1cff3-6fc0-7016-8000-000000000016",
+          "reviewedAt": 1794490200000,
+          "utcOffsetMin": 600,
+          "rating": 3
+        },
+        {
+          "id": "01a1d02a-5e40-7017-8000-000000000017",
+          "reviewedAt": 1794493800000,
+          "utcOffsetMin": -600,
+          "rating": 3
+        }
+      ],
+      "note": "time-zone change: a later log with an earlier review day (elapsed clamped to 0)",
+      "expected": {
+        "steps": [
+          {
+            "logId": "01a1b9f4-f180-7015-8000-000000000015",
+            "reviewDay": 20765,
+            "stability": 2.3065,
+            "difficulty": 2.118103970459015,
+            "lastReviewDay": 20765,
+            "dueDay": 20767,
+            "interval": 2,
+            "reps": 1,
+            "lapses": 0,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a1cff3-6fc0-7016-8000-000000000016",
+            "reviewDay": 20769,
+            "stability": 16.177263202654682,
+            "difficulty": 2.1112142357853942,
+            "lastReviewDay": 20769,
+            "dueDay": 20787,
+            "interval": 16,
+            "reps": 2,
+            "lapses": 0,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a1d02a-5e40-7017-8000-000000000017",
+            "reviewDay": 20769,
+            "stability": 16.177263202654682,
+            "difficulty": 2.1043313908464474,
+            "lastReviewDay": 20769,
+            "dueDay": 20788,
+            "interval": 16,
+            "reps": 3,
+            "lapses": 0,
+            "stage": "learning"
+          }
+        ],
+        "final": {
+          "stability": 16.177263202654682,
+          "difficulty": 2.1043313908464474,
+          "lastReviewDay": 20769,
+          "dueDay": 20788,
+          "interval": 16,
+          "reps": 3,
+          "lapses": 0,
+          "stage": "learning"
+        }
+      }
+    },
+    {
+      "id": "rp-007",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "logs": [
+        {
+          "id": "01a1d8db-1980-7018-8000-000000000018",
+          "reviewedAt": 1794639600000,
+          "utcOffsetMin": 180,
+          "rating": null
+        }
+      ],
+      "note": "only null ratings → still new (final null)",
+      "expected": {
+        "steps": [],
+        "final": null
+      }
+    },
+    {
+      "id": "rp-008",
+      "cardId": "f8c246ae-fff7-56e7-8490-8dc110841f6f",
+      "logs": [
+        {
+          "id": "01a1e327-d180-7019-8000-000000000019",
+          "reviewedAt": 1794812400000,
+          "utcOffsetMin": 180,
+          "rating": 2
+        },
+        {
+          "id": "01a1e43a-7a00-701a-8000-00000000001a",
+          "reviewedAt": 1794830400000,
+          "utcOffsetMin": 180,
+          "rating": 3
+        }
+      ],
+      "note": "imported first answer Hard (G=2) stays due that day, then Good",
+      "expected": {
+        "steps": [
+          {
+            "logId": "01a1e327-d180-7019-8000-000000000019",
+            "reviewDay": 20773,
+            "stability": 1.2931,
+            "difficulty": 5.112170705601055,
+            "lastReviewDay": 20773,
+            "dueDay": 20773,
+            "interval": null,
+            "reps": 1,
+            "lapses": 0,
+            "stage": "learning"
+          },
+          {
+            "logId": "01a1e43a-7a00-701a-8000-00000000001a",
+            "reviewDay": 20773,
+            "stability": 1.3358997622047517,
+            "difficulty": 5.102286904192292,
+            "lastReviewDay": 20773,
+            "dueDay": 20774,
+            "interval": 1,
+            "reps": 2,
+            "lapses": 0,
+            "stage": "learning"
+          }
+        ],
+        "final": {
+          "stability": 1.3358997622047517,
+          "difficulty": 5.102286904192292,
+          "lastReviewDay": 20773,
+          "dueDay": 20774,
+          "interval": 1,
+          "reps": 2,
+          "lapses": 0,
+          "stage": "learning"
+        }
+      }
+    }
+  ]
+}

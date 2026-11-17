@@ -1,0 +1,215 @@
+{
+  "kind": "hlc-receive",
+  "source": "doc 36 §11.3 Receive: standard HLC receive with ms' = max(ms, r.ms, pt); a remote r.ms more than 24 h (86,400,000 ms) ahead of pt is not adopted (state unchanged). Server skew check (§11.3, §22.1): clock ms − serverTime > 1 h (3,600,000 ms) → clock_skew",
+  "cases": [
+    {
+      "id": "rc-001",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 3
+      },
+      "remote": "019a6e7ef3880007fedcba9876543210",
+      "now": 1762790401000,
+      "expected": {
+        "state": {
+          "ms": 1762790405000,
+          "counter": 8
+        }
+      },
+      "note": "remote ahead → adopt remote ms, remote counter + 1"
+    },
+    {
+      "id": "rc-002",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 3
+      },
+      "remote": "019a6e7ecc780007fedcba9876543210",
+      "now": 1762790399000,
+      "expected": {
+        "state": {
+          "ms": 1762790400000,
+          "counter": 4
+        }
+      },
+      "note": "local ms largest → local counter + 1"
+    },
+    {
+      "id": "rc-003",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 3
+      },
+      "remote": "019a6e7ee0000007fedcba9876543210",
+      "now": 1762790399000,
+      "expected": {
+        "state": {
+          "ms": 1762790400000,
+          "counter": 8
+        }
+      },
+      "note": "local ms = remote ms → max(counters) + 1"
+    },
+    {
+      "id": "rc-004",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 9
+      },
+      "remote": "019a6e7ee0000007fedcba9876543210",
+      "now": 1762790399000,
+      "expected": {
+        "state": {
+          "ms": 1762790400000,
+          "counter": 10
+        }
+      },
+      "note": "local ms = remote ms, local counter larger"
+    },
+    {
+      "id": "rc-005",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 3
+      },
+      "remote": "019a6e7ecc780007fedcba9876543210",
+      "now": 1762790402000,
+      "expected": {
+        "state": {
+          "ms": 1762790402000,
+          "counter": 0
+        }
+      },
+      "note": "physical time largest → counter 0"
+    },
+    {
+      "id": "rc-006",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 3
+      },
+      "remote": "019a6e7ee7d00007fedcba9876543210",
+      "now": 1762790402000,
+      "expected": {
+        "state": {
+          "ms": 1762790402000,
+          "counter": 8
+        }
+      },
+      "note": "remote ms = now > local ms → remote counter + 1"
+    },
+    {
+      "id": "rc-007",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 3
+      },
+      "remote": "019a73a53c010007fedcba9876543210",
+      "now": 1762790400000,
+      "expected": {
+        "state": {
+          "ms": 1762790400000,
+          "counter": 3
+        }
+      },
+      "note": "remote more than 24 h ahead of now → not adopted, state unchanged"
+    },
+    {
+      "id": "rc-008",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 3
+      },
+      "remote": "019a73a53c000007fedcba9876543210",
+      "now": 1762790400000,
+      "expected": {
+        "state": {
+          "ms": 1762876800000,
+          "counter": 8
+        }
+      },
+      "note": "exactly 24 h ahead → adopted"
+    },
+    {
+      "id": "rc-009",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 3
+      },
+      "remote": "019a78cb98000000fedcba9876543210",
+      "now": 1762876799999,
+      "expected": {
+        "state": {
+          "ms": 1762790400000,
+          "counter": 3
+        }
+      },
+      "note": "> 24 h ahead of now even though local ms is behind → not adopted"
+    },
+    {
+      "id": "rc-010",
+      "type": "receive",
+      "state": {
+        "ms": 1762790400000,
+        "counter": 65535
+      },
+      "remote": "019a6e7ee000fffffedcba9876543210",
+      "now": 1762790400000,
+      "expected": {
+        "state": {
+          "ms": 1762790400001,
+          "counter": 0
+        }
+      },
+      "note": "receive counter overflow → ms + 1, counter 0"
+    },
+    {
+      "id": "skew-001",
+      "type": "serverSkew",
+      "clock": "019a6eb5ce800000fedcba9876543210",
+      "serverTime": 1762790400000,
+      "expected": {
+        "result": "accepted"
+      },
+      "note": "exactly 1 h ahead → accepted"
+    },
+    {
+      "id": "skew-002",
+      "type": "serverSkew",
+      "clock": "019a6eb5ce810000fedcba9876543210",
+      "serverTime": 1762790400000,
+      "expected": {
+        "result": "clock_skew"
+      },
+      "note": "more than 1 h ahead → clock_skew"
+    },
+    {
+      "id": "skew-003",
+      "type": "serverSkew",
+      "clock": "019a3aff48000000fedcba9876543210",
+      "serverTime": 1762790400000,
+      "expected": {
+        "result": "accepted"
+      },
+      "note": "clocks behind server time are always accepted"
+    },
+    {
+      "id": "skew-004",
+      "type": "serverSkew",
+      "clock": "019a6e7ee0000000fedcba9876543210",
+      "serverTime": 1762790400000,
+      "expected": {
+        "result": "accepted"
+      }
+    }
+  ]
+}

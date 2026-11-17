@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/day-boundary.schema.json",
+  "title": "Day number with the 04:00 boundary (doc 36 §7.2)",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "const": "day-boundary"
+    },
+    "source": {
+      "type": "string"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "tMs": {
+            "type": "integer"
+          },
+          "utcOffsetMin": {
+            "type": "integer",
+            "minimum": -720,
+            "maximum": 840
+          },
+          "expected": {
+            "type": "integer"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tMs",
+          "utcOffsetMin",
+          "expected"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "source",
+    "cases"
+  ],
+  "additionalProperties": false
+}

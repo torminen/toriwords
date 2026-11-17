@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/text-key.schema.json",
+  "title": "String → string text key cases (doc 36 §15.1)",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "const": "text-key"
+    },
+    "source": {
+      "type": "string"
+    },
+    "function": {
+      "enum": [
+        "matchKey",
+        "translationKey",
+        "sentenceKey",
+        "tagKey",
+        "searchFold",
+        "urlKey"
+      ]
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "input": {
+            "type": "string"
+          },
+          "expected": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "input",
+          "expected"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "source",
+    "function",
+    "cases"
+  ],
+  "additionalProperties": false
+}

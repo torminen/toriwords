@@ -1,0 +1,261 @@
+{
+  "kind": "capture-clean",
+  "source": "doc 36 §5.2 steps 1–3: clean (tags, letter-only [..]/(..) annotations, leading speaker label of ≤ 3 words per line, line breaks → spaces, collapse, first 5,000 code points), classify (> 6 words or ends with . ! ? … plus optional closers \" ' ” ’ » ) ]), reject text without a Latin letter (A–Z, a–z, U+00C0–U+024F except × ÷, U+1E00–U+1EFF)",
+  "cases": [
+    {
+      "id": "cl-001",
+      "input": "Hello",
+      "expected": {
+        "text": "Hello",
+        "kind": "term",
+        "saveable": true
+      }
+    },
+    {
+      "id": "cl-002",
+      "input": "  take   off ",
+      "expected": {
+        "text": "take off",
+        "kind": "term",
+        "saveable": true
+      }
+    },
+    {
+      "id": "cl-003",
+      "input": "<b>serendipity</b>",
+      "expected": {
+        "text": "serendipity",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "tags removed"
+    },
+    {
+      "id": "cl-004",
+      "input": "a<br>b",
+      "expected": {
+        "text": "ab",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "tags are removed without a space"
+    },
+    {
+      "id": "cl-005",
+      "input": "[music] I can't stop thinking about you",
+      "expected": {
+        "text": "I can't stop thinking about you",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "exactly 6 words and no terminal → term"
+    },
+    {
+      "id": "cl-006",
+      "input": "We need to get the ball rolling on this",
+      "expected": {
+        "text": "We need to get the ball rolling on this",
+        "kind": "sentence",
+        "saveable": true
+      },
+      "note": "more than 6 words"
+    },
+    {
+      "id": "cl-007",
+      "input": "Run!",
+      "expected": {
+        "text": "Run!",
+        "kind": "sentence",
+        "saveable": true
+      },
+      "note": "terminal punctuation"
+    },
+    {
+      "id": "cl-008",
+      "input": "e.g.",
+      "expected": {
+        "text": "e.g.",
+        "kind": "sentence",
+        "saveable": true
+      },
+      "note": "ends with '.'"
+    },
+    {
+      "id": "cl-009",
+      "input": "Hello…",
+      "expected": {
+        "text": "Hello…",
+        "kind": "sentence",
+        "saveable": true
+      },
+      "note": "ends with U+2026"
+    },
+    {
+      "id": "cl-010",
+      "input": "He said “stop.”",
+      "expected": {
+        "text": "He said “stop.”",
+        "kind": "sentence",
+        "saveable": true
+      },
+      "note": "terminal followed by a closing quote"
+    },
+    {
+      "id": "cl-011",
+      "input": "\"Really?\" she asked",
+      "expected": {
+        "text": "\"Really?\" she asked",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "terminal not at the end"
+    },
+    {
+      "id": "cl-012",
+      "input": "JOHN: Where are you going?",
+      "expected": {
+        "text": "Where are you going?",
+        "kind": "sentence",
+        "saveable": true
+      },
+      "note": "speaker label removed"
+    },
+    {
+      "id": "cl-013",
+      "input": "Mary Ann Lee: hello",
+      "expected": {
+        "text": "hello",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "3-word speaker label removed"
+    },
+    {
+      "id": "cl-014",
+      "input": "Dr. Who Smith Jr: hi",
+      "expected": {
+        "text": "Dr. Who Smith Jr: hi",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "4 words before ':' is not a speaker label"
+    },
+    {
+      "id": "cl-015",
+      "input": "Time is 10:30 now",
+      "expected": {
+        "text": "Time is 10:30 now",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "':' not followed by whitespace"
+    },
+    {
+      "id": "cl-016",
+      "input": "Anna: line one\nBen Ford: line two.",
+      "expected": {
+        "text": "line one line two.",
+        "kind": "sentence",
+        "saveable": true
+      },
+      "note": "a speaker label at the start of every line"
+    },
+    {
+      "id": "cl-017",
+      "input": "First line\r\nSecond line",
+      "expected": {
+        "text": "First line Second line",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "line breaks become spaces"
+    },
+    {
+      "id": "cl-018",
+      "input": "(laughs) You know what (sighs) fine",
+      "expected": {
+        "text": "You know what fine",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "letter-only annotations removed"
+    },
+    {
+      "id": "cl-019",
+      "input": "take (sth) off",
+      "expected": {
+        "text": "take off",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "consequence of the annotation rule"
+    },
+    {
+      "id": "cl-020",
+      "input": "Wait [2x] (part 2)",
+      "expected": {
+        "text": "Wait [2x] (part 2)",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "annotations with digits are kept"
+    },
+    {
+      "id": "cl-021",
+      "input": "привет мир",
+      "expected": {
+        "text": "привет мир",
+        "kind": "term",
+        "saveable": false
+      },
+      "note": "no Latin letter → cannot be saved"
+    },
+    {
+      "id": "cl-022",
+      "input": "123 456",
+      "expected": {
+        "text": "123 456",
+        "kind": "term",
+        "saveable": false
+      }
+    },
+    {
+      "id": "cl-023",
+      "input": "naïve café",
+      "expected": {
+        "text": "naïve café",
+        "kind": "term",
+        "saveable": true
+      }
+    },
+    {
+      "id": "cl-024",
+      "input": "āṃ",
+      "expected": {
+        "text": "āṃ",
+        "kind": "term",
+        "saveable": true
+      },
+      "note": "Latin Extended-A and Latin Extended Additional letters count as Latin"
+    },
+    {
+      "id": "cl-025",
+      "input": "   ",
+      "expected": {
+        "text": "",
+        "kind": "term",
+        "saveable": false
+      }
+    },
+    {
+      "id": "cl-026",
+      "input": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ",
+      "expected": {
+        "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word",
+        "kind": "sentence",
+        "saveable": true
+      },
+      "note": "keep the first 5,000 code points, then trim"
+    }
+  ]
+}

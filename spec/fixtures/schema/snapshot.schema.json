@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/snapshot.schema.json",
+  "title": "Widget snapshot (doc 36 §10.1)",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "const": "snapshot"
+    },
+    "source": {
+      "type": "string"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "w": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 21,
+          "maxItems": 21
+        },
+        "desiredRetention": {
+          "type": "number"
+        },
+        "maximumInterval": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "w",
+        "desiredRetention",
+        "maximumInterval"
+      ],
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "input": {
+            "type": "object",
+            "properties": {
+              "now": {
+                "type": "integer"
+              },
+              "utcOffsetMin": {
+                "type": "integer"
+              },
+              "settings": {
+                "type": "object",
+                "properties": {
+                  "newWordsPerDay": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 50
+                  }
+                },
+                "required": [
+                  "newWordsPerDay"
+                ],
+                "additionalProperties": false
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                    },
+                    "createdAt": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "enum": [
+                        "active",
+                        "excluded"
+                      ]
+                    },
+                    "cards": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                          },
+                          "direction": {
+                            "enum": [
+                              "recognition",
+                              "recall",
+                              "cloze"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "direction"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "createdAt",
+                    "status",
+                    "cards"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "logs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                    },
+                    "cardId": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                    },
+                    "reviewedAt": {
+                      "type": "integer"
+                    },
+                    "utcOffsetMin": {
+                      "type": "integer"
+                    },
+                    "rating": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            1,
+                            2,
+                            3,
+                            4
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "cardId",
+                    "reviewedAt",
+                    "utcOffsetMin",
+                    "rating"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "now",
+              "utcOffsetMin",
+              "settings",
+              "entries",
+              "logs"
+            ],
+            "additionalProperties": false
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "format": {
+                "const": 1
+              },
+              "generatedAt": {
+                "type": "integer"
+              },
+              "utcOffsetMin": {
+                "type": "integer"
+              },
+              "days": {
+                "type": "array",
+                "minItems": 7,
+                "maxItems": 7,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "day": {
+                      "type": "integer"
+                    },
+                    "dueReviews": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "newAvailable": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "day",
+                    "dueReviews",
+                    "newAvailable"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "nextDueDay": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "homeState": {
+                "enum": [
+                  "due",
+                  "allDone",
+                  "nothingDue",
+                  "noneReviewable",
+                  "empty"
+                ]
+              }
+            },
+            "required": [
+              "format",
+              "generatedAt",
+              "utcOffsetMin",
+              "days",
+              "nextDueDay",
+              "homeState"
+            ],
+            "additionalProperties": false
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "input",
+          "expected"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "source",
+    "params",
+    "cases"
+  ],
+  "additionalProperties": false
+}

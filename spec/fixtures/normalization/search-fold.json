@@ -1,0 +1,13 @@
+{
+  "kind": "text-key",
+  "function": "searchFold",
+  "source": "doc 36 §15.1 Search fold (CH-35): match-key steps 1–4, ё→е, whitespace collapsed/trimmed; punctuation and symbols kept; empty allowed",
+  "cases": [
+    { "id": "sf-001", "input": "Don’t Stop!", "expected": "don't stop!" },
+    { "id": "sf-002", "input": "Ёж", "expected": "еж" },
+    { "id": "sf-003", "input": "  ", "expected": "" },
+    { "id": "sf-004", "input": "C#", "expected": "c#" },
+    { "id": "sf-005", "input": "— well‐known —", "expected": "- well-known -" },
+    { "id": "sf-006", "input": "zero​width space", "expected": "zerowidth space" }
+  ]
+}

@@ -1,0 +1,19 @@
+[project]
+name = "torifix"
+version = "0.1.0"
+description = "Toriwords parity fixtures: scheduler generator, Python reference rules, fixture validator"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fsrs==6.3.3",
+    "jsonschema==4.26.0",
+]
+
+[dependency-groups]
+dev = ["pytest==8.4.2"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

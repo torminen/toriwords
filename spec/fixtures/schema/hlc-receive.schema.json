@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/hlc-receive.schema.json",
+  "title": "HLC receive and server skew check (doc 36 §11.3, §22.1)",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "const": "hlc-receive"
+    },
+    "source": {
+      "type": "string"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "type": {
+                "const": "receive"
+              },
+              "state": {
+                "type": "object",
+                "properties": {
+                  "ms": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "counter": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  }
+                },
+                "required": [
+                  "ms",
+                  "counter"
+                ],
+                "additionalProperties": false
+              },
+              "remote": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$"
+              },
+              "now": {
+                "type": "integer"
+              },
+              "expected": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "object",
+                    "properties": {
+                      "ms": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "counter": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535
+                      }
+                    },
+                    "required": [
+                      "ms",
+                      "counter"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "state"
+                ],
+                "additionalProperties": false
+              },
+              "note": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "state",
+              "remote",
+              "now",
+              "expected"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "type": {
+                "const": "serverSkew"
+              },
+              "clock": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$"
+              },
+              "serverTime": {
+                "type": "integer"
+              },
+              "expected": {
+                "type": "object",
+                "properties": {
+                  "result": {
+                    "enum": [
+                      "accepted",
+                      "clock_skew"
+                    ]
+                  }
+                },
+                "required": [
+                  "result"
+                ],
+                "additionalProperties": false
+              },
+              "note": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "clock",
+              "serverTime",
+              "expected"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "source",
+    "cases"
+  ],
+  "additionalProperties": false
+}

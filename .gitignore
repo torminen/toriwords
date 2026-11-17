@@ -1,0 +1,22 @@
+# Xcode / Tuist (project and workspace are generated: `tuist install && tuist generate`)
+*.xcworkspace
+*.xcodeproj
+Derived/
+DerivedData/
+xcuserdata/
+ios/Tuist/.build/
+.DS_Store
+
+# SwiftPM
+.build/
+.swiftpm/
+
+# Dictionary: the full build is a GitHub Release asset, fetched by tools/dictionary/fetch.sh
+ios/Resources/dictionary.sqlite
+tools/dictionary/cache/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/

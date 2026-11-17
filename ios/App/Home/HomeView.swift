@@ -83,7 +83,7 @@ enum TranslationLine {
     static func text(_ state: TranslationState) -> Text {
         switch state {
         case .has(let t): Text(verbatim: t)
-        case .notFound: Text("No translation found")
+        case .notFound: Text("No translation found — add your own")
         case .pending: Text("Translation pending")
         case .none: Text("No translation yet")
         }

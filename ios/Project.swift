@@ -32,6 +32,9 @@ let project = Project(
                 "CFBundleURLTypes": [["CFBundleURLSchemes": ["$(TORI_URL_SCHEME)"]]],
                 "BGTaskSchedulerPermittedIdentifiers": ["$(TORI_BG_REFRESH_TASK_ID)"],
                 "UIBackgroundModes": ["fetch"],
+                "ToriAPIBaseURL": "$(TORI_API_BASE_URL)",
+                "ToriGoogleClientID": "$(TORI_GOOGLE_CLIENT_ID)",
+                "ToriGoogleReversedClientID": "$(TORI_GOOGLE_REVERSED_CLIENT_ID)",
             ]),
             sources: ["App/**"],
             // §8.3: the full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app

@@ -67,5 +67,26 @@ public enum InboxNotification {
         CFNotificationCenterPostNotification(
             CFNotificationCenterGetDarwinNotifyCenter(), CFNotificationName(name as CFString), nil, nil, true)
     }
+
+    /// Calls `handler` (on an arbitrary thread) for each post while this object is alive (doc 36 §5.6).
+    public final class Observer: Sendable {
+        private let handler: @Sendable () -> Void
+
+        public init(_ handler: @escaping @Sendable () -> Void) {
+            self.handler = handler
+            CFNotificationCenterAddObserver(
+                CFNotificationCenterGetDarwinNotifyCenter(), Unmanaged.passUnretained(self).toOpaque(),
+                { _, observer, _, _, _ in
+                    guard let observer else { return }
+                    Unmanaged<Observer>.fromOpaque(observer).takeUnretainedValue().handler()
+                },
+                InboxNotification.name as CFString, nil, .deliverImmediately)
+        }
+
+        deinit {
+            CFNotificationCenterRemoveEveryObserver(CFNotificationCenterGetDarwinNotifyCenter(),
+                                                    Unmanaged.passUnretained(self).toOpaque())
+        }
+    }
     #endif
 }

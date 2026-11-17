@@ -59,6 +59,8 @@ public struct EntryDetail: Hashable, Sendable {
         public var partOfSpeech: String?
         /// The user edited the translation (rank 1).
         public var translationByUser: Bool
+        /// Provenance of the translation (`wiktionary` shows the Wiktionary mark).
+        public var translationSource: SenseSource?
     }
 
     public struct Context: Hashable, Sendable {
@@ -205,19 +207,47 @@ extension StoreReader {
         case .nextDue: "(e.status <> 'active' OR stages IS NULL), next_due IS NULL, next_due, e.created_at DESC, e.id"
         }
         let rows = try Row.fetchAll(db, sql: """
-            SELECT * FROM (
-              SELECT e.id, e.text, e.text_fold, e.deleted, e.merged_into, e.status, e.excluded_reason, e.enrichment_status,
+            SELECT * FROM (\(Self.wordColumns)) e WHERE \(conditions.joined(separator: " AND ")) ORDER BY \(order)
+            """, arguments: StatementArguments(args))
+        var result = rows.map(Self.wordRow)
+        if case .stage(let s) = q.filter { result = result.filter { $0.stage == s } }
+        return result
+    }
+
+    /// One row per Entry with the columns `wordRow` reads.
+    static let wordColumns = """
+        SELECT e.id, e.text, e.text_fold, e.deleted, e.merged_into, e.status, e.excluded_reason, e.enrichment_status,
                 e.needs_check, e.created_at, e.match_key,
                 (SELECT s.translation FROM sense s WHERE s.canonical_entry_id = e.id AND \(Self.liveSense) AND s.translation <> ''
                  ORDER BY \(Self.senseOrder) LIMIT 1) AS translation,
                 (SELECT MIN(c.due_day) FROM card c WHERE c.canonical_entry_id = e.id AND c.id = c.canonical_card_id) AS next_due,
                 (SELECT group_concat(c.stage) FROM card c WHERE c.canonical_entry_id = e.id AND c.id = c.canonical_card_id) AS stages
               FROM entry e
-            ) e WHERE \(conditions.joined(separator: " AND ")) ORDER BY \(order)
-            """, arguments: StatementArguments(args))
-        var result = rows.map(Self.wordRow)
-        if case .stage(let s) = q.filter { result = result.filter { $0.stage == s } }
-        return result
+        """
+
+    /// Add autocomplete (a): live Entries whose match key starts with the typed key, by key then ID (§6.2 item 1).
+    public func vocabularyMatches(prefix text: String, limit: Int = 3) throws -> [WordRow] {
+        let key = TextKey.matchKey(text)
+        guard !key.isEmpty else { return [] }
+        return try Row.fetchAll(db, sql: """
+            SELECT * FROM (\(Self.wordColumns)) e WHERE \(Self.liveEntry) AND substr(e.match_key, 1, length(?)) = ?
+            ORDER BY e.match_key, e.id LIMIT ?
+            """, arguments: [key, key, limit]).map(Self.wordRow)
+    }
+
+    /// The live Entry with exactly this match key ("Already in your vocabulary", §5.3).
+    public func entryID(matching text: String) throws -> ToriID? {
+        try ToriID.fetchOne(db, sql: "SELECT id FROM entry e WHERE \(Self.liveEntry) AND e.match_key = ? ORDER BY e.id LIMIT 1",
+                            arguments: [TextKey.matchKey(text)])
+    }
+
+    /// Live Entries per live canonical Tag (Tags screen, tag filter counts).
+    public func tagCounts() throws -> [ToriID: Int] {
+        let rows = try Row.fetchAll(db, sql: """
+            SELECT et.canonical_tag_id AS tag, COUNT(DISTINCT e.id) AS n FROM entry_tag et JOIN entry e ON e.id = et.canonical_entry_id
+            WHERE et.present = 1 AND \(Self.liveEntry) GROUP BY et.canonical_tag_id
+            """)
+        return Dictionary(uniqueKeysWithValues: rows.map { ($0["tag"] as ToriID, $0["n"] as Int) })
     }
 
     static func likePattern(_ fold: String) -> String {
@@ -265,7 +295,8 @@ extension StoreReader {
             """, arguments: [canonical]).map { r in
             let clocks = JSONText.decode([String: FieldClock].self, r["field_clocks"]) ?? [:]
             return EntryDetail.Sense(id: r["id"], translation: r["translation"], definition: r["definition"],
-                                     partOfSpeech: r["part_of_speech"], translationByUser: clocks["translation"]?.u == 1)
+                                     partOfSpeech: r["part_of_speech"], translationByUser: clocks["translation"]?.u == 1,
+                                     translationSource: (r["translation_src"] as String?).flatMap(SenseSource.init(rawValue:)))
         }
         let contexts = try Row.fetchAll(db, sql: """
             SELECT c.id, c.sentence, c.highlight_offset, c.highlight_length, c.captured_at, so.id AS source_id, so.title, so.url

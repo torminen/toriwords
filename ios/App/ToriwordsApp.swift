@@ -7,12 +7,17 @@ struct ToriwordsApp: App {
     @State private var env = AppEnvironment()
 
     var body: some Scene {
+        let env = env
         WindowGroup {
             RootView()
                 .environment(env)
                 .environment(env.router)
+                .environment(env.deletion)
                 .tint(Palette.accent)
+                .onOpenURL { env.open($0) }
         }
+        // Registered at launch by SwiftUI; expiration cancels the task (§10.4).
+        .backgroundTask(.appRefresh(AppConfig.backgroundRefreshTaskID)) { await env.backgroundRefresh() }
     }
 }
 
@@ -36,6 +41,7 @@ struct RootView: View {
                         HomeView(store: store)
                             .navigationDestination(for: Route.self) { RouteView(route: $0) }
                     }
+                    .overlay(alignment: .bottom) { UndoToast().animation(.default, value: env.deletion.current) }
                     .fullScreenCover(isPresented: $router.isReviewPresented) {
                         ReviewView(store: store)
                     }

@@ -1,6 +1,7 @@
 import Foundation
 import GRDB
 import Testing
+import ToriCore
 import ToriTestSupport
 @testable import ToriDictionary
 
@@ -188,4 +189,14 @@ func otherTimingsOnFullDictionary() throws {
     defer { try? FileManager.default.removeItem(at: dir) }
     let install = try ms { _ = try DictionaryInstaller(bundled: fullDictionary, installed: dir.appendingPathComponent("d.sqlite")).installIfNeeded() }
     print("full dictionary ms: resolve(run) \(lookup), resolve(ran) \(base), containedPhrases \(phrases), reverse(соба) \(reverse), reverse(д) \(reverseShort), install \(install)")
+}
+
+@Test func variantsKeepHeadwordAndRankOrderWithoutRepeats() throws {
+    let hws = try sample.headwords(key: "run")
+    let variants = Variant.of(hws)
+    let expected = hws.flatMap { $0.translations.map(\.text) }
+    #expect(variants.count == Set(expected.map { TextKey.translationKey($0) }).count)
+    #expect(variants.first?.translation == expected.first)
+    #expect(variants.allSatisfy { v in v.senseOrdinal == nil ? v.glossEn == nil : v.glossEn != nil })
+    #expect(Variant.of([]).isEmpty)
 }

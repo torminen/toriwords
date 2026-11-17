@@ -44,7 +44,7 @@ public struct CaptureInput: Hashable, Sendable {
         if let typed = file.typedTranslation, !typed.isEmpty { senses.append(NewSense(translation: typed)) }
         let source = file.source.flatMap { s -> SourceInput? in
             guard s.url != nil || s.title != nil else { return nil }
-            return SourceInput(kind: s.url != nil ? .web : .other, url: s.url, title: s.title)
+            return SourceInput(kind: s.url != nil ? .web : .other, url: s.url, title: s.title, app: s.app)
         }
         self.init(term: file.term, capturedAt: file.capturedAt, origin: file.origin, nativeLang: file.languagePair.native,
                   targetLang: file.languagePair.target, senses: senses, sentence: file.sentence, highlight: file.highlight,

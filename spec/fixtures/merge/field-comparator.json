@@ -1,0 +1,126 @@
+{
+  "kind": "merge-field",
+  "source": "doc 36 §11.3 Comparator: wins(a, b) = (a.u, a.c) > (b.u, b.c) (rank first, then clock string); merge(local, remote) = wins(remote, local) ? remote : local; §22.1",
+  "cases": [
+    {
+      "id": "fc-001",
+      "local": {
+        "v": "user",
+        "c": "019a6e7ee00000000123456789abcdef",
+        "u": 1
+      },
+      "remote": {
+        "v": "auto",
+        "c": "019a6e7f032800000123456789abcdef",
+        "u": 0
+      },
+      "expected": "local",
+      "note": "rank 1 beats rank 0 even with an older clock"
+    },
+    {
+      "id": "fc-002",
+      "local": {
+        "v": "auto",
+        "c": "019a6e7f032800000123456789abcdef",
+        "u": 0
+      },
+      "remote": {
+        "v": "user",
+        "c": "019a6e7ee00000000123456789abcdef",
+        "u": 1
+      },
+      "expected": "remote",
+      "note": "rank 1 beats rank 0 (remote side)"
+    },
+    {
+      "id": "fc-003",
+      "local": {
+        "v": "old",
+        "c": "019a6e7ee00000000123456789abcdef",
+        "u": 1
+      },
+      "remote": {
+        "v": "new",
+        "c": "019a6e7ee00100000123456789abcdef",
+        "u": 1
+      },
+      "expected": "remote",
+      "note": "same rank → later clock wins"
+    },
+    {
+      "id": "fc-004",
+      "local": {
+        "v": "new",
+        "c": "019a6e7ee00100000123456789abcdef",
+        "u": 0
+      },
+      "remote": {
+        "v": "old",
+        "c": "019a6e7ee00000000123456789abcdef",
+        "u": 0
+      },
+      "expected": "local",
+      "note": "same rank → later clock wins (local side)"
+    },
+    {
+      "id": "fc-005",
+      "local": {
+        "v": "a",
+        "c": "019a6e7ee00000020123456789abcdef",
+        "u": 1
+      },
+      "remote": {
+        "v": "b",
+        "c": "019a6e7ee000000a0123456789abcdef",
+        "u": 1
+      },
+      "expected": "remote",
+      "note": "same ms → counter decides (0x000a > 0x0002, compared as the clock string)"
+    },
+    {
+      "id": "fc-006",
+      "local": {
+        "v": "a",
+        "c": "019a6e7ee0000003fedcba9876543210",
+        "u": 1
+      },
+      "remote": {
+        "v": "b",
+        "c": "019a6e7ee00000030123456789abcdef",
+        "u": 1
+      },
+      "expected": "local",
+      "note": "same ms and counter → node decides"
+    },
+    {
+      "id": "fc-007",
+      "local": {
+        "v": "same",
+        "c": "019a6e7ee00000030123456789abcdef",
+        "u": 1
+      },
+      "remote": {
+        "v": "same",
+        "c": "019a6e7ee00000030123456789abcdef",
+        "u": 1
+      },
+      "expected": "local",
+      "note": "identical clocks: the same write; local kept"
+    },
+    {
+      "id": "fc-008",
+      "local": {
+        "v": null,
+        "c": "019a6e7ee00100000123456789abcdef",
+        "u": 1
+      },
+      "remote": {
+        "v": "x",
+        "c": "019a6e7ee00000000123456789abcdef",
+        "u": 1
+      },
+      "expected": "local",
+      "note": "a null value wins like any other value"
+    }
+  ]
+}

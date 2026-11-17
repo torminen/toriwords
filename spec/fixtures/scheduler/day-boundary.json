@@ -1,0 +1,109 @@
+{
+  "kind": "day-boundary",
+  "source": "doc 36 §7.2: dayNumber(t_ms, offsetMin) = floorDiv(floorDiv(t_ms, 1000) + offsetMin*60 − 4*3600, 86400), 64-bit, floor toward −∞",
+  "cases": [
+    {
+      "id": "db-001",
+      "tMs": 1794877200000,
+      "utcOffsetMin": 180,
+      "expected": 20774,
+      "note": "04:00 local starts the day"
+    },
+    {
+      "id": "db-002",
+      "tMs": 1794877199999,
+      "utcOffsetMin": 180,
+      "expected": 20773,
+      "note": "03:59:59.999 local belongs to the previous day"
+    },
+    {
+      "id": "db-003",
+      "tMs": 1794949140000,
+      "utcOffsetMin": 180,
+      "expected": 20774
+    },
+    {
+      "id": "db-004",
+      "tMs": 1794963599999,
+      "utcOffsetMin": 180,
+      "expected": 20774,
+      "note": "one ms before the next 04:00"
+    },
+    {
+      "id": "db-005",
+      "tMs": 1794909600000,
+      "utcOffsetMin": 0,
+      "expected": 20774,
+      "note": "UTC"
+    },
+    {
+      "id": "db-006",
+      "tMs": 1794952800000,
+      "utcOffsetMin": -720,
+      "expected": 20774,
+      "note": "UTC−12"
+    },
+    {
+      "id": "db-007",
+      "tMs": 1794859200000,
+      "utcOffsetMin": 840,
+      "expected": 20774,
+      "note": "UTC+14"
+    },
+    {
+      "id": "db-008",
+      "tMs": 1794868200000,
+      "utcOffsetMin": 330,
+      "expected": 20774,
+      "note": "UTC+5:30, exactly 04:00"
+    },
+    {
+      "id": "db-009",
+      "tMs": 1794867299999,
+      "utcOffsetMin": 345,
+      "expected": 20773,
+      "note": "UTC+5:45, just before 04:00"
+    },
+    {
+      "id": "db-010",
+      "tMs": 0,
+      "utcOffsetMin": 0,
+      "expected": -1,
+      "note": "epoch at UTC: 1970-01-01 00:00 is before 04:00 → day −1"
+    },
+    {
+      "id": "db-011",
+      "tMs": -1,
+      "utcOffsetMin": 0,
+      "expected": -1,
+      "note": "negative instant: floor toward −∞"
+    },
+    {
+      "id": "db-012",
+      "tMs": -31536000001,
+      "utcOffsetMin": 180,
+      "expected": -366,
+      "note": "far before epoch"
+    },
+    {
+      "id": "db-013",
+      "tMs": 1000,
+      "utcOffsetMin": -300,
+      "expected": -1,
+      "note": "floorDiv of a negative sum"
+    },
+    {
+      "id": "db-014",
+      "tMs": 14399999,
+      "utcOffsetMin": 0,
+      "expected": -1
+    },
+    {
+      "id": "db-015",
+      "tMs": 14400000,
+      "utcOffsetMin": 0,
+      "expected": 0,
+      "note": "1970-01-01 04:00 UTC = day 0"
+    }
+  ]
+}

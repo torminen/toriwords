@@ -1,0 +1,478 @@
+import Foundation
+import GRDB
+import Testing
+import ToriCore
+import ToriShared
+import ToriTestSupport
+@testable import ToriStore
+
+// MARK: Schema and launch
+
+@Test func migrationsAndPragmas() throws {
+    let s = try TestStore(launch: false)
+    #expect(try s.scalar("SELECT version FROM schema_meta") == 1)
+    #expect(try s.scalar("PRAGMA journal_mode") == "wal")
+    #expect(try s.scalar("PRAGMA synchronous") == 1)
+    #expect(try s.scalar("PRAGMA foreign_keys") == 1)
+    #expect(try s.scalar("PRAGMA encoding") == "UTF-8")
+    let tables: [String] = try s.store.db.read { try String.fetchAll($0, sql: "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name") }
+    #expect(Set(tables).isSuperset(of: RecordType.all.map(\.name) + ["pending_changes", "sync_state", "inbox_import", "schema_meta"]))
+    // Reopening runs no migration twice.
+    _ = try ToriStore(path: s.dir.appendingPathComponent("user.sqlite").path)
+}
+
+@Test func launchFreshThenRestore() throws {
+    let s = try TestStore(launch: false)
+    var purged = 0
+    #expect(try s.store.launch(deviceMarker: s.marker, displayName: "iPhone", purgeKeychain: { purged += 1 }) == .freshInstall)
+    #expect(purged == 1)
+    let first = try #require(try s.store.thisDeviceID())
+    #expect(try Data(contentsOf: s.marker) == Data(first.bytes))
+    #expect(try s.scalar("SELECT new_words_per_day FROM settings WHERE id = ?", [ToriID.settings]) == 10)
+    #expect(try s.scalar("SELECT native_lang FROM language_pair WHERE id = ?", [ToriID.languagePair(native: "ru", target: "en")]) == "ru")
+    #expect((try s.scalar("SELECT field_clocks FROM settings") as String?)?.contains("\"u\":0") == true)
+
+    #expect(try s.store.launch(deviceMarker: s.marker, displayName: "iPhone", purgeKeychain: { purged += 1 }) == .existing)
+
+    // Restored from a backup: the marker (excluded from backup) is missing.
+    try s.store.setSyncState([.accountId: "acc", .lastSyncedAccountId: "acc", .cursor: "42"])
+    try FileManager.default.removeItem(at: s.marker)
+    #expect(try s.store.launch(deviceMarker: s.marker, displayName: "iPhone", purgeKeychain: { purged += 1 }) == .restoredFromBackup)
+    #expect(purged == 1)
+    let second = try #require(try s.store.thisDeviceID())
+    #expect(second != first)
+    #expect(try s.scalar("SELECT is_this_device FROM device WHERE id = ?", [first]) == 0)
+    #expect(try s.store.syncState(.accountId) == nil && s.store.syncState(.cursor) == nil)
+    #expect(try s.store.syncState(.lastSyncedAccountId) == "acc")
+}
+
+// MARK: Text order through the real A–Z query
+
+@Test(arguments: Fixture.cases("normalization/text-order.json").filter { $0["prefix"].string == nil })
+func alphabeticalQueryOrder(_ c: FixtureCase) throws {
+    let s = try TestStore()
+    for (i, key) in c["keys"].array.enumerated() {
+        let id = try s.store.capture(CaptureInput(term: "w\(i)", capturedAt: t0))
+        try s.store.db.write { try $0.execute(sql: "UPDATE entry SET match_key = ? WHERE id = ?", arguments: [key.string!, id]) }
+    }
+    let ordered = try s.store.read { try $0.words(WordsQuery(sort: .alphabetical)) }
+    let keys: [String] = try ordered.map { try #require(try s.scalar("SELECT match_key FROM entry WHERE id = ?", [$0.id])) }
+    #expect(keys.map { Array($0.utf8) } == c["expected"].array.map { Array($0.string!.utf8) })
+}
+
+// MARK: Clocks and outbox
+
+@Test func outboxOnlyWhileSignedInAndNotPaused() throws {
+    let s = try TestStore()
+    let a = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
+    #expect(try s.store.pendingRecordCount() == 0)
+    let clocks = try #require(JSONText.decode([String: FieldClock].self, try s.scalar("SELECT field_clocks FROM entry WHERE id = ?", [a])))
+    #expect(clocks["text"]?.u == 1 && clocks["enrichment_status"]?.u == 0 && clocks["needs_check"]?.u == 0)
+
+    try s.signIn()
+    s.clock.ms += 1
+    try s.store.setEntryNote(a, "note")
+    let rows = try s.rows("SELECT type, field FROM pending_changes").map { "\($0["type"] as String).\($0["field"] as String)" }
+    #expect(Set(rows) == ["entry.note", "entry.updated_at"])
+    let push = try s.store.pendingPush()
+    #expect(push.records.count == 1 && Set(push.records[0].fields.keys) == ["note", "updated_at"])
+
+    // Paused (account prompt cancelled): no outbox rows, clocks still stamped.
+    try s.store.setSyncState([.pendingAccountChoice: "{}"])
+    try s.store.setEntryNote(a, "paused edit")
+    #expect(try s.store.pendingRecordCount() == 1)
+    #expect(try s.scalar("SELECT note FROM entry WHERE id = ?", [a]) == "paused edit")
+
+    // Ack removes only rows whose clock is unchanged.
+    try s.store.setSyncState([.pendingAccountChoice: nil])
+    s.clock.ms += 1
+    try s.store.setEntryNote(a, "newer")
+    try s.store.acknowledge(push.rows, acked: [a])
+    #expect(try s.rows("SELECT field FROM pending_changes").map { $0["field"] as String }.sorted() == ["note", "updated_at"])
+    let all = try s.store.pendingPush()
+    try s.store.acknowledge(all.rows, acked: [a])
+    #expect(try s.store.pendingRecordCount() == 0)
+}
+
+@Test func automaticWriteNeverOverridesUserValue() throws {
+    let s = try TestStore()
+    let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0))
+    try s.store.fillAutomaticSense(e, .tr("бежать"))
+    let auto = ToriID.autoSense(entry: e, ordinal: 0)
+    try s.store.editSense(auto, translation: "", definition: nil, partOfSpeech: nil)  // user cleared it
+    try s.store.fillAutomaticSense(e, .tr("бегать"))
+    #expect(try s.scalar("SELECT translation FROM sense WHERE id = ?", [auto]) == "")
+    let row = try #require(try s.store.read { try $0.words(WordsQuery(filter: .needsTranslation)) }.first)
+    #expect(row.translation == .none)
+}
+
+@Test func clockAheadRecoveryRestampsPendingFields() throws {
+    let s = try TestStore()
+    try s.signIn()
+    s.clock.ms = t0 + 10 * HLCState.hourMs  // device clock ran ahead
+    let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0))
+    s.clock.ms = t0
+    #expect(try s.store.recoverClockAhead(lastServerTime: t0))
+    let clocks = try s.rows("SELECT clock FROM pending_changes").map { HLCTimestamp($0["clock"] as String)! }
+    #expect(clocks.allSatisfy { $0.ms == t0 })
+    let fields = try #require(JSONText.decode([String: FieldClock].self, try s.scalar("SELECT field_clocks FROM entry WHERE id = ?", [e])))
+    #expect(fields.values.allSatisfy { HLCTimestamp($0.c)!.ms == t0 })
+    #expect(try !s.store.recoverClockAhead(lastServerTime: t0))
+}
+
+// MARK: Duplicate merge
+
+@Test func mergeByEditIsAskedThenDeterministic() throws {
+    let s = try TestStore()
+    try s.signIn()
+    let run = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
+    s.clock.ms += 1000
+    let walk = try s.store.capture(CaptureInput(term: "walk", capturedAt: t0, senses: [.tr("идти")]))
+    #expect(try s.store.setEntryText(walk, "Run") == .duplicate(of: run))
+    #expect(try s.scalar("SELECT text FROM entry WHERE id = ?", [walk]) == "walk")
+
+    #expect(try s.store.setEntryText(walk, "Run", mergeIfDuplicate: true) == .saved)
+    let survivor = min(run, walk), loser = max(run, walk)
+    #expect(try s.scalar("SELECT merged_into FROM entry WHERE id = ?", [loser]) == survivor)
+    #expect(try s.scalar("SELECT COUNT(*) FROM pending_changes WHERE record_id = ? AND field = '_mergedInto'", [loser]) == 1)
+    let words = try s.store.read { try $0.words(WordsQuery()) }
+    #expect(words.map(\.id) == [survivor])
+    let detail = try #require(try s.store.read { try $0.entry(loser) })
+    #expect(detail.id == survivor)
+    #expect(detail.senses.map(\.translation) == ["бежать", "идти"])
+    // The survivor took the loser's newer user text ("Run", rank 1, later clock).
+    #expect(detail.text == "Run")
+    // Cards resolve to the survivor's canonical Cards only.
+    #expect(Set(detail.cards.map(\.id)) == [ToriID.card(entry: survivor, direction: .recognition), .card(entry: survivor, direction: .recall)])
+}
+
+@Test func postPullMergePicksSmallestIDAndKeepsHistory() throws {
+    let phone = try TestStore(now: t0 + 60_000)
+    let tablet = try TestStore(now: t0)  // earlier clock → smaller UUIDv7
+    let mine = try phone.store.capture(CaptureInput(term: "take off", capturedAt: t0, senses: [.tr("взлетать")]))
+    let theirs = try tablet.store.capture(CaptureInput(term: "Take  off", capturedAt: t0, senses: [.tr("снимать")]))
+    #expect(theirs < mine)
+    let card = ToriID.card(entry: mine, direction: .recognition)
+    try phone.store.commitAnswer(card: card, rating: .remembered, reviewedAt: t0 + 120_000, utcOffsetMin: 0, answerMs: 1000)
+
+    try phone.store.applyPulledPage(try tablet.records(), cursor: "1")
+    #expect(try phone.scalar("SELECT merged_into FROM entry WHERE id = ?", [mine]) == theirs)
+    #expect(try phone.store.syncState(.cursor) == "1")
+    let detail = try #require(try phone.store.read { try $0.entry(mine) })
+    #expect(detail.id == theirs)
+    #expect(Set(detail.senses.compactMap(\.translation)) == ["взлетать", "снимать"])
+    // The answer on the loser's Card now counts for the survivor's canonical Card.
+    let canonical = ToriID.card(entry: theirs, direction: .recognition)
+    #expect(detail.cards.first { $0.direction == .recognition }?.reps == 1)
+    #expect(try phone.scalar("SELECT canonical_card_id FROM review_log") == canonical)
+    #expect(try phone.store.read { try $0.words(WordsQuery()) }.count == 1)
+}
+
+@Test func tagsMergeByKeyAndMembershipIsOr() throws {
+    let s = try TestStore()
+    let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, tags: ["Work"]))
+    let f = try s.store.capture(CaptureInput(term: "walk", capturedAt: t0))
+    try s.store.tag([f], name: "home")
+    let home = try #require(try s.store.read { try $0.allTags() }.first { $0.name == "home" })
+    #expect(try s.store.renameTag(home.id, to: "WORK") != .saved)
+    #expect(try s.store.renameTag(home.id, to: "WORK", mergeIfDuplicate: true) == .saved)
+    let tags = try s.store.read { try $0.allTags() }
+    #expect(tags.count == 1)
+    let work = tags[0].id
+    #expect(Set(try s.store.read { try $0.words(WordsQuery(tags: [work])) }.map(\.id)) == [e, f])
+    try s.store.untag(f, tag: work)
+    #expect(try s.store.read { try $0.words(WordsQuery(tags: [work])) }.map(\.id) == [e])
+}
+
+// MARK: Pull: orphans, tombstones
+
+@Test func orphansThenParentEqualsSinglePage() throws {
+    let source = try TestStore(now: t0)
+    let e = try source.store.capture(CaptureInput(term: "take off", capturedAt: t0, senses: [.tr("взлетать")],
+                                                  sentence: "The plane took off late.", highlight: .init(offset: 10, length: 8),
+                                                  source: SourceInput(kind: .web, url: "https://example.com/a?utm_source=x", title: "News"),
+                                                  tags: ["travel"]))
+    for (i, card) in [CardDirection.recognition, .recall, .cloze].enumerated() {
+        try source.store.commitAnswer(card: .card(entry: e, direction: card), rating: i == 1 ? .forgot : .remembered,
+                                      reviewedAt: t0 + Int64(i) * 1000, utcOffsetMin: 180, answerMs: 900)
+    }
+    let records = try source.records()
+    let parents: Set = ["entry", "card", "tag", "source", "language_pair", "settings"]
+
+    let one = try TestStore(now: t0 + 1)
+    try one.store.applyPulledPage(records, cursor: "1")
+    let two = try TestStore(now: t0 + 1)
+    try two.store.applyPulledPage(records.filter { !parents.contains($0.type) }, cursor: "1")
+    #expect(try two.store.read { try $0.words(WordsQuery()) }.isEmpty)  // orphans hidden
+    try two.store.applyPulledPage(records.filter { parents.contains($0.type) }, cursor: "2")
+
+    #expect(try one.dump().filter { !$0.hasPrefix("settings") && !$0.hasPrefix("language_pair") }
+            == two.dump().filter { !$0.hasPrefix("settings") && !$0.hasPrefix("language_pair") })
+    let detail = try #require(try two.store.read { try $0.entry(e) })
+    #expect(detail.cards.map(\.reps) == [1, 1, 1])
+    #expect(detail.contexts.first?.sourceTitle == "News")
+    #expect(detail.tags.map(\.name) == ["travel"])
+    // Same canonical card state as on the source device.
+    #expect(try one.rows("SELECT id, stability, due_day FROM card ORDER BY id").map { "\($0)" }
+            == source.rows("SELECT id, stability, due_day FROM card ORDER BY id").map { "\($0)" })
+}
+
+@Test func deleteWinsHidesPurgesAndDropsLateChildren() throws {
+    let a = try TestStore(now: t0)
+    let e = try a.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
+    let b = try TestStore(now: t0)
+    try b.store.applyPulledPage(try a.records(), cursor: "1")
+
+    // A adds a Sense offline; B deletes (signed out → children purged at once).
+    let lateSense = try a.store.addSense(to: e, .tr("бегать"))
+    try b.store.deleteEntries([e])
+    #expect(try b.store.read { try $0.words(WordsQuery()) }.isEmpty)
+    #expect(try b.scalar("SELECT COUNT(*) FROM sense") == 0)
+    #expect(try b.scalar("SELECT COUNT(*) FROM card") == 0)
+
+    try b.store.applyPulledPage(try a.store.db.read { db in [try RecordIO.load(db, .sense, lateSense)!] }, cursor: "2")
+    #expect(try b.scalar("SELECT COUNT(*) FROM sense") == 0)
+
+    // The tombstone reaches A and wins over its offline edit.
+    let tombstone = try b.store.db.read { try RecordIO.load($0, .entry, e)! }
+    #expect(tombstone.deleted && tombstone.fields.isEmpty)
+    try a.store.applyPulledPage([tombstone], cursor: "1")
+    #expect(try a.store.read { try $0.words(WordsQuery()) }.isEmpty)
+    #expect(try a.store.read { try $0.entry(e) } == nil)
+}
+
+@Test func unknownFieldsAndTypesAreKept() throws {
+    let s = try TestStore()
+    let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0))
+    var record = try s.store.db.read { try RecordIO.load($0, .entry, e)! }
+    let clock = HLCTimestamp(ms: t0 + 5000, counter: 0, node: 7)
+    record.fields["future_field"] = FieldVersion(value: .string("x"), clock: clock, rank: .user)
+    record.schema = 2
+    let unknown = SyncRecord(id: .v5("x"), type: "deck", schema: 1, owner: nil, deleted: false, mergedInto: nil, fields: [:])
+    let result = try s.store.applyPulledPage([record, unknown], cursor: "1")
+    #expect(result.skippedUnknownTypes == ["deck"])
+    try s.signIn()
+    try s.store.markAllPending()
+    let pushed = try #require(try s.store.pendingPush().records.first { $0.id == e })
+    #expect(pushed.fields["future_field"] == FieldVersion(value: .string("x"), clock: clock, rank: .user))
+    #expect(pushed.schema == 2)
+}
+
+// MARK: Scheduler cache
+
+@Test func incrementalAnswerEqualsFullReplayAndParamsRebuild() throws {
+    let s = try TestStore()
+    let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
+    let card = ToriID.card(entry: e, direction: .recall)
+    let answers: [(Int, Rating)] = [(0, .remembered), (0, .forgot), (1, .remembered), (4, .remembered), (13, .forgot), (14, .remembered)]
+    for (day, rating) in answers {
+        try s.store.commitAnswer(card: card, rating: rating, reviewedAt: t0 + Int64(day) * 86_400_000 + 1, utcOffsetMin: 180, answerMs: 2000)
+    }
+    // An out-of-order (older) answer takes the full-replay path.
+    try s.store.commitAnswer(card: card, rating: .remembered, reviewedAt: t0 + 2 * 86_400_000, utcOffsetMin: 180, answerMs: nil)
+
+    func expected(_ p: FSRSParameters) throws -> CardState? {
+        let logs = try s.rows("SELECT id, reviewed_at, utc_offset_min, rating FROM review_log").map {
+            ReviewLogInput(id: $0["id"], cardID: card, reviewedAt: $0["reviewed_at"], utcOffsetMin: $0["utc_offset_min"],
+                           rating: Rating(rawValue: $0["rating"]))
+        }
+        return FSRS.replay(cardID: card, logs: logs, p)
+    }
+    func cached() throws -> Row { try #require(try s.rows("SELECT * FROM card WHERE id = ?", [card]).first) }
+
+    var want = try #require(try expected(.default))
+    var row = try cached()
+    #expect(row["stability"] == want.stability && row["difficulty"] == want.difficulty)
+    #expect(row["due_day"] == want.dueDay && row["reps"] == want.reps && row["lapses"] == want.lapses && row["stage"] == want.stage.rawValue)
+
+    var p = FSRSParameters.default
+    p.desiredRetention = 0.85
+    try s.store.setSchedulerParameters(p, paramsID: "custom-1")
+    want = try #require(try expected(p))
+    row = try cached()
+    #expect(row["stability"] == want.stability && row["due_day"] == want.dueDay && row["params_id"] == "custom-1")
+}
+
+// MARK: Cards and enrichment
+
+@Test func cardsCreatedWhenReviewableWithClozeForHighlightedSentence() throws {
+    let s = try TestStore()
+    let plain = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")], sentence: "They walk."))
+    let cloze = try s.store.capture(CaptureInput(term: "walk", capturedAt: t0, senses: [.tr("идти")], sentence: "They walk.",
+                                                 highlight: .init(offset: 5, length: 4)))
+    let pending = try s.store.capture(CaptureInput(term: "jump", capturedAt: t0))
+    func directions(_ e: ToriID) throws -> [CardDirection] { try #require(try s.store.read { try $0.entry(e) }).cards.map(\.direction) }
+    #expect(try directions(plain) == [.recognition, .recall])
+    #expect(try directions(cloze) == [.recognition, .recall, .cloze])
+    #expect(try directions(pending).isEmpty)
+    #expect(try s.store.read { try $0.entry(pending) }?.translation == .pending)
+    #expect(try s.store.read { try $0.pendingEnrichment() } == [pending])
+
+    try s.store.fillAutomaticSense(pending, .tr("прыгать"))
+    #expect(try directions(pending) == [.recognition, .recall])
+    #expect(try s.store.read { try $0.words(WordsQuery(filter: .checkTranslation)) }.map(\.id) == [pending])
+    try s.store.commitAnswer(card: .card(entry: pending, direction: .recall), rating: .remembered, reviewedAt: t0, utcOffsetMin: 0, answerMs: 1)
+    #expect(try s.store.read { try $0.words(WordsQuery(filter: .checkTranslation)) }.isEmpty)
+    let clocks = try #require(JSONText.decode([String: FieldClock].self, try s.scalar("SELECT field_clocks FROM entry WHERE id = ?", [pending])))
+    #expect(clocks["needs_check"]?.u == 0)
+
+    for _ in 0..<3 { try s.store.recordEnrichmentFailure(plain) }  // has a translation: state stays "has"
+    let none = try s.store.capture(CaptureInput(term: "fly", capturedAt: t0))
+    for _ in 0..<3 { try s.store.recordEnrichmentFailure(none) }
+    #expect(try s.store.read { try $0.entry(none) }?.translation == .notFound)
+}
+
+// MARK: Inbox
+
+@Test func inboxImportIsIdempotentAndOrdered() throws {
+    let s = try TestStore()
+    let group = AppGroup(root: s.dir.appendingPathComponent("group"))
+    let inbox = group.inbox
+    let first = ToriID.v7(unixMs: t0, randA: 1, randB: 1), second = ToriID.v7(unixMs: t0 + 1, randA: 1, randB: 1)
+    let file = InboxFile(captureId: first, capturedAt: t0, utcOffsetMin: 180, term: "take off",
+                         sentence: "The plane took off an hour late.", highlight: .init(offset: 10, length: 8),
+                         source: .init(url: "https://example.com/a", title: "News"), tags: ["work"],
+                         chosenSenses: [.init(translation: "взлетать", provenance: .init(kind: "wiktionary", dictVersion: "2026.11.1",
+                                                                                         headwordKey: "take off", senseOrdinal: 0))])
+    try inbox.write(file)
+    var again = file
+    again.captureId = second
+    again.chosenSenses = [.init(translation: "Взлетать", provenance: .init(kind: "user"))]  // same translation key
+    again.typedTranslation = "уходить"
+    again.resume = true
+    try inbox.write(again)
+    let unknown = ToriID.v7(unixMs: t0 + 2, randA: 1, randB: 1)
+    try Data(#"{"format": 9}"#.utf8).write(to: inbox.url(for: unknown))
+
+    let result = try s.store.importInbox(inbox)
+    #expect(result.imported == [first, second] && result.leftInPlace == [unknown])
+    #expect(inbox.pending() == [unknown])
+    let words = try s.store.read { try $0.words(WordsQuery()) }
+    #expect(words.count == 1)
+    let detail = try #require(try s.store.read { try $0.entry(words[0].id) })
+    #expect(detail.senses.compactMap(\.translation) == ["взлетать", "уходить"])
+    #expect(detail.contexts.count == 1 && detail.tags.map(\.name) == ["work"])
+    #expect(detail.createdAt == t0)
+    #expect(try s.scalar("SELECT origin FROM entry") == "shared")
+
+    // Crash between commit and delete: the file reappears and is skipped.
+    try inbox.write(file)
+    let before = try s.dump()
+    #expect(try s.store.importInbox(inbox).imported.isEmpty)
+    #expect(inbox.pending() == [unknown])
+    #expect(try s.dump() == before)
+}
+
+// MARK: Words list and search
+
+@Test func searchUsesFoldsAndEscapesLike() throws {
+    let s = try TestStore()
+    let yolka = try s.store.capture(CaptureInput(term: "Ёлка", capturedAt: t0, senses: [.tr("fir tree")]))
+    let pct = try s.store.capture(CaptureInput(term: "100% sure", capturedAt: t0 + 1, senses: [.tr("уверен")],
+                                               sentence: "I am ABC Sure."))
+    let other = try s.store.capture(CaptureInput(term: "1000 sure", capturedAt: t0 + 2))
+    func search(_ q: String) throws -> Set<ToriID> { Set(try s.store.read { try $0.words(WordsQuery(search: q)) }.map(\.id)) }
+    #expect(try search("ЕЛК") == [yolka])
+    #expect(try search("Fir") == [yolka])
+    #expect(try search("abc") == [pct])
+    #expect(try search("0%") == [pct])
+    #expect(try search("1_0") == [])
+    #expect(try search("уверен") == [pct])
+    #expect(try search("  ") == [yolka, pct, other])
+}
+
+@Test func wordsFiltersAndSorts() throws {
+    let s = try TestStore()
+    let b = try s.store.capture(CaptureInput(term: "b word", capturedAt: t0, senses: [.tr("б")],
+                                             source: SourceInput(kind: .other, title: "The Bear S2E3")))
+    let a = try s.store.capture(CaptureInput(term: "alpha", capturedAt: t0 + 1, senses: [.tr("а")]))
+    let c = try s.store.capture(CaptureInput(term: "Charlie", capturedAt: t0 + 2))
+    try s.store.setStatus([a], .known)
+    func ids(_ q: WordsQuery) throws -> [ToriID] { try s.store.read { try $0.words(q) }.map(\.id) }
+    #expect(try ids(WordsQuery()) == [c, a, b])
+    #expect(try ids(WordsQuery(sort: .alphabetical)) == [a, b, c])
+    #expect(try ids(WordsQuery(filter: .needsTranslation)) == [c])
+    #expect(try ids(WordsQuery(filter: .phrases)) == [b])
+    #expect(try ids(WordsQuery(filter: .stage(.known))) == [a])
+    #expect(try ids(WordsQuery(filter: .stage(.new))) == [b])
+    #expect(try ids(WordsQuery(sort: .nextDue)) == [b, c, a])
+    let source = try #require(try s.scalar("SELECT id FROM source") as ToriID?)
+    #expect(try ids(WordsQuery(source: source)) == [b])
+    // The same title-only source is reused by key.
+    _ = try s.store.capture(CaptureInput(term: "delta", capturedAt: t0, source: SourceInput(kind: .other, title: " the bear s2e3 ")))
+    #expect(try s.scalar("SELECT COUNT(*) FROM source") == 1)
+}
+
+// MARK: Home, widget, Share index, observation
+
+@Test func homeSnapshotIndexAndObservation() async throws {
+    let s = try TestStore()
+    var updates = s.store.observe { try $0.words(WordsQuery()).count }.makeAsyncIterator()
+    #expect(try await updates.next() == 0)
+    let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать"), .tr("бегать"), .tr("течь"), .tr("работать")]))
+    #expect(try await updates.next() == 1)
+    try s.store.tag([e], name: "Work")
+
+    let queue = try s.store.read { try $0.dailyQueue(now: t0, utcOffsetMin: 0) }
+    #expect(queue.newCount == 1 && queue.homeState == .due)  // sibling filter: one Card per Entry per day
+    let group = AppGroup(root: s.dir.appendingPathComponent("group"))
+    try s.store.writeAppGroupFiles(group, now: t0, utcOffsetMin: 0)
+    #expect(try group.readWidgetSnapshot()?.days.first?.newAvailable == 1)
+    let index = try #require(try group.readVocabIndex())
+    #expect(index.entries == [VocabIndex.Entry(matchKey: "run", entryId: e, translations: ["бежать", "бегать", "течь"], status: .active)])
+    #expect(index.tags == [VocabIndex.Tag(key: "work", name: "Work")])
+
+    let progress = try s.store.read { try $0.progress(now: t0, utcOffsetMin: 0) }
+    #expect(progress.vocabulary.new == 1 && progress.capturedPerWeek.last == 1)
+}
+
+// MARK: Backup
+
+@Test func exportRestoreRoundTripIsIdempotent() throws {
+    let a = try TestStore()
+    let e = try a.store.capture(CaptureInput(term: "take off", capturedAt: t0, senses: [.tr("взлетать")], sentence: "It took off.",
+                                             tags: ["travel"]))
+    let gone = try a.store.capture(CaptureInput(term: "gone", capturedAt: t0, senses: [.tr("ушёл")]))
+    try a.store.commitAnswer(card: .card(entry: e, direction: .recognition), rating: .remembered, reviewedAt: t0, utcOffsetMin: 0, answerMs: 5)
+    let backup = try a.store.exportBackup(attribution: "Wiktionary, CC BY-SA 4.0")
+    let wrapper = try JSONDecoder().decode(Backup.self, from: backup)
+    #expect(wrapper.format == "toriwords-backup" && wrapper.version == 1 && wrapper.protocol == 1)
+
+    let b = try TestStore(now: t0 + 1)
+    try b.signIn()
+    #expect(try b.store.restore(backup) == RestoreSummary(imported: 2, merged: 0, deletedEarlier: 0))
+    #expect(try b.store.pendingRecordCount() > 0)
+    #expect(try a.store.read { try $0.entry(e) }?.cards == b.store.read { try $0.entry(e) }?.cards)
+    #expect(try a.store.read { try $0.words(WordsQuery()) } == b.store.read { try $0.words(WordsQuery()) })
+
+    let before = try b.dump()
+    #expect(try b.store.restore(backup) == RestoreSummary())
+    #expect(try b.dump() == before)
+
+    try b.store.deleteEntries([gone])
+    #expect(try b.store.restore(backup).deletedEarlier == 1)
+    #expect(try b.store.read { try $0.entry(gone) } == nil)
+
+    #expect(throws: StoreError.notABackup) { try b.store.restore(Data("{}".utf8)) }
+    var newer = try JSONSerialization.jsonObject(with: backup) as! [String: Any]
+    newer["version"] = 2
+    #expect(throws: StoreError.updateRequired) { try b.store.restore(try JSONSerialization.data(withJSONObject: newer)) }
+
+    let csv = try a.store.exportCSV(utcOffsetMin: 0)
+    #expect(csv.containsWiktionary)
+    #expect(csv.csv.hasPrefix("text,translations,definitions,sentence,source,tags,stage,created\r\n"))
+    #expect(csv.csv.contains("take off,взлетать,,It took off.,,travel,learning,2025-11-10\r\n"))
+}
+
+@Test func removeAllDataRecreatesDefaultsAndSignsOut() throws {
+    let s = try TestStore()
+    try s.signIn()
+    _ = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
+    var signedOut = false
+    try s.store.removeAllDataFromDevice { signedOut = true }
+    #expect(signedOut)
+    #expect(try s.scalar("SELECT COUNT(*) FROM entry") == 0 && s.scalar("SELECT COUNT(*) FROM card") == 0)
+    #expect(try s.scalar("SELECT COUNT(*) FROM settings") == 1 && s.scalar("SELECT COUNT(*) FROM language_pair") == 1)
+    #expect(try s.store.syncState(.accountId) == nil && s.store.pendingRecordCount() == 0)
+    #expect(try s.store.thisDeviceID() != nil)
+}

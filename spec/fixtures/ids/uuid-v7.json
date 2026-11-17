@@ -1,0 +1,34 @@
+{
+  "kind": "uuid-v7",
+  "source": "doc 36 §11.2 Random IDs: RFC 9562 UUIDv7 = 48-bit Unix ms | version 7 | 12-bit rand_a | variant 0b10 | 62-bit rand_b. Runners build the UUID from the parts and parse the parts back",
+  "cases": [
+    {
+      "id": "v7-001",
+      "unixMs": 1730666396238,
+      "randA": "cc3",
+      "randB": "1b1e3f5a2d6c8e01",
+      "uuid": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01"
+    },
+    {
+      "id": "v7-002",
+      "unixMs": 0,
+      "randA": "000",
+      "randB": "0000000000000000",
+      "uuid": "00000000-0000-7000-8000-000000000000"
+    },
+    {
+      "id": "v7-003",
+      "unixMs": 281474976710655,
+      "randA": "fff",
+      "randB": "3fffffffffffffff",
+      "uuid": "ffffffff-ffff-7fff-bfff-ffffffffffff"
+    },
+    {
+      "id": "v7-004",
+      "unixMs": 1762790400000,
+      "randA": "123",
+      "randB": "0123456789abcdef",
+      "uuid": "019a6e7e-e000-7123-8123-456789abcdef"
+    }
+  ]
+}

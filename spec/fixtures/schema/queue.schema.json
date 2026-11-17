@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/queue.schema.json",
+  "title": "Daily queue, catch-up and Home state (doc 36 §7.7)",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "const": "queue"
+    },
+    "source": {
+      "type": "string"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "w": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 21,
+          "maxItems": 21
+        },
+        "desiredRetention": {
+          "type": "number"
+        },
+        "maximumInterval": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "w",
+        "desiredRetention",
+        "maximumInterval"
+      ],
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "input": {
+            "type": "object",
+            "properties": {
+              "now": {
+                "type": "integer"
+              },
+              "utcOffsetMin": {
+                "type": "integer"
+              },
+              "settings": {
+                "type": "object",
+                "properties": {
+                  "newWordsPerDay": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 50
+                  }
+                },
+                "required": [
+                  "newWordsPerDay"
+                ],
+                "additionalProperties": false
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                    },
+                    "createdAt": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "enum": [
+                        "active",
+                        "excluded"
+                      ]
+                    },
+                    "cards": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                          },
+                          "direction": {
+                            "enum": [
+                              "recognition",
+                              "recall",
+                              "cloze"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "direction"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "createdAt",
+                    "status",
+                    "cards"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "logs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                    },
+                    "cardId": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                    },
+                    "reviewedAt": {
+                      "type": "integer"
+                    },
+                    "utcOffsetMin": {
+                      "type": "integer"
+                    },
+                    "rating": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            1,
+                            2,
+                            3,
+                            4
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "cardId",
+                    "reviewedAt",
+                    "utcOffsetMin",
+                    "rating"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "now",
+              "utcOffsetMin",
+              "settings",
+              "entries",
+              "logs"
+            ],
+            "additionalProperties": false
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "reviews": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              },
+              "new": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              },
+              "reshow": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              },
+              "dueToday": {
+                "type": "object",
+                "properties": {
+                  "toReview": {
+                    "type": "integer"
+                  },
+                  "new": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "toReview",
+                  "new"
+                ],
+                "additionalProperties": false
+              },
+              "waiting": {
+                "type": "integer"
+              },
+              "catchUp": {
+                "type": "boolean"
+              },
+              "normalLoad": {
+                "type": "integer"
+              },
+              "homeState": {
+                "enum": [
+                  "due",
+                  "allDone",
+                  "nothingDue",
+                  "noneReviewable",
+                  "empty"
+                ]
+              }
+            },
+            "required": [
+              "reviews",
+              "new",
+              "reshow",
+              "dueToday",
+              "waiting",
+              "catchUp",
+              "normalLoad",
+              "homeState"
+            ],
+            "additionalProperties": false
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "input",
+          "expected"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "source",
+    "params",
+    "cases"
+  ],
+  "additionalProperties": false
+}

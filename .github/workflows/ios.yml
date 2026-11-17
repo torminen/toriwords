@@ -28,9 +28,9 @@ permissions:
   contents: read
 
 env:
-  # Assumption: Xcode 26.4 (iOS 26.4 SDK, Swift 6.3) on the GitHub `macos-26` image. The app's deployment target is
-  # iOS 26.0 and ToriKit's swift-tools-version is 6.2, so any Xcode 26.x or later works; bump both lines together.
-  XCODE_VERSION: "26.4"
+  # Project decision: iOS 26 deployment target, built with the iOS 27 SDK (Xcode 27, Swift 6.4 like `.swift-version`).
+  # Assumption: the GitHub `macos-26` image carries Xcode 27; setup-xcode picks the newest 27.x. Bump with `.swift-version`.
+  XCODE_VERSION: "27"
 
 jobs:
   toriKit-package:

@@ -4,6 +4,7 @@ import ToriCore
 import ToriEnrichment
 import ToriShared
 import ToriStore
+import ToriSync
 import UIKit
 
 /// Slot for ToriSync (wired in a later step): token purge on a fresh install, launch reconciliation, sync triggers.
@@ -12,6 +13,33 @@ import UIKit
     func purgeLeftoverTokens()
     /// §4.7 step 5 / §12.5: launch reconciliation and a sync when signed in.
     func syncIfSignedIn() async
+
+    // Settings → Account (doc 35 §3.10, doc 36 §11.10, §12). Observable: the Account screen reads `status` in its body.
+    var status: SyncStatus { get }
+    /// Runs the provider's sign-in UI (Apple: ASAuthorization; Google: web auth session), then `SyncEngine.signIn`.
+    /// Throws when the user cancels or the server refuses; the Account screen shows a generic error except on cancel.
+    func signIn(with provider: SignInProvider) async throws
+    /// "Sync now".
+    func syncNow() async
+    /// "Add these N words to this account" / "Remove all N words from this device" (§12.5). Cancel needs no call.
+    func resolveAccountChoice(_ choice: AccountChoice) async -> ChoiceResult
+    func signOut() async throws
+    /// Needs a connection; throws `APIError` otherwise.
+    func deleteAccount(removeLocalData: Bool) async throws
+    /// Drops `status.notices.first` after the Account screen showed it.
+    func dismissNotice()
+}
+
+enum SignInProvider: String, Sendable {
+    /// Raw values are the `lastProvider` sync_state values.
+    case apple, google
+}
+
+/// What About and Translation show from the bundled dictionary (doc 36 §8.4): `meta.dictionary_version` and
+/// `meta.licence_text`. The dictionary step makes its `BundledDictionary` conform.
+protocol DictionaryAttribution {
+    var version: String { get }
+    var licenceText: String { get }
 }
 
 /// Slot for the dictionary step: copy the bundled `dictionary.sqlite` into the App Group when its version changed
@@ -20,9 +48,14 @@ import UIKit
     func installIfNeeded(into group: AppGroup?) throws -> (any DictionaryLookup)?
 }
 
-/// Slot for reminders (step 9d). The Review reminder offer calls `enableDailyReminder`; commits call `refresh`.
+/// Slot for reminders (step 9d). The Review reminder offer and Settings call `enableDailyReminder`; commits call `refresh`.
+/// The implementation owns `DeviceSettings.reminderEnabled / reminderHour / reminderMinute`: it sets them when the
+/// reminder is turned on (permission granted) or its time changes, and clears `reminderEnabled` on disable.
 @MainActor protocol ReminderScheduling: AnyObject {
     func enableDailyReminder(hour: Int, minute: Int) async
+    func disableDailyReminder() async
+    /// Settings shows "Notifications are off for ToriWords" when true (SD3); the app never asks again by itself.
+    func notificationsDenied() async -> Bool
     func refresh() async
 }
 
@@ -42,6 +75,10 @@ final class DeviceSettings {
     var autoPlayOnReveal: Bool { didSet { defaults.set(autoPlayOnReveal, forKey: "autoPlayOnReveal") } }
     var swipeDemoShown: Bool { didSet { defaults.set(swipeDemoShown, forKey: "swipeDemoShown") } }
     var reminderOfferShown: Bool { didSet { defaults.set(reminderOfferShown, forKey: "reminderOfferShown") } }
+    /// Written by `ReminderScheduling` only (default off, 19:00).
+    var reminderEnabled: Bool { didSet { defaults.set(reminderEnabled, forKey: "reminderEnabled") } }
+    var reminderHour: Int { didSet { defaults.set(reminderHour, forKey: "reminderHour") } }
+    var reminderMinute: Int { didSet { defaults.set(reminderMinute, forKey: "reminderMinute") } }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -49,6 +86,9 @@ final class DeviceSettings {
         autoPlayOnReveal = defaults.bool(forKey: "autoPlayOnReveal")
         swipeDemoShown = defaults.bool(forKey: "swipeDemoShown")
         reminderOfferShown = defaults.bool(forKey: "reminderOfferShown")
+        reminderEnabled = defaults.bool(forKey: "reminderEnabled")
+        reminderHour = defaults.object(forKey: "reminderHour") as? Int ?? 19
+        reminderMinute = defaults.integer(forKey: "reminderMinute")
     }
 }
 
@@ -60,6 +100,8 @@ final class AppEnvironment {
     private(set) var phase: Phase = .launching
     private(set) var store: ToriStore?
     private(set) var enrichment: EnrichmentOrchestrator?
+    /// The installed dictionary; About and Translation read its version and licence (`DictionaryAttribution`).
+    private(set) var dictionary: (any DictionaryLookup)?
     let router = Router()
     let settings = DeviceSettings()
     let speech: SpeechPlayer
@@ -99,6 +141,7 @@ final class AppEnvironment {
             let dictionary = try? dictionaryInstaller?.installIfNeeded(into: appGroup)
             // 5: inbox import, then pending enrichment, then sync.
             if let appGroup { _ = try? store.importInbox(appGroup.inbox) }
+            self.dictionary = dictionary
             let enrichment = EnrichmentOrchestrator(store: store, dictionary: dictionary,
                                                     translator: AppleTranslator(bridge: translationBridge))
             self.store = store
@@ -138,7 +181,10 @@ final class AppEnvironment {
     // MARK: After a write
 
     /// After a review commit: debounced snapshot + vocab index (§7.8, 2 s) and reminders.
-    func didCommitAnswer() {
+    func didCommitAnswer() { didChangeData() }
+
+    /// After any bulk write (restore, remove all data): same refresh as after an answer.
+    func didChangeData() {
         scheduleAppGroupRefresh(delay: .seconds(2))
         Task { await reminders?.refresh() }
     }

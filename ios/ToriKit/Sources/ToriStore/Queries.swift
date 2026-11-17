@@ -313,6 +313,11 @@ extension StoreReader {
         try ToriID.fetchAll(db, sql: "SELECT id FROM entry e WHERE \(Self.liveEntry) AND e.enrichment_status = 'pending' ORDER BY e.created_at, e.id")
     }
 
+    /// Entries enrichment gave up on; re-run when a new source appears (§6.4).
+    public func unavailableEnrichment() throws -> [ToriID] {
+        try ToriID.fetchAll(db, sql: "SELECT id FROM entry e WHERE \(Self.liveEntry) AND e.enrichment_status = 'unavailable' ORDER BY e.created_at, e.id")
+    }
+
     // MARK: Progress (§14.1)
 
     public func progress(now: Int64, utcOffsetMin: Int) throws -> ProgressSummary {

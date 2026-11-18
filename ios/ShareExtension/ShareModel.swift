@@ -40,7 +40,7 @@ final class ShareModel {
         self.finish = finish
         draft = CaptureDraft(payload)
         sticky = try? group?.readCaptureSticky()
-        let offered = sticky?.offered(now: Self.nowMs) ?? (nil, [])
+        let offered = sticky?.offered(now: Self.nowMs) ?? (sourceTitle: nil, tags: [])
         sourceTitle = payload.title ?? offered.sourceTitle ?? ""
         tagsText = offered.tags.joined(separator: ", ")
         showTip = sticky?.tipShown != true

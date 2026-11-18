@@ -56,6 +56,7 @@ struct TranslationView: View {
         .navigationBarTitleDisplayMode(.inline)
         // The system shows its own download prompt; `prepareTranslation` returns when the user answered.
         .translationTask(download) { session in
+            nonisolated(unsafe) let session = session // Not Sendable; used only here.
             try? await session.prepareTranslation()
             await refresh()
         }

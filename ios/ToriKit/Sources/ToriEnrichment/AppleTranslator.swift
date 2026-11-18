@@ -72,6 +72,8 @@ public final class TranslationBridge {
 
     /// Drains the queued requests with the session the modifier provides.
     public func serve(_ session: TranslationSession) async {
+        // `TranslationSession` is not Sendable; the modifier hands it to this one serial loop and nothing else uses it.
+        nonisolated(unsafe) let session = session
         while !queue.isEmpty {
             let request = queue.removeFirst()
             do { request.done.resume(returning: try await session.translate(request.text).targetText) }

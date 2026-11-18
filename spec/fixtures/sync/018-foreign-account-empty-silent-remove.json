@@ -1,0 +1,83 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §12.4, §12.5 (N = 0)",
+  "cases": [
+    {
+      "id": "018-foreign-account-empty-silent-remove",
+      "title": "Signing in to another account with no live words removes silently",
+      "start": 1762776000000,
+      "devices": {
+        "A": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 20,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "delete",
+          "entry": "run"
+        },
+        {
+          "t": 40,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 50,
+          "device": "A",
+          "op": "signOut"
+        },
+        {
+          "t": 60,
+          "device": "A",
+          "op": "signIn",
+          "account": "bob"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [],
+            "account": {
+              "state": "synced",
+              "signedIn": "bob",
+              "lastSynced": "bob",
+              "pendingChoice": false,
+              "outbox": 0
+            },
+            "notices": []
+          }
+        },
+        "hub": {
+          "bob": {
+            "entries": {
+              "live": 0,
+              "deleted": 0,
+              "merged": 0
+            }
+          }
+        }
+      }
+    }
+  ]
+}

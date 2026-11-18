@@ -1,0 +1,1401 @@
+{
+  "kind": "fsrs-step",
+  "source": "doc 36 §7.3–7.5 (FSRS-6 step, intervals, fuzz), §7.6 stage. state = previous state or null for a new card. expected.interval = rounded interval before fuzz (null when dueDay = reviewDay). S and D within 1e-9 relative; everything else exact",
+  "params": {
+    "w": [
+      0.212,
+      1.2931,
+      2.3065,
+      8.2956,
+      6.4133,
+      0.8334,
+      3.0194,
+      0.001,
+      1.8722,
+      0.1666,
+      0.796,
+      1.4835,
+      0.0614,
+      0.2629,
+      1.6483,
+      0.6014,
+      1.8729,
+      0.5425,
+      0.0912,
+      0.0658,
+      0.1542
+    ],
+    "desiredRetention": 0.9,
+    "maximumInterval": 36500
+  },
+  "cases": [
+    {
+      "id": "st-001",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": null,
+      "reviewDay": 20774,
+      "rating": 1,
+      "expected": {
+        "stability": 0.212,
+        "difficulty": 6.4133,
+        "lastReviewDay": 20774,
+        "dueDay": 20774,
+        "interval": null,
+        "reps": 1,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "first review of a new card"
+    },
+    {
+      "id": "st-002",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": null,
+      "reviewDay": 20774,
+      "rating": 2,
+      "expected": {
+        "stability": 1.2931,
+        "difficulty": 5.112170705601055,
+        "lastReviewDay": 20774,
+        "dueDay": 20774,
+        "interval": null,
+        "reps": 1,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "first review of a new card (G=2: re-show, imports only)"
+    },
+    {
+      "id": "st-003",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": null,
+      "reviewDay": 20774,
+      "rating": 3,
+      "expected": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459015,
+        "lastReviewDay": 20774,
+        "dueDay": 20776,
+        "interval": 2,
+        "reps": 1,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "first review of a new card"
+    },
+    {
+      "id": "st-004",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": null,
+      "reviewDay": 20774,
+      "rating": 4,
+      "expected": {
+        "stability": 8.2956,
+        "difficulty": 1,
+        "lastReviewDay": 20774,
+        "dueDay": 20780,
+        "interval": 8,
+        "reps": 1,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "first review of a new card"
+    },
+    {
+      "id": "st-005",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20764,
+      "rating": 1,
+      "expected": {
+        "stability": 0.7750839828558983,
+        "difficulty": 7.394502741279718,
+        "lastReviewDay": 20764,
+        "dueDay": 20764,
+        "interval": null,
+        "reps": 2,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "young card, t = 0"
+    },
+    {
+      "id": "st-006",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20764,
+      "rating": 2,
+      "expected": {
+        "stability": 2.3065,
+        "difficulty": 4.752858488532557,
+        "lastReviewDay": 20764,
+        "dueDay": 20766,
+        "interval": 2,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "young card, t = 0"
+    },
+    {
+      "id": "st-007",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20764,
+      "rating": 3,
+      "expected": {
+        "stability": 2.3065,
+        "difficulty": 2.111214235785395,
+        "lastReviewDay": 20764,
+        "dueDay": 20766,
+        "interval": 2,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "young card, t = 0"
+    },
+    {
+      "id": "st-008",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20764,
+      "rating": 4,
+      "expected": {
+        "stability": 3.9460540679694778,
+        "difficulty": 1,
+        "lastReviewDay": 20764,
+        "dueDay": 20769,
+        "interval": 4,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "young card, t = 0"
+    },
+    {
+      "id": "st-009",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20765,
+      "rating": 1,
+      "expected": {
+        "stability": 0.5712991793450282,
+        "difficulty": 7.394502741279718,
+        "lastReviewDay": 20765,
+        "dueDay": 20765,
+        "interval": null,
+        "reps": 2,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "young card, t = 1"
+    },
+    {
+      "id": "st-010",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20765,
+      "rating": 2,
+      "expected": {
+        "stability": 5.318792767488077,
+        "difficulty": 4.752858488532557,
+        "lastReviewDay": 20765,
+        "dueDay": 20771,
+        "interval": 5,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "young card, t = 1"
+    },
+    {
+      "id": "st-011",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20765,
+      "rating": 3,
+      "expected": {
+        "stability": 7.31530074407728,
+        "difficulty": 2.111214235785395,
+        "lastReviewDay": 20765,
+        "dueDay": 20773,
+        "interval": 7,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "young card, t = 1"
+    },
+    {
+      "id": "st-012",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20765,
+      "rating": 4,
+      "expected": {
+        "stability": 11.687482913582336,
+        "difficulty": 1,
+        "lastReviewDay": 20765,
+        "dueDay": 20778,
+        "interval": 12,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "young card, t = 1"
+    },
+    {
+      "id": "st-013",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20774,
+      "rating": 1,
+      "expected": {
+        "stability": 0.7591601630111713,
+        "difficulty": 7.394502741279718,
+        "lastReviewDay": 20774,
+        "dueDay": 20774,
+        "interval": null,
+        "reps": 2,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "young card, t = 10"
+    },
+    {
+      "id": "st-014",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20774,
+      "rating": 2,
+      "expected": {
+        "stability": 16.01975520922122,
+        "difficulty": 4.752858488532557,
+        "lastReviewDay": 20774,
+        "dueDay": 20792,
+        "interval": 16,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "young card, t = 10"
+    },
+    {
+      "id": "st-015",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20774,
+      "rating": 3,
+      "expected": {
+        "stability": 25.10872016830931,
+        "difficulty": 2.111214235785395,
+        "lastReviewDay": 20774,
+        "dueDay": 20801,
+        "interval": 25,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "known_well"
+      },
+      "note": "young card, t = 10"
+    },
+    {
+      "id": "st-016",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20774,
+      "rating": 4,
+      "expected": {
+        "stability": 45.012778153226506,
+        "difficulty": 1,
+        "lastReviewDay": 20774,
+        "dueDay": 20821,
+        "interval": 45,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "known_well"
+      },
+      "note": "young card, t = 10"
+    },
+    {
+      "id": "st-017",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20864,
+      "rating": 1,
+      "expected": {
+        "stability": 1.0828543769642898,
+        "difficulty": 7.394502741279718,
+        "lastReviewDay": 20864,
+        "dueDay": 20864,
+        "interval": null,
+        "reps": 2,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "young card, t = 100"
+    },
+    {
+      "id": "st-018",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20864,
+      "rating": 2,
+      "expected": {
+        "stability": 31.62591245899519,
+        "difficulty": 4.752858488532557,
+        "lastReviewDay": 20864,
+        "dueDay": 20898,
+        "interval": 32,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "known_well"
+      },
+      "note": "young card, t = 100"
+    },
+    {
+      "id": "st-019",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20864,
+      "rating": 3,
+      "expected": {
+        "stability": 51.05843292150847,
+        "difficulty": 2.111214235785395,
+        "lastReviewDay": 20864,
+        "dueDay": 20918,
+        "interval": 51,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "known_well"
+      },
+      "note": "young card, t = 100"
+    },
+    {
+      "id": "st-020",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 2.3065,
+        "difficulty": 2.118103970459016,
+        "lastReviewDay": 20764,
+        "reps": 1,
+        "lapses": 0
+      },
+      "reviewDay": 20864,
+      "rating": 4,
+      "expected": {
+        "stability": 93.61399516869321,
+        "difficulty": 1,
+        "lastReviewDay": 20864,
+        "dueDay": 20962,
+        "interval": 94,
+        "reps": 2,
+        "lapses": 0,
+        "stage": "known_well"
+      },
+      "note": "young card, t = 100"
+    },
+    {
+      "id": "st-021",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20754,
+      "rating": 1,
+      "expected": {
+        "stability": 4.456378754906346,
+        "difficulty": 8.341762369296838,
+        "lastReviewDay": 20754,
+        "dueDay": 20754,
+        "interval": null,
+        "reps": 5,
+        "lapses": 2,
+        "stage": "learning"
+      },
+      "note": "mid card, t = 0"
+    },
+    {
+      "id": "st-022",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20754,
+      "rating": 2,
+      "expected": {
+        "stability": 15.0,
+        "difficulty": 6.665995369296838,
+        "lastReviewDay": 20754,
+        "dueDay": 20771,
+        "interval": 15,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "mid card, t = 0"
+    },
+    {
+      "id": "st-023",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20754,
+      "rating": 3,
+      "expected": {
+        "stability": 15.0,
+        "difficulty": 4.9902283692968386,
+        "lastReviewDay": 20754,
+        "dueDay": 20771,
+        "interval": 15,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "mid card, t = 0"
+    },
+    {
+      "id": "st-024",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20754,
+      "rating": 4,
+      "expected": {
+        "stability": 22.688007884534393,
+        "difficulty": 3.3144613692968385,
+        "lastReviewDay": 20754,
+        "dueDay": 20779,
+        "interval": 23,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "known_well"
+      },
+      "note": "mid card, t = 0"
+    },
+    {
+      "id": "st-025",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20755,
+      "rating": 1,
+      "expected": {
+        "stability": 1.4650585528038864,
+        "difficulty": 8.341762369296838,
+        "lastReviewDay": 20755,
+        "dueDay": 20755,
+        "interval": null,
+        "reps": 5,
+        "lapses": 2,
+        "stage": "learning"
+      },
+      "note": "mid card, t = 1"
+    },
+    {
+      "id": "st-026",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20755,
+      "rating": 2,
+      "expected": {
+        "stability": 16.740136009111108,
+        "difficulty": 6.665995369296838,
+        "lastReviewDay": 20755,
+        "dueDay": 20774,
+        "interval": 17,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "mid card, t = 1"
+    },
+    {
+      "id": "st-027",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20755,
+      "rating": 3,
+      "expected": {
+        "stability": 17.893475239626053,
+        "difficulty": 4.9902283692968386,
+        "lastReviewDay": 20755,
+        "dueDay": 20775,
+        "interval": 18,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "mid card, t = 1"
+    },
+    {
+      "id": "st-028",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20755,
+      "rating": 4,
+      "expected": {
+        "stability": 20.41918977629564,
+        "difficulty": 3.3144613692968385,
+        "lastReviewDay": 20755,
+        "dueDay": 20777,
+        "interval": 20,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "mid card, t = 1"
+    },
+    {
+      "id": "st-029",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20764,
+      "rating": 1,
+      "expected": {
+        "stability": 1.6304901550074342,
+        "difficulty": 8.341762369296838,
+        "lastReviewDay": 20764,
+        "dueDay": 20764,
+        "interval": null,
+        "reps": 5,
+        "lapses": 2,
+        "stage": "learning"
+      },
+      "note": "mid card, t = 10"
+    },
+    {
+      "id": "st-030",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20764,
+      "rating": 2,
+      "expected": {
+        "stability": 28.718089042142083,
+        "difficulty": 6.665995369296838,
+        "lastReviewDay": 20764,
+        "dueDay": 20795,
+        "interval": 29,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "known_well"
+      },
+      "note": "mid card, t = 10"
+    },
+    {
+      "id": "st-031",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20764,
+      "rating": 3,
+      "expected": {
+        "stability": 37.81025780203206,
+        "difficulty": 4.9902283692968386,
+        "lastReviewDay": 20764,
+        "dueDay": 20805,
+        "interval": 38,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "known_well"
+      },
+      "note": "mid card, t = 10"
+    },
+    {
+      "id": "st-032",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20764,
+      "rating": 4,
+      "expected": {
+        "stability": 57.72133183742584,
+        "difficulty": 3.3144613692968385,
+        "lastReviewDay": 20764,
+        "dueDay": 20826,
+        "interval": 58,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "known_well"
+      },
+      "note": "mid card, t = 10"
+    },
+    {
+      "id": "st-033",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20854,
+      "rating": 1,
+      "expected": {
+        "stability": 2.241103025239826,
+        "difficulty": 8.341762369296838,
+        "lastReviewDay": 20854,
+        "dueDay": 20854,
+        "interval": null,
+        "reps": 5,
+        "lapses": 2,
+        "stage": "learning"
+      },
+      "note": "mid card, t = 100"
+    },
+    {
+      "id": "st-034",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20854,
+      "rating": 2,
+      "expected": {
+        "stability": 68.21456415877188,
+        "difficulty": 6.665995369296838,
+        "lastReviewDay": 20854,
+        "dueDay": 20926,
+        "interval": 68,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "known_well"
+      },
+      "note": "mid card, t = 100"
+    },
+    {
+      "id": "st-035",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20854,
+      "rating": 3,
+      "expected": {
+        "stability": 103.4844764861521,
+        "difficulty": 4.9902283692968386,
+        "lastReviewDay": 20854,
+        "dueDay": 20962,
+        "interval": 103,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "known_well"
+      },
+      "note": "mid card, t = 100"
+    },
+    {
+      "id": "st-036",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 15.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20754,
+        "reps": 4,
+        "lapses": 1
+      },
+      "reviewDay": 20854,
+      "rating": 4,
+      "expected": {
+        "stability": 180.72257601091425,
+        "difficulty": 3.3144613692968385,
+        "lastReviewDay": 20854,
+        "dueDay": 21043,
+        "interval": 181,
+        "reps": 5,
+        "lapses": 1,
+        "stage": "known_well"
+      },
+      "note": "mid card, t = 100"
+    },
+    {
+      "id": "st-037",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20644,
+      "rating": 1,
+      "expected": {
+        "stability": 31.092007298506285,
+        "difficulty": 9.492188569296838,
+        "lastReviewDay": 20644,
+        "dueDay": 20644,
+        "interval": null,
+        "reps": 10,
+        "lapses": 3,
+        "stage": "learning"
+      },
+      "note": "mature, hard card, t = 0"
+    },
+    {
+      "id": "st-038",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20644,
+      "rating": 2,
+      "expected": {
+        "stability": 120.0,
+        "difficulty": 8.989458469296839,
+        "lastReviewDay": 20644,
+        "dueDay": 20770,
+        "interval": 120,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 0"
+    },
+    {
+      "id": "st-039",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20644,
+      "rating": 3,
+      "expected": {
+        "stability": 120.0,
+        "difficulty": 8.486728369296838,
+        "lastReviewDay": 20644,
+        "dueDay": 20770,
+        "interval": 120,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 0"
+    },
+    {
+      "id": "st-040",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20644,
+      "rating": 4,
+      "expected": {
+        "stability": 158.29348121675451,
+        "difficulty": 7.983998269296839,
+        "lastReviewDay": 20644,
+        "dueDay": 20810,
+        "interval": 158,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 0"
+    },
+    {
+      "id": "st-041",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20645,
+      "rating": 1,
+      "expected": {
+        "stability": 3.295684841011563,
+        "difficulty": 9.492188569296838,
+        "lastReviewDay": 20645,
+        "dueDay": 20645,
+        "interval": null,
+        "reps": 10,
+        "lapses": 3,
+        "stage": "learning"
+      },
+      "note": "mature, hard card, t = 1"
+    },
+    {
+      "id": "st-042",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20645,
+      "rating": 2,
+      "expected": {
+        "stability": 120.5276565743273,
+        "difficulty": 8.989458469296839,
+        "lastReviewDay": 20645,
+        "dueDay": 20772,
+        "interval": 121,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 1"
+    },
+    {
+      "id": "st-043",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20645,
+      "rating": 3,
+      "expected": {
+        "stability": 120.87738040293866,
+        "difficulty": 8.486728369296838,
+        "lastReviewDay": 20645,
+        "dueDay": 20772,
+        "interval": 121,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 1"
+    },
+    {
+      "id": "st-044",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20645,
+      "rating": 4,
+      "expected": {
+        "stability": 121.64324575666379,
+        "difficulty": 7.983998269296839,
+        "lastReviewDay": 20645,
+        "dueDay": 20773,
+        "interval": 122,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 1"
+    },
+    {
+      "id": "st-045",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20654,
+      "rating": 1,
+      "expected": {
+        "stability": 3.3547815633626823,
+        "difficulty": 9.492188569296838,
+        "lastReviewDay": 20654,
+        "dueDay": 20654,
+        "interval": null,
+        "reps": 10,
+        "lapses": 3,
+        "stage": "learning"
+      },
+      "note": "mature, hard card, t = 10"
+    },
+    {
+      "id": "st-046",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20654,
+      "rating": 2,
+      "expected": {
+        "stability": 125.0870519672308,
+        "difficulty": 8.989458469296839,
+        "lastReviewDay": 20654,
+        "dueDay": 20785,
+        "interval": 125,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 10"
+    },
+    {
+      "id": "st-047",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20654,
+      "rating": 3,
+      "expected": {
+        "stability": 128.45868301834187,
+        "difficulty": 8.486728369296838,
+        "lastReviewDay": 20654,
+        "dueDay": 20788,
+        "interval": 128,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 10"
+    },
+    {
+      "id": "st-048",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20654,
+      "rating": 4,
+      "expected": {
+        "stability": 135.84226742505248,
+        "difficulty": 7.983998269296839,
+        "lastReviewDay": 20654,
+        "dueDay": 20797,
+        "interval": 136,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 10"
+    },
+    {
+      "id": "st-049",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20744,
+      "rating": 1,
+      "expected": {
+        "stability": 3.802079944339348,
+        "difficulty": 9.492188569296838,
+        "lastReviewDay": 20744,
+        "dueDay": 20744,
+        "interval": null,
+        "reps": 10,
+        "lapses": 3,
+        "stage": "learning"
+      },
+      "note": "mature, hard card, t = 100"
+    },
+    {
+      "id": "st-050",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20744,
+      "rating": 2,
+      "expected": {
+        "stability": 158.3284498313032,
+        "difficulty": 8.989458469296839,
+        "lastReviewDay": 20744,
+        "dueDay": 20910,
+        "interval": 158,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 100"
+    },
+    {
+      "id": "st-051",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20744,
+      "rating": 3,
+      "expected": {
+        "stability": 183.73204162172135,
+        "difficulty": 8.486728369296838,
+        "lastReviewDay": 20744,
+        "dueDay": 20937,
+        "interval": 184,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 100"
+    },
+    {
+      "id": "st-052",
+      "cardId": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa",
+      "state": {
+        "stability": 120.0,
+        "difficulty": 8.5,
+        "lastReviewDay": 20644,
+        "reps": 9,
+        "lapses": 2
+      },
+      "reviewDay": 20744,
+      "rating": 4,
+      "expected": {
+        "stability": 239.3637407533219,
+        "difficulty": 7.983998269296839,
+        "lastReviewDay": 20744,
+        "dueDay": 20994,
+        "interval": 239,
+        "reps": 10,
+        "lapses": 2,
+        "stage": "known_well"
+      },
+      "note": "mature, hard card, t = 100"
+    },
+    {
+      "id": "st-053",
+      "cardId": "f8c246ae-fff7-56e7-8490-8dc110841f6f",
+      "state": {
+        "stability": 36000.0,
+        "difficulty": 1.0,
+        "lastReviewDay": 17774,
+        "reps": 30,
+        "lapses": 0
+      },
+      "reviewDay": 20774,
+      "rating": 4,
+      "expected": {
+        "stability": 36500,
+        "difficulty": 1,
+        "lastReviewDay": 20774,
+        "dueDay": 55698,
+        "interval": 36500,
+        "reps": 31,
+        "lapses": 0,
+        "stage": "known_well"
+      },
+      "note": "S clamped to 36500, interval capped at 36500"
+    },
+    {
+      "id": "st-054",
+      "cardId": "f8c246ae-fff7-56e7-8490-8dc110841f6f",
+      "state": {
+        "stability": 0.001,
+        "difficulty": 10.0,
+        "lastReviewDay": 20773,
+        "reps": 5,
+        "lapses": 4
+      },
+      "reviewDay": 20774,
+      "rating": 1,
+      "expected": {
+        "stability": 0.001,
+        "difficulty": 9.985228369296838,
+        "lastReviewDay": 20774,
+        "dueDay": 20774,
+        "interval": null,
+        "reps": 6,
+        "lapses": 5,
+        "stage": "learning"
+      },
+      "note": "S floor 0.001, D at 10"
+    },
+    {
+      "id": "st-055",
+      "cardId": "f8c246ae-fff7-56e7-8490-8dc110841f6f",
+      "state": {
+        "stability": 0.5,
+        "difficulty": 1.0,
+        "lastReviewDay": 20773,
+        "reps": 2,
+        "lapses": 0
+      },
+      "reviewDay": 20774,
+      "rating": 4,
+      "expected": {
+        "stability": 9.420563890332344,
+        "difficulty": 1,
+        "lastReviewDay": 20774,
+        "dueDay": 20781,
+        "interval": 9,
+        "reps": 3,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "D floor 1"
+    },
+    {
+      "id": "st-056",
+      "cardId": "f8c246ae-fff7-56e7-8490-8dc110841f6f",
+      "state": {
+        "stability": 3.0,
+        "difficulty": 5.0,
+        "lastReviewDay": 20769,
+        "reps": 2,
+        "lapses": 0
+      },
+      "reviewDay": 20764,
+      "rating": 3,
+      "expected": {
+        "stability": 3.0,
+        "difficulty": 4.9902283692968386,
+        "lastReviewDay": 20764,
+        "dueDay": 20766,
+        "interval": 3,
+        "reps": 3,
+        "lapses": 0,
+        "stage": "learning"
+      },
+      "note": "review day before the last review day: t clamped to 0"
+    },
+    {
+      "id": "st-057",
+      "cardId": "f8c246ae-fff7-56e7-8490-8dc110841f6f",
+      "state": {
+        "stability": 20.9,
+        "difficulty": 4.0,
+        "lastReviewDay": 20749,
+        "reps": 5,
+        "lapses": 0
+      },
+      "reviewDay": 20774,
+      "rating": 3,
+      "expected": {
+        "stability": 74.74463492267193,
+        "difficulty": 3.9912283692968384,
+        "lastReviewDay": 20774,
+        "dueDay": 20844,
+        "interval": 75,
+        "reps": 6,
+        "lapses": 0,
+        "stage": "known_well"
+      },
+      "note": "crosses S ≥ 21 → known_well"
+    },
+    {
+      "id": "st-058",
+      "cardId": "f8c246ae-fff7-56e7-8490-8dc110841f6f",
+      "state": {
+        "stability": 40.0,
+        "difficulty": 4.0,
+        "lastReviewDay": 20729,
+        "reps": 6,
+        "lapses": 0
+      },
+      "reviewDay": 20774,
+      "rating": 1,
+      "expected": {
+        "stability": 2.6948769844560507,
+        "difficulty": 8.013069169296836,
+        "lastReviewDay": 20774,
+        "dueDay": 20774,
+        "interval": null,
+        "reps": 7,
+        "lapses": 1,
+        "stage": "learning"
+      },
+      "note": "lapse of a known_well card → learning"
+    }
+  ]
+}

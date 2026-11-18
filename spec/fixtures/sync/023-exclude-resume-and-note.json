@@ -1,0 +1,126 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.3",
+  "cases": [
+    {
+      "id": "023-exclude-resume-and-note",
+      "title": "Exclude, resume and a note on different devices all arrive",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "exclude",
+          "entry": "run",
+          "reason": "known"
+        },
+        {
+          "t": 110,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 111,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 112,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 113,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 200,
+          "device": "B",
+          "op": "resume",
+          "entry": "run"
+        },
+        {
+          "t": 250,
+          "device": "A",
+          "op": "editField",
+          "entry": "run",
+          "field": "note",
+          "value": "kept"
+        },
+        {
+          "t": 300,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 301,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 302,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 303,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "status": "active",
+                "note": "kept"
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "status": "active",
+                "note": "kept"
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

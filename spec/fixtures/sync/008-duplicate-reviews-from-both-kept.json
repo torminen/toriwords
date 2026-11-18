@@ -1,0 +1,93 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.7 step 5, §7.6",
+  "cases": [
+    {
+      "id": "008-duplicate-reviews-from-both-kept",
+      "title": "Answers given on two devices to duplicate words are all kept",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "a"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "review",
+          "entry": "a",
+          "rating": "remembered"
+        },
+        {
+          "t": 5,
+          "device": "B",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "b"
+        },
+        {
+          "t": 200,
+          "device": "B",
+          "op": "review",
+          "entry": "b",
+          "rating": "forgot"
+        },
+        {
+          "t": 300,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 310,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 320,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "reviews": 2
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "reviews": 2
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "ReviewLogs keep card_id; both resolve to the canonical Card v5(card:<survivor>:recognition) and are replayed."
+    }
+  ]
+}

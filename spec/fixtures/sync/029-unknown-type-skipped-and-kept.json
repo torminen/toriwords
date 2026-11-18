@@ -1,0 +1,99 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.8",
+  "cases": [
+    {
+      "id": "029-unknown-type-skipped-and-kept",
+      "title": "A record type from a newer app is skipped on pull and kept on the server",
+      "start": 1762776000000,
+      "devices": {
+        "A": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "op": "upgradeSchema",
+          "account": "alice",
+          "records": [
+            {
+              "id": "0192f3c1-0000-7000-8000-00000000d001",
+              "type": "deck",
+              "schema": 1,
+              "fields": {
+                "name": {
+                  "v": "Travel",
+                  "u": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 40,
+          "device": "A",
+          "op": "editField",
+          "entry": "run",
+          "field": "note",
+          "value": "still syncing"
+        },
+        {
+          "t": 50,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "note": "still syncing"
+              }
+            ],
+            "account": {
+              "state": "synced",
+              "signedIn": "alice",
+              "lastSynced": "alice",
+              "pendingChoice": false,
+              "outbox": 0
+            }
+          }
+        },
+        "hub": {
+          "alice": {
+            "types": {
+              "deck": 1
+            },
+            "entries": {
+              "live": 1,
+              "deleted": 0,
+              "merged": 0
+            }
+          }
+        }
+      }
+    }
+  ]
+}

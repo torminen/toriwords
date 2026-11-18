@@ -1,0 +1,123 @@
+{
+  "kind": "uuid-v5",
+  "source": "doc 36 §11.2 Deterministic IDs: UUIDv5 (SHA-1), names UTF-8",
+  "namespace": "6f1c2a4e-3b7d-5e59-9a0c-5d8e7f2b1c34",
+  "cases": [
+    {
+      "id": "v5-001",
+      "record": "languagePair",
+      "params": {
+        "native": "ru",
+        "target": "en"
+      },
+      "name": "pair:ru:en",
+      "uuid": "b80c514f-7291-598d-bbe6-862008368d45"
+    },
+    {
+      "id": "v5-002",
+      "record": "settings",
+      "params": {},
+      "name": "settings",
+      "uuid": "8eae3b9b-d948-584b-aa9b-95e949097d6d"
+    },
+    {
+      "id": "v5-003",
+      "record": "card",
+      "params": {
+        "entryId": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "direction": "recognition"
+      },
+      "name": "card:0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01:recognition",
+      "uuid": "d853ba0b-520e-5e04-8ee7-5fdcbd02c0fa"
+    },
+    {
+      "id": "v5-004",
+      "record": "card",
+      "params": {
+        "entryId": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "direction": "recall"
+      },
+      "name": "card:0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01:recall",
+      "uuid": "f8c246ae-fff7-56e7-8490-8dc110841f6f"
+    },
+    {
+      "id": "v5-005",
+      "record": "card",
+      "params": {
+        "entryId": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "direction": "cloze"
+      },
+      "name": "card:0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01:cloze",
+      "uuid": "ad3ca229-ab23-5f2b-a38a-13df01dd4241"
+    },
+    {
+      "id": "v5-006",
+      "record": "source",
+      "params": {
+        "urlKey": "https://example.com/a?id=5"
+      },
+      "name": "source:https://example.com/a?id=5",
+      "uuid": "1af11ba6-be8c-5dd8-833d-00c865832f30"
+    },
+    {
+      "id": "v5-007",
+      "record": "source",
+      "params": {
+        "urlKey": "https://xn--e1afmkfd.xn--p1ai/путь"
+      },
+      "name": "source:https://xn--e1afmkfd.xn--p1ai/путь",
+      "uuid": "841e11e5-fd0a-5aae-911d-34fa21d5c1e5"
+    },
+    {
+      "id": "v5-008",
+      "record": "entryTag",
+      "params": {
+        "entryId": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "tagId": "0192f3c2-0b10-7a01-8c00-00000000beef"
+      },
+      "name": "entrytag:0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01:0192f3c2-0b10-7a01-8c00-00000000beef",
+      "uuid": "c358733d-d0b5-53dc-8736-117f9024a962"
+    },
+    {
+      "id": "v5-009",
+      "record": "autoSense",
+      "params": {
+        "entryId": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "ordinal": 0
+      },
+      "name": "autosense:0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01:0",
+      "uuid": "ffb61018-699e-5fcb-b210-fe2566e5800c"
+    },
+    {
+      "id": "v5-010",
+      "record": "autoSense",
+      "params": {
+        "entryId": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "ordinal": 1
+      },
+      "name": "autosense:0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01:1",
+      "uuid": "c32698da-5e26-5412-a153-aeb6ea7667ae"
+    },
+    {
+      "id": "v5-011",
+      "record": "importedReviewLog",
+      "params": {
+        "collectionId": "0192f3c3-1111-7222-a333-444455556666",
+        "ankiRevlogId": 1700000000123
+      },
+      "name": "import:0192f3c3-1111-7222-a333-444455556666:1700000000123",
+      "uuid": "6fb529f5-b842-5401-9fe8-ca975239c4c7"
+    },
+    {
+      "id": "v5-012",
+      "record": "card",
+      "params": {
+        "entryId": "0192F3C1-7A4E-7CC3-9B1E-3F5A2D6C8E01",
+        "direction": "recall"
+      },
+      "name": "card:0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01:recall",
+      "uuid": "f8c246ae-fff7-56e7-8490-8dc110841f6f",
+      "note": "IDs inside names are always lowercase hyphenated, whatever the input spelling"
+    }
+  ]
+}

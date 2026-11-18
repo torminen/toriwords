@@ -1,0 +1,3327 @@
+{
+  "kind": "snapshot",
+  "source": "doc 36 §10.1 widget snapshot: 7 days from today; day T+k (k ≥ 1) applies §7.7 assuming no further answers; dueReviews = steps 1 + 3, newAvailable = step 2; nextDueDay = first of the 7 days with dueReviews + newAvailable > 0, else null; homeState = today's Home state",
+  "params": {
+    "w": [
+      0.212,
+      1.2931,
+      2.3065,
+      8.2956,
+      6.4133,
+      0.8334,
+      3.0194,
+      0.001,
+      1.8722,
+      0.1666,
+      0.796,
+      1.4835,
+      0.0614,
+      0.2629,
+      1.6483,
+      0.6014,
+      1.8729,
+      0.5425,
+      0.0912,
+      0.0658,
+      0.1542
+    ],
+    "desiredRetention": 0.9,
+    "maximumInterval": 36500
+  },
+  "cases": [
+    {
+      "id": "sn-001",
+      "note": "empty vocabulary: homeState empty, nextDueDay null",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 10
+        },
+        "entries": [],
+        "logs": []
+      },
+      "expected": {
+        "format": 1,
+        "generatedAt": 1794927600000,
+        "utcOffsetMin": 180,
+        "days": [
+          {
+            "day": 20774,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20775,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20776,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20777,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20778,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20779,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20780,
+            "dueReviews": 0,
+            "newAvailable": 0
+          }
+        ],
+        "nextDueDay": null,
+        "homeState": "empty"
+      }
+    },
+    {
+      "id": "sn-002",
+      "note": "reviews falling due on different future days; New Entries limited to 2 per day",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 2
+        },
+        "entries": [
+          {
+            "id": "01a14d98-7700-7001-8000-000000000001",
+            "createdAt": 1792303200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "5756a9dd-00ac-5263-9a64-166a72b7414b",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14d98-7700-7003-8000-000000000003",
+            "createdAt": 1792303200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "d80b4f3c-5d80-540f-ad47-f1c7190980b8",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14d98-7700-7005-8000-000000000005",
+            "createdAt": 1792303200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "14e0736f-1cde-571b-8aa7-0031c99f96f6",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14d98-7700-7007-8000-000000000007",
+            "createdAt": 1792303200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "31d7bd1c-fb6c-50e3-8340-ecde6d9946d4",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a1e2f0-e300-7009-8000-000000000009",
+            "createdAt": 1794808800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "7e25ca01-60bd-53a6-a201-56aa1aaae046",
+                "direction": "recognition"
+              },
+              {
+                "id": "fdc88178-bf3c-5013-8fd0-b98f4af6b1d1",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1e2f0-e300-700a-8000-00000000000a",
+            "createdAt": 1794808800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "74063945-2adc-5ca9-9cf4-1d38e3e233f8",
+                "direction": "recognition"
+              },
+              {
+                "id": "f5372bf6-4efa-5c50-bcca-7a4870171a47",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1e2f0-e300-700b-8000-00000000000b",
+            "createdAt": 1794808800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "aae3879e-f704-5337-8568-3144816f523a",
+                "direction": "recognition"
+              },
+              {
+                "id": "a8a3e81f-a884-5398-af03-6c2a6a4ce843",
+                "direction": "recall"
+              }
+            ]
+          }
+        ],
+        "logs": [
+          {
+            "id": "01a1e327-d180-7002-8000-000000000002",
+            "cardId": "5756a9dd-00ac-5263-9a64-166a72b7414b",
+            "reviewedAt": 1794812400000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a1d8db-1980-7004-8000-000000000004",
+            "cardId": "d80b4f3c-5d80-540f-ad47-f1c7190980b8",
+            "reviewedAt": 1794639600000,
+            "utcOffsetMin": 180,
+            "rating": 4
+          },
+          {
+            "id": "01a1ce8e-6180-7006-8000-000000000006",
+            "cardId": "14e0736f-1cde-571b-8aa7-0031c99f96f6",
+            "reviewedAt": 1794466800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a1de01-7580-7008-8000-000000000008",
+            "cardId": "31d7bd1c-fb6c-50e3-8340-ecde6d9946d4",
+            "reviewedAt": 1794726000000,
+            "utcOffsetMin": 180,
+            "rating": 4
+          }
+        ]
+      },
+      "expected": {
+        "format": 1,
+        "generatedAt": 1794927600000,
+        "utcOffsetMin": 180,
+        "days": [
+          {
+            "day": 20774,
+            "dueReviews": 1,
+            "newAvailable": 2
+          },
+          {
+            "day": 20775,
+            "dueReviews": 2,
+            "newAvailable": 2
+          },
+          {
+            "day": 20776,
+            "dueReviews": 2,
+            "newAvailable": 2
+          },
+          {
+            "day": 20777,
+            "dueReviews": 3,
+            "newAvailable": 2
+          },
+          {
+            "day": 20778,
+            "dueReviews": 3,
+            "newAvailable": 2
+          },
+          {
+            "day": 20779,
+            "dueReviews": 3,
+            "newAvailable": 2
+          },
+          {
+            "day": 20780,
+            "dueReviews": 3,
+            "newAvailable": 2
+          }
+        ],
+        "nextDueDay": 20774,
+        "homeState": "due"
+      }
+    },
+    {
+      "id": "sn-003",
+      "note": "today all done; the Card falls due on T+2 → nextDueDay = T+2",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 0
+        },
+        "entries": [
+          {
+            "id": "01a14d98-7700-7001-8000-000000000001",
+            "createdAt": 1792303200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "5756a9dd-00ac-5263-9a64-166a72b7414b",
+                "direction": "recognition"
+              }
+            ]
+          }
+        ],
+        "logs": [
+          {
+            "id": "01a1e84e-2d80-7002-8000-000000000002",
+            "cardId": "5756a9dd-00ac-5263-9a64-166a72b7414b",
+            "reviewedAt": 1794898800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          }
+        ]
+      },
+      "expected": {
+        "format": 1,
+        "generatedAt": 1794927600000,
+        "utcOffsetMin": 180,
+        "days": [
+          {
+            "day": 20774,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20775,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20776,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20777,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20778,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20779,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20780,
+            "dueReviews": 1,
+            "newAvailable": 0
+          }
+        ],
+        "nextDueDay": 20776,
+        "homeState": "allDone"
+      }
+    },
+    {
+      "id": "sn-007",
+      "note": "next review more than 6 days ahead → nextDueDay null although Entries exist",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 0
+        },
+        "entries": [
+          {
+            "id": "01a14d98-7700-7001-8000-000000000001",
+            "createdAt": 1792303200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "5756a9dd-00ac-5263-9a64-166a72b7414b",
+                "direction": "recognition"
+              }
+            ]
+          }
+        ],
+        "logs": [
+          {
+            "id": "01a1de01-7580-7002-8000-000000000002",
+            "cardId": "5756a9dd-00ac-5263-9a64-166a72b7414b",
+            "reviewedAt": 1794726000000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a1e84e-2d80-7003-8000-000000000003",
+            "cardId": "5756a9dd-00ac-5263-9a64-166a72b7414b",
+            "reviewedAt": 1794898800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          }
+        ]
+      },
+      "expected": {
+        "format": 1,
+        "generatedAt": 1794927600000,
+        "utcOffsetMin": 180,
+        "days": [
+          {
+            "day": 20774,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20775,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20776,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20777,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20778,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20779,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20780,
+            "dueReviews": 0,
+            "newAvailable": 0
+          }
+        ],
+        "nextDueDay": null,
+        "homeState": "allDone"
+      }
+    },
+    {
+      "id": "sn-004",
+      "note": "catch-up today: dueReviews is today's capped share (84), the remainder rolls over to following days",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 10
+        },
+        "entries": [
+          {
+            "id": "01a14872-1b00-7001-8000-000000000001",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "064eb86e-47ce-520e-8726-b7509c07e9eb",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7003-8000-000000000003",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "31c006fa-e072-52c4-882d-5e2d2567e9d3",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7005-8000-000000000005",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "3dcb66bf-9b85-5da0-b740-9fed86d96bad",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7007-8000-000000000007",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "94634cb5-3070-5b8e-b1fa-897233315a22",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7009-8000-000000000009",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "b6f6fe5b-0cc9-5238-b75a-268a08e99f7f",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-700b-8000-00000000000b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "24d64379-3cf3-527e-936e-319120832f5a",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-700d-8000-00000000000d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "5fbb4b84-779b-531d-9d43-b2801bc38c10",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-700f-8000-00000000000f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "4069ce35-9fe2-5ae1-b664-26e3fbc50536",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7011-8000-000000000011",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "3ef467ad-cc63-587a-bc3c-cba9ad4772c9",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7013-8000-000000000013",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "490a4cfd-7a7d-561c-9299-299b434c680d",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7015-8000-000000000015",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "768ccd36-587c-58e8-ad5d-8526262f1309",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7017-8000-000000000017",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "f41da1f1-55ca-52d0-a744-ed8524ab7500",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7019-8000-000000000019",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "32026e1e-4f95-5dac-b7a8-a0925fc87594",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-701b-8000-00000000001b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "65f95c9d-c8d1-5a22-952f-dd352fbb07b3",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-701d-8000-00000000001d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "00bca233-4c78-5511-9581-81de7fdc02e2",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-701f-8000-00000000001f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "754afca7-8c3b-567a-a772-083a2e7655b2",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7021-8000-000000000021",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "9667104d-2fa1-5832-96dc-76c536fa8148",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7023-8000-000000000023",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "8e06de39-fefa-5d6b-a8ea-aa0384f40447",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7025-8000-000000000025",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "8c0f513b-2493-5a94-a823-61d62d651184",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7027-8000-000000000027",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "cdc211dd-9e3c-5af1-9106-64ed17dffb91",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7029-8000-000000000029",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "d5d7613c-3654-59f5-a22d-79efd7c53ac4",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-702b-8000-00000000002b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "93977798-f0e6-5731-b100-54a4e97c93b9",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-702d-8000-00000000002d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "cbfa42d3-f836-5643-87ea-73a1e3b5d017",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-702f-8000-00000000002f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "14d5ed0e-afdc-551e-b644-368df18cbd6e",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7031-8000-000000000031",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "4648c248-dc3f-51de-a07d-d0e006d9f47c",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7033-8000-000000000033",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "32576d23-213f-5ff0-a243-a04782ed309c",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7035-8000-000000000035",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "f2d7357e-c63a-5f31-b98b-91bcd7d079b1",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7037-8000-000000000037",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "a405dd0c-496c-5f3c-87cc-bae048bea648",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7039-8000-000000000039",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "efc67248-6b47-5e46-bdd9-25c9ec12dc53",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-703b-8000-00000000003b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "37b0b9d3-fa48-5d2e-af77-1d1e0b797a34",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-703d-8000-00000000003d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "79e8ce66-ea3f-5ebf-b8ae-e84241f37a55",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-703f-8000-00000000003f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "e5b4fd53-ae4f-5ec0-94ae-ee7d9b50fb5b",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7041-8000-000000000041",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "70633e20-e24d-5738-9f03-19b3be1f44fa",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7043-8000-000000000043",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "e2f574ce-90f5-5172-b57c-09900e1cd7cb",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7045-8000-000000000045",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "16806c5e-1edb-56ef-93f6-81d7b789a085",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7047-8000-000000000047",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "e5e719de-1f6c-507a-9069-9124358d9141",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7049-8000-000000000049",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "f550c8e3-3d7c-5b69-b6f8-9aaa3e5235f5",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-704b-8000-00000000004b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "7861d9eb-dae3-525f-b278-04bdc426cb90",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-704d-8000-00000000004d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "d5fa48f0-5511-599f-82a9-98ae5033ea6e",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-704f-8000-00000000004f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "165402e7-ae55-51d9-8b55-694a9213475a",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7051-8000-000000000051",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "3365252d-ebcf-5591-a75e-44003ef3f627",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7053-8000-000000000053",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "7f805f2f-0b26-5f1a-86fe-149496e45821",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7055-8000-000000000055",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "c8c7e042-5ab4-5842-b1a0-b87a9a796d86",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7057-8000-000000000057",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "429689ca-f370-59d0-8425-caa005b682de",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7059-8000-000000000059",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "be8f2a21-4d99-5a32-a73a-3bb4770c8f73",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-705b-8000-00000000005b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "b4913eb3-d0fb-55ee-a517-695c047edeca",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-705d-8000-00000000005d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "cffd2ce6-627d-5788-8b9b-c1070c7f010d",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-705f-8000-00000000005f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "7736f46e-df0c-5dae-a29c-4dddca2b8ef1",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7061-8000-000000000061",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "f0b276e4-c5b7-5904-a1a0-75ae68fc0607",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7063-8000-000000000063",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "e1deba01-6326-5ad5-9f40-a501ad54bd6d",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7065-8000-000000000065",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "29effa87-6271-5edb-8f04-1c3125ddd22d",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7067-8000-000000000067",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "c6c57a95-78d6-55c1-b95b-d601f2e74066",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7069-8000-000000000069",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "b49ee886-9ec2-5cb1-ad0d-88a1fdc5459c",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-706b-8000-00000000006b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "86bfc8e1-7810-52d6-b899-21b5a7753591",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-706d-8000-00000000006d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "01ee4edd-7d4e-5d5b-919f-b01aa5ad0506",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-706f-8000-00000000006f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "c5426b1c-235d-514c-a491-4a298bc2f1c3",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7071-8000-000000000071",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "a1f4f368-058c-5561-b537-125f09865136",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7073-8000-000000000073",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "42d32ef9-c57e-5115-b019-07276a55cc1e",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7075-8000-000000000075",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "df31917a-12e5-597f-a434-0860414c819b",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7077-8000-000000000077",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "db7704fc-dd98-5002-a260-fc2f22d180f9",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7079-8000-000000000079",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "c7151a28-ccad-5b43-98ed-25837779ec02",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-707b-8000-00000000007b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "35e62ebc-1a5d-57c4-a249-793773e77132",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-707d-8000-00000000007d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "f5360fa0-2dca-59c0-b344-e09e1384bcc7",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-707f-8000-00000000007f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "f9e49395-ffb4-5b91-a13d-8d85be6e89a2",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7081-8000-000000000081",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "13949066-0518-5724-9fb7-0bab8eb9f68d",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7083-8000-000000000083",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "03756d65-18b8-5d4e-b08a-fc361f512a1a",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7085-8000-000000000085",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "7985d34a-7bba-57f0-8fb6-8225a1151399",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7087-8000-000000000087",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "b3d8e9c5-ddee-57d7-96cd-e185ad824b90",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7089-8000-000000000089",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "a1b63b50-db17-5336-bc1e-57de2130b9cf",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-708b-8000-00000000008b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "62efcb38-1e3f-5d67-8a00-caa57a0afb51",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-708d-8000-00000000008d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "4a198fd5-e979-5113-b79e-2fe60ad1b332",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-708f-8000-00000000008f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "3659db2f-976a-53eb-a1cc-682938d44fca",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7091-8000-000000000091",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "b78352ed-fde7-5f76-a1d2-13ee7f746469",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7093-8000-000000000093",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "269fc9d3-5f55-5212-9381-d0dc307d9200",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7095-8000-000000000095",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "88d420bd-43c2-5f47-9c5d-974fbedc1367",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7097-8000-000000000097",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "5c05edb2-f4f6-560f-b7d1-f25f8656ba80",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7099-8000-000000000099",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "6c32fec5-eff7-53da-92f4-48bef5d74fbd",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-709b-8000-00000000009b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "20187fef-f390-52ac-93d5-23fa1a3ca32c",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-709d-8000-00000000009d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "98a4fa2e-34eb-5d25-9f0a-0a8a7d4e1f10",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-709f-8000-00000000009f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "b1629ad3-0fc4-5265-9d5a-da57d8850755",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70a1-8000-0000000000a1",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "16329203-df7e-5828-ab1c-d0b6234f70a2",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70a3-8000-0000000000a3",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "f32488f7-8318-53cb-8d1a-ce6029deebd1",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70a5-8000-0000000000a5",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "b4fb35c0-5657-5001-a076-841b1f2b8adc",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70a7-8000-0000000000a7",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "3d7b3414-dce8-5256-8f1d-9e3f65a4b7f2",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70a9-8000-0000000000a9",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "2180243d-61b9-52ba-abc8-16da84b44c47",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70ab-8000-0000000000ab",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "38433a81-79a2-5d51-b82e-e1e4aeff51e9",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70ad-8000-0000000000ad",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "c51cedc7-656a-535b-ad08-3ccc37d47766",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70af-8000-0000000000af",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "04ce3acb-7b86-5ca6-b68c-b9a290a55223",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70b1-8000-0000000000b1",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "92326b89-2144-55b2-b2f2-80dba7b20366",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70b3-8000-0000000000b3",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "1cec7787-3399-5faf-a10f-096d15c62b90",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70b5-8000-0000000000b5",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "443cb6cb-c679-5b45-a368-d32ad61dccd3",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70b7-8000-0000000000b7",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "1e5a67d4-1302-5b6a-b426-6f84edb95853",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70b9-8000-0000000000b9",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "86831b85-4ffb-5e95-89d6-428456d34317",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70bb-8000-0000000000bb",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "c90f8165-a022-5594-8a3f-89c247ecbb41",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70bd-8000-0000000000bd",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "490a1140-4b57-5afd-8ee8-855875d05c95",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70bf-8000-0000000000bf",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "834ce56c-8d36-5b8f-a7ec-cb444d949c04",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70c1-8000-0000000000c1",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "4d169e46-64dc-56bd-9db5-899ae7a716f6",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70c3-8000-0000000000c3",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "86733cac-60d5-5073-bf89-4e61238dd6ad",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70c5-8000-0000000000c5",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "163bb618-49b0-5864-a9d4-0db7bd2169bd",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70c7-8000-0000000000c7",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "5fcc3f55-927d-5988-8f3d-b4f62fb3830c",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70c9-8000-0000000000c9",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "8f55afc2-3049-5397-918e-f867cec8a480",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70cb-8000-0000000000cb",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "2baef6be-07fb-534f-8d85-bfc82998c8d8",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70cd-8000-0000000000cd",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "a919c034-2955-5f26-8c16-d873b59c1275",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70cf-8000-0000000000cf",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "856142ac-159b-5d3f-973d-88580353d352",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70d1-8000-0000000000d1",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "70b4c377-f50b-5dc3-bcc8-f1a39a53f7bd",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70d3-8000-0000000000d3",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "1e88f1b8-20f2-5c63-b5a7-76f58c8b6aaf",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70d5-8000-0000000000d5",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "1e00cf49-d2b1-50f9-9a58-9a6315d4176c",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70d7-8000-0000000000d7",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "1e9133a7-0f40-5fee-b0b4-5e238616a6de",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70d9-8000-0000000000d9",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "4ab7ddd2-87e8-53a1-9cda-1cb272ca0f26",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70db-8000-0000000000db",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "cfc6f21c-3dc2-53ad-8f3b-5252ba4ced3a",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70dd-8000-0000000000dd",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "5ae7b43c-c431-5d1a-90ff-7c98eaa4c8c7",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70df-8000-0000000000df",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "ac3962fb-1cfa-5865-9407-9563c726a6fe",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70e1-8000-0000000000e1",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "3fad73d3-3c0c-5c05-9a52-7fd73fe99d07",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70e3-8000-0000000000e3",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "0d8867e8-255e-5ee5-9f69-8410c3382dd5",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70e5-8000-0000000000e5",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "af156815-1554-5ede-b484-32f3bf479e97",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70e7-8000-0000000000e7",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "23801c51-6812-5d2f-b57b-010a25a4da12",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70e9-8000-0000000000e9",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "bbe1afb0-7b5a-5581-8c89-f7090b4d09cf",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70eb-8000-0000000000eb",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "636e09a0-a940-5d3b-b034-7228f2ec1cf1",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70ed-8000-0000000000ed",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "71343453-4704-544d-82d5-f59414ab3af7",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70ef-8000-0000000000ef",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "ee305b8e-fb7a-56e2-a448-96363343afe9",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70f1-8000-0000000000f1",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "9f4e167c-64ae-5375-a39e-1400ed9e6cdc",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70f3-8000-0000000000f3",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "bb461116-4a77-5825-8ec9-01f084b6d260",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70f5-8000-0000000000f5",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "5e5d8ce9-4e81-5b1d-bf93-9d979bcc71b9",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70f7-8000-0000000000f7",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "aca0014b-7ca9-55d2-8b8d-714dce54abfa",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70f9-8000-0000000000f9",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "67631790-64df-5613-9874-8401b16ed455",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70fb-8000-0000000000fb",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "7f454eab-9fa3-5a38-b440-76938a02cafc",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70fd-8000-0000000000fd",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "18605288-b65a-5add-b662-d7c7c1d98598",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-70ff-8000-0000000000ff",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "7bce56e6-79f0-5eaf-a6a4-8a813edd1311",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7101-8000-000000000101",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "abc1f1a5-d0ac-578f-a16a-b8a7e82438fe",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7103-8000-000000000103",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "15f857fc-c2eb-5fe5-847c-d23259513baa",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7105-8000-000000000105",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "081f4ff1-7d4d-5ece-bf5b-86a0de82d990",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7107-8000-000000000107",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "450c5123-6b37-5d00-96c1-8356f2c2fc17",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7109-8000-000000000109",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "51122b3b-5d70-5c71-8fec-2c8e5b1d626f",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-710b-8000-00000000010b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "6b368dfb-f9f5-5821-a646-080587c47e63",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-710d-8000-00000000010d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "c4a83845-dbe0-5074-85cf-16588ff2b7cb",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-710f-8000-00000000010f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "199369a3-a24c-56f7-abeb-19303965f684",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7111-8000-000000000111",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "7f909572-5bc7-56aa-ba6e-14ee62291510",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7113-8000-000000000113",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "ebd14282-d6a9-55f0-9e03-27f21e0d6db1",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7115-8000-000000000115",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "4343f272-ea94-580f-9a05-d94277e40921",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7117-8000-000000000117",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "1574be09-c403-5630-ac56-8a89124aa855",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7119-8000-000000000119",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "fadd9603-804e-523b-98e4-5f514ebdfddd",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-711b-8000-00000000011b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "0fab32b0-ecbe-5699-852a-00db6d9b221f",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-711d-8000-00000000011d",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "e1d7eb8b-167a-5fb8-8fa2-bcc700cb56f2",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-711f-8000-00000000011f",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "a1925c4d-c708-5ed1-8aa7-5ce7216565aa",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7121-8000-000000000121",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "6ff703e0-2e7d-59fd-9a49-ac2b71f668e0",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7123-8000-000000000123",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "b5a78179-8821-562c-a2c0-ad4ba8164977",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7125-8000-000000000125",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "54834716-a437-5b2c-90a1-3ecf58998d8a",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7127-8000-000000000127",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "4cd2affd-fb60-546e-91da-cc8b1c35c9d9",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-7129-8000-000000000129",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "daa5df2d-b0f1-520c-98d8-f56ceee3e959",
+                "direction": "recognition"
+              }
+            ]
+          },
+          {
+            "id": "01a14872-1b00-712b-8000-00000000012b",
+            "createdAt": 1792216800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "ed63264e-f770-5a2a-93b2-bcc582e17636",
+                "direction": "recognition"
+              }
+            ]
+          }
+        ],
+        "logs": [
+          {
+            "id": "01a14dcf-6580-7002-8000-000000000002",
+            "cardId": "064eb86e-47ce-520e-8726-b7509c07e9eb",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7004-8000-000000000004",
+            "cardId": "31c006fa-e072-52c4-882d-5e2d2567e9d3",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7006-8000-000000000006",
+            "cardId": "3dcb66bf-9b85-5da0-b740-9fed86d96bad",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7008-8000-000000000008",
+            "cardId": "94634cb5-3070-5b8e-b1fa-897233315a22",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-700a-8000-00000000000a",
+            "cardId": "b6f6fe5b-0cc9-5238-b75a-268a08e99f7f",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-700c-8000-00000000000c",
+            "cardId": "24d64379-3cf3-527e-936e-319120832f5a",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-700e-8000-00000000000e",
+            "cardId": "5fbb4b84-779b-531d-9d43-b2801bc38c10",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7010-8000-000000000010",
+            "cardId": "4069ce35-9fe2-5ae1-b664-26e3fbc50536",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7012-8000-000000000012",
+            "cardId": "3ef467ad-cc63-587a-bc3c-cba9ad4772c9",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7014-8000-000000000014",
+            "cardId": "490a4cfd-7a7d-561c-9299-299b434c680d",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7016-8000-000000000016",
+            "cardId": "768ccd36-587c-58e8-ad5d-8526262f1309",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7018-8000-000000000018",
+            "cardId": "f41da1f1-55ca-52d0-a744-ed8524ab7500",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-701a-8000-00000000001a",
+            "cardId": "32026e1e-4f95-5dac-b7a8-a0925fc87594",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-701c-8000-00000000001c",
+            "cardId": "65f95c9d-c8d1-5a22-952f-dd352fbb07b3",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-701e-8000-00000000001e",
+            "cardId": "00bca233-4c78-5511-9581-81de7fdc02e2",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7020-8000-000000000020",
+            "cardId": "754afca7-8c3b-567a-a772-083a2e7655b2",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7022-8000-000000000022",
+            "cardId": "9667104d-2fa1-5832-96dc-76c536fa8148",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7024-8000-000000000024",
+            "cardId": "8e06de39-fefa-5d6b-a8ea-aa0384f40447",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7026-8000-000000000026",
+            "cardId": "8c0f513b-2493-5a94-a823-61d62d651184",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7028-8000-000000000028",
+            "cardId": "cdc211dd-9e3c-5af1-9106-64ed17dffb91",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-702a-8000-00000000002a",
+            "cardId": "d5d7613c-3654-59f5-a22d-79efd7c53ac4",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-702c-8000-00000000002c",
+            "cardId": "93977798-f0e6-5731-b100-54a4e97c93b9",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-702e-8000-00000000002e",
+            "cardId": "cbfa42d3-f836-5643-87ea-73a1e3b5d017",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7030-8000-000000000030",
+            "cardId": "14d5ed0e-afdc-551e-b644-368df18cbd6e",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7032-8000-000000000032",
+            "cardId": "4648c248-dc3f-51de-a07d-d0e006d9f47c",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7034-8000-000000000034",
+            "cardId": "32576d23-213f-5ff0-a243-a04782ed309c",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7036-8000-000000000036",
+            "cardId": "f2d7357e-c63a-5f31-b98b-91bcd7d079b1",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7038-8000-000000000038",
+            "cardId": "a405dd0c-496c-5f3c-87cc-bae048bea648",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-703a-8000-00000000003a",
+            "cardId": "efc67248-6b47-5e46-bdd9-25c9ec12dc53",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-703c-8000-00000000003c",
+            "cardId": "37b0b9d3-fa48-5d2e-af77-1d1e0b797a34",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-703e-8000-00000000003e",
+            "cardId": "79e8ce66-ea3f-5ebf-b8ae-e84241f37a55",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7040-8000-000000000040",
+            "cardId": "e5b4fd53-ae4f-5ec0-94ae-ee7d9b50fb5b",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7042-8000-000000000042",
+            "cardId": "70633e20-e24d-5738-9f03-19b3be1f44fa",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7044-8000-000000000044",
+            "cardId": "e2f574ce-90f5-5172-b57c-09900e1cd7cb",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7046-8000-000000000046",
+            "cardId": "16806c5e-1edb-56ef-93f6-81d7b789a085",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7048-8000-000000000048",
+            "cardId": "e5e719de-1f6c-507a-9069-9124358d9141",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-704a-8000-00000000004a",
+            "cardId": "f550c8e3-3d7c-5b69-b6f8-9aaa3e5235f5",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-704c-8000-00000000004c",
+            "cardId": "7861d9eb-dae3-525f-b278-04bdc426cb90",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-704e-8000-00000000004e",
+            "cardId": "d5fa48f0-5511-599f-82a9-98ae5033ea6e",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7050-8000-000000000050",
+            "cardId": "165402e7-ae55-51d9-8b55-694a9213475a",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7052-8000-000000000052",
+            "cardId": "3365252d-ebcf-5591-a75e-44003ef3f627",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7054-8000-000000000054",
+            "cardId": "7f805f2f-0b26-5f1a-86fe-149496e45821",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7056-8000-000000000056",
+            "cardId": "c8c7e042-5ab4-5842-b1a0-b87a9a796d86",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7058-8000-000000000058",
+            "cardId": "429689ca-f370-59d0-8425-caa005b682de",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-705a-8000-00000000005a",
+            "cardId": "be8f2a21-4d99-5a32-a73a-3bb4770c8f73",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-705c-8000-00000000005c",
+            "cardId": "b4913eb3-d0fb-55ee-a517-695c047edeca",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-705e-8000-00000000005e",
+            "cardId": "cffd2ce6-627d-5788-8b9b-c1070c7f010d",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7060-8000-000000000060",
+            "cardId": "7736f46e-df0c-5dae-a29c-4dddca2b8ef1",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7062-8000-000000000062",
+            "cardId": "f0b276e4-c5b7-5904-a1a0-75ae68fc0607",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7064-8000-000000000064",
+            "cardId": "e1deba01-6326-5ad5-9f40-a501ad54bd6d",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7066-8000-000000000066",
+            "cardId": "29effa87-6271-5edb-8f04-1c3125ddd22d",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7068-8000-000000000068",
+            "cardId": "c6c57a95-78d6-55c1-b95b-d601f2e74066",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-706a-8000-00000000006a",
+            "cardId": "b49ee886-9ec2-5cb1-ad0d-88a1fdc5459c",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-706c-8000-00000000006c",
+            "cardId": "86bfc8e1-7810-52d6-b899-21b5a7753591",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-706e-8000-00000000006e",
+            "cardId": "01ee4edd-7d4e-5d5b-919f-b01aa5ad0506",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7070-8000-000000000070",
+            "cardId": "c5426b1c-235d-514c-a491-4a298bc2f1c3",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7072-8000-000000000072",
+            "cardId": "a1f4f368-058c-5561-b537-125f09865136",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7074-8000-000000000074",
+            "cardId": "42d32ef9-c57e-5115-b019-07276a55cc1e",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7076-8000-000000000076",
+            "cardId": "df31917a-12e5-597f-a434-0860414c819b",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7078-8000-000000000078",
+            "cardId": "db7704fc-dd98-5002-a260-fc2f22d180f9",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-707a-8000-00000000007a",
+            "cardId": "c7151a28-ccad-5b43-98ed-25837779ec02",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-707c-8000-00000000007c",
+            "cardId": "35e62ebc-1a5d-57c4-a249-793773e77132",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-707e-8000-00000000007e",
+            "cardId": "f5360fa0-2dca-59c0-b344-e09e1384bcc7",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7080-8000-000000000080",
+            "cardId": "f9e49395-ffb4-5b91-a13d-8d85be6e89a2",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7082-8000-000000000082",
+            "cardId": "13949066-0518-5724-9fb7-0bab8eb9f68d",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7084-8000-000000000084",
+            "cardId": "03756d65-18b8-5d4e-b08a-fc361f512a1a",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7086-8000-000000000086",
+            "cardId": "7985d34a-7bba-57f0-8fb6-8225a1151399",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7088-8000-000000000088",
+            "cardId": "b3d8e9c5-ddee-57d7-96cd-e185ad824b90",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-708a-8000-00000000008a",
+            "cardId": "a1b63b50-db17-5336-bc1e-57de2130b9cf",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-708c-8000-00000000008c",
+            "cardId": "62efcb38-1e3f-5d67-8a00-caa57a0afb51",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-708e-8000-00000000008e",
+            "cardId": "4a198fd5-e979-5113-b79e-2fe60ad1b332",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7090-8000-000000000090",
+            "cardId": "3659db2f-976a-53eb-a1cc-682938d44fca",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7092-8000-000000000092",
+            "cardId": "b78352ed-fde7-5f76-a1d2-13ee7f746469",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7094-8000-000000000094",
+            "cardId": "269fc9d3-5f55-5212-9381-d0dc307d9200",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7096-8000-000000000096",
+            "cardId": "88d420bd-43c2-5f47-9c5d-974fbedc1367",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7098-8000-000000000098",
+            "cardId": "5c05edb2-f4f6-560f-b7d1-f25f8656ba80",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-709a-8000-00000000009a",
+            "cardId": "6c32fec5-eff7-53da-92f4-48bef5d74fbd",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-709c-8000-00000000009c",
+            "cardId": "20187fef-f390-52ac-93d5-23fa1a3ca32c",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-709e-8000-00000000009e",
+            "cardId": "98a4fa2e-34eb-5d25-9f0a-0a8a7d4e1f10",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70a0-8000-0000000000a0",
+            "cardId": "b1629ad3-0fc4-5265-9d5a-da57d8850755",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70a2-8000-0000000000a2",
+            "cardId": "16329203-df7e-5828-ab1c-d0b6234f70a2",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70a4-8000-0000000000a4",
+            "cardId": "f32488f7-8318-53cb-8d1a-ce6029deebd1",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70a6-8000-0000000000a6",
+            "cardId": "b4fb35c0-5657-5001-a076-841b1f2b8adc",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70a8-8000-0000000000a8",
+            "cardId": "3d7b3414-dce8-5256-8f1d-9e3f65a4b7f2",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70aa-8000-0000000000aa",
+            "cardId": "2180243d-61b9-52ba-abc8-16da84b44c47",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70ac-8000-0000000000ac",
+            "cardId": "38433a81-79a2-5d51-b82e-e1e4aeff51e9",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70ae-8000-0000000000ae",
+            "cardId": "c51cedc7-656a-535b-ad08-3ccc37d47766",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70b0-8000-0000000000b0",
+            "cardId": "04ce3acb-7b86-5ca6-b68c-b9a290a55223",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70b2-8000-0000000000b2",
+            "cardId": "92326b89-2144-55b2-b2f2-80dba7b20366",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70b4-8000-0000000000b4",
+            "cardId": "1cec7787-3399-5faf-a10f-096d15c62b90",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70b6-8000-0000000000b6",
+            "cardId": "443cb6cb-c679-5b45-a368-d32ad61dccd3",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70b8-8000-0000000000b8",
+            "cardId": "1e5a67d4-1302-5b6a-b426-6f84edb95853",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70ba-8000-0000000000ba",
+            "cardId": "86831b85-4ffb-5e95-89d6-428456d34317",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70bc-8000-0000000000bc",
+            "cardId": "c90f8165-a022-5594-8a3f-89c247ecbb41",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70be-8000-0000000000be",
+            "cardId": "490a1140-4b57-5afd-8ee8-855875d05c95",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70c0-8000-0000000000c0",
+            "cardId": "834ce56c-8d36-5b8f-a7ec-cb444d949c04",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70c2-8000-0000000000c2",
+            "cardId": "4d169e46-64dc-56bd-9db5-899ae7a716f6",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70c4-8000-0000000000c4",
+            "cardId": "86733cac-60d5-5073-bf89-4e61238dd6ad",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70c6-8000-0000000000c6",
+            "cardId": "163bb618-49b0-5864-a9d4-0db7bd2169bd",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70c8-8000-0000000000c8",
+            "cardId": "5fcc3f55-927d-5988-8f3d-b4f62fb3830c",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70ca-8000-0000000000ca",
+            "cardId": "8f55afc2-3049-5397-918e-f867cec8a480",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70cc-8000-0000000000cc",
+            "cardId": "2baef6be-07fb-534f-8d85-bfc82998c8d8",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70ce-8000-0000000000ce",
+            "cardId": "a919c034-2955-5f26-8c16-d873b59c1275",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70d0-8000-0000000000d0",
+            "cardId": "856142ac-159b-5d3f-973d-88580353d352",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70d2-8000-0000000000d2",
+            "cardId": "70b4c377-f50b-5dc3-bcc8-f1a39a53f7bd",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70d4-8000-0000000000d4",
+            "cardId": "1e88f1b8-20f2-5c63-b5a7-76f58c8b6aaf",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70d6-8000-0000000000d6",
+            "cardId": "1e00cf49-d2b1-50f9-9a58-9a6315d4176c",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70d8-8000-0000000000d8",
+            "cardId": "1e9133a7-0f40-5fee-b0b4-5e238616a6de",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70da-8000-0000000000da",
+            "cardId": "4ab7ddd2-87e8-53a1-9cda-1cb272ca0f26",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70dc-8000-0000000000dc",
+            "cardId": "cfc6f21c-3dc2-53ad-8f3b-5252ba4ced3a",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70de-8000-0000000000de",
+            "cardId": "5ae7b43c-c431-5d1a-90ff-7c98eaa4c8c7",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70e0-8000-0000000000e0",
+            "cardId": "ac3962fb-1cfa-5865-9407-9563c726a6fe",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70e2-8000-0000000000e2",
+            "cardId": "3fad73d3-3c0c-5c05-9a52-7fd73fe99d07",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70e4-8000-0000000000e4",
+            "cardId": "0d8867e8-255e-5ee5-9f69-8410c3382dd5",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70e6-8000-0000000000e6",
+            "cardId": "af156815-1554-5ede-b484-32f3bf479e97",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70e8-8000-0000000000e8",
+            "cardId": "23801c51-6812-5d2f-b57b-010a25a4da12",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70ea-8000-0000000000ea",
+            "cardId": "bbe1afb0-7b5a-5581-8c89-f7090b4d09cf",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70ec-8000-0000000000ec",
+            "cardId": "636e09a0-a940-5d3b-b034-7228f2ec1cf1",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70ee-8000-0000000000ee",
+            "cardId": "71343453-4704-544d-82d5-f59414ab3af7",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70f0-8000-0000000000f0",
+            "cardId": "ee305b8e-fb7a-56e2-a448-96363343afe9",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70f2-8000-0000000000f2",
+            "cardId": "9f4e167c-64ae-5375-a39e-1400ed9e6cdc",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70f4-8000-0000000000f4",
+            "cardId": "bb461116-4a77-5825-8ec9-01f084b6d260",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70f6-8000-0000000000f6",
+            "cardId": "5e5d8ce9-4e81-5b1d-bf93-9d979bcc71b9",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70f8-8000-0000000000f8",
+            "cardId": "aca0014b-7ca9-55d2-8b8d-714dce54abfa",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70fa-8000-0000000000fa",
+            "cardId": "67631790-64df-5613-9874-8401b16ed455",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70fc-8000-0000000000fc",
+            "cardId": "7f454eab-9fa3-5a38-b440-76938a02cafc",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-70fe-8000-0000000000fe",
+            "cardId": "18605288-b65a-5add-b662-d7c7c1d98598",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7100-8000-000000000100",
+            "cardId": "7bce56e6-79f0-5eaf-a6a4-8a813edd1311",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7102-8000-000000000102",
+            "cardId": "abc1f1a5-d0ac-578f-a16a-b8a7e82438fe",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7104-8000-000000000104",
+            "cardId": "15f857fc-c2eb-5fe5-847c-d23259513baa",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7106-8000-000000000106",
+            "cardId": "081f4ff1-7d4d-5ece-bf5b-86a0de82d990",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7108-8000-000000000108",
+            "cardId": "450c5123-6b37-5d00-96c1-8356f2c2fc17",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-710a-8000-00000000010a",
+            "cardId": "51122b3b-5d70-5c71-8fec-2c8e5b1d626f",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-710c-8000-00000000010c",
+            "cardId": "6b368dfb-f9f5-5821-a646-080587c47e63",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-710e-8000-00000000010e",
+            "cardId": "c4a83845-dbe0-5074-85cf-16588ff2b7cb",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7110-8000-000000000110",
+            "cardId": "199369a3-a24c-56f7-abeb-19303965f684",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7112-8000-000000000112",
+            "cardId": "7f909572-5bc7-56aa-ba6e-14ee62291510",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7114-8000-000000000114",
+            "cardId": "ebd14282-d6a9-55f0-9e03-27f21e0d6db1",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7116-8000-000000000116",
+            "cardId": "4343f272-ea94-580f-9a05-d94277e40921",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7118-8000-000000000118",
+            "cardId": "1574be09-c403-5630-ac56-8a89124aa855",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-711a-8000-00000000011a",
+            "cardId": "fadd9603-804e-523b-98e4-5f514ebdfddd",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-711c-8000-00000000011c",
+            "cardId": "0fab32b0-ecbe-5699-852a-00db6d9b221f",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-711e-8000-00000000011e",
+            "cardId": "e1d7eb8b-167a-5fb8-8fa2-bcc700cb56f2",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7120-8000-000000000120",
+            "cardId": "a1925c4d-c708-5ed1-8aa7-5ce7216565aa",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7122-8000-000000000122",
+            "cardId": "6ff703e0-2e7d-59fd-9a49-ac2b71f668e0",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7124-8000-000000000124",
+            "cardId": "b5a78179-8821-562c-a2c0-ad4ba8164977",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7126-8000-000000000126",
+            "cardId": "54834716-a437-5b2c-90a1-3ecf58998d8a",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-7128-8000-000000000128",
+            "cardId": "4cd2affd-fb60-546e-91da-cc8b1c35c9d9",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-712a-8000-00000000012a",
+            "cardId": "daa5df2d-b0f1-520c-98d8-f56ceee3e959",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a14dcf-6580-712c-8000-00000000012c",
+            "cardId": "ed63264e-f770-5a2a-93b2-bcc582e17636",
+            "reviewedAt": 1792306800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          }
+        ]
+      },
+      "expected": {
+        "format": 1,
+        "generatedAt": 1794927600000,
+        "utcOffsetMin": 180,
+        "days": [
+          {
+            "day": 20774,
+            "dueReviews": 84,
+            "newAvailable": 0
+          },
+          {
+            "day": 20775,
+            "dueReviews": 84,
+            "newAvailable": 0
+          },
+          {
+            "day": 20776,
+            "dueReviews": 84,
+            "newAvailable": 0
+          },
+          {
+            "day": 20777,
+            "dueReviews": 84,
+            "newAvailable": 0
+          },
+          {
+            "day": 20778,
+            "dueReviews": 84,
+            "newAvailable": 0
+          },
+          {
+            "day": 20779,
+            "dueReviews": 84,
+            "newAvailable": 0
+          },
+          {
+            "day": 20780,
+            "dueReviews": 84,
+            "newAvailable": 0
+          }
+        ],
+        "nextDueDay": 20774,
+        "homeState": "due"
+      }
+    },
+    {
+      "id": "sn-005",
+      "note": "a Forgot today counts in today's dueReviews; future days assume no further answers",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 10
+        },
+        "entries": [
+          {
+            "id": "01a18118-0f00-7001-8000-000000000001",
+            "createdAt": 1793167200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "6884e2fc-f3ea-5932-9c8f-9e606142c263",
+                "direction": "recognition"
+              }
+            ]
+          }
+        ],
+        "logs": [
+          {
+            "id": "01a1b4ce-9580-7002-8000-000000000002",
+            "cardId": "6884e2fc-f3ea-5932-9c8f-9e606142c263",
+            "reviewedAt": 1794034800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a1e84e-2d80-7003-8000-000000000003",
+            "cardId": "6884e2fc-f3ea-5932-9c8f-9e606142c263",
+            "reviewedAt": 1794898800000,
+            "utcOffsetMin": 180,
+            "rating": 1
+          }
+        ]
+      },
+      "expected": {
+        "format": 1,
+        "generatedAt": 1794927600000,
+        "utcOffsetMin": 180,
+        "days": [
+          {
+            "day": 20774,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20775,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20776,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20777,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20778,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20779,
+            "dueReviews": 1,
+            "newAvailable": 0
+          },
+          {
+            "day": 20780,
+            "dueReviews": 1,
+            "newAvailable": 0
+          }
+        ],
+        "nextDueDay": 20774,
+        "homeState": "due"
+      }
+    },
+    {
+      "id": "sn-006",
+      "note": "generatedAt and utcOffsetMin are echoed from the input",
+      "input": {
+        "now": 1794877200000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 10
+        },
+        "entries": [],
+        "logs": []
+      },
+      "expected": {
+        "format": 1,
+        "generatedAt": 1794877200000,
+        "utcOffsetMin": 180,
+        "days": [
+          {
+            "day": 20774,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20775,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20776,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20777,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20778,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20779,
+            "dueReviews": 0,
+            "newAvailable": 0
+          },
+          {
+            "day": 20780,
+            "dueReviews": 0,
+            "newAvailable": 0
+          }
+        ],
+        "nextDueDay": null,
+        "homeState": "empty"
+      }
+    }
+  ]
+}

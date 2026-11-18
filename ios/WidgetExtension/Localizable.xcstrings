@@ -1,0 +1,105 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "%lld new": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новых: %lld"
+          }
+        }
+      }
+    },
+    "%lld to review": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Повторить: %lld"
+          }
+        }
+      }
+    },
+    "%lld to review · %lld new": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Повторить: %1$lld · Новых: %2$lld"
+          }
+        }
+      }
+    },
+    "Cards to review today.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Карточки на сегодня."
+          }
+        }
+      }
+    },
+    "Next review: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Следующее повторение: %@"
+          }
+        }
+      }
+    },
+    "Next review: tomorrow": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Следующее повторение: завтра"
+          }
+        }
+      }
+    },
+    "Open ToriWords": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Откройте ToriWords"
+          }
+        }
+      }
+    },
+    "Tap to start reviewing": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нажмите, чтобы начать"
+          }
+        }
+      }
+    },
+    "to review": {
+      "extractionState": "manual",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "повторить"
+          }
+        }
+      }
+    }
+  }
+}

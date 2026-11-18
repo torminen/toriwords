@@ -1,0 +1,108 @@
+{
+  "kind": "capture-typed-highlight",
+  "source": "doc 36 §5.2 step 6: highlight = first occurrence (smallest start, then smallest end) of a slice [s, e) of the sentence that starts and ends at word boundaries (letter/number L*/N* on the inside, non-letter/number or text edge on the outside) with matchKey(slice) == matchKey(entryText); none → null. UTF-16 code units",
+  "cases": [
+    {
+      "id": "th-001",
+      "sentence": "She TOOK OFF her coat.",
+      "entryText": "take off",
+      "expected": null,
+      "note": "no inflection matching"
+    },
+    {
+      "id": "th-002",
+      "sentence": "The plane took off at noon.",
+      "entryText": "took off",
+      "expected": {
+        "offset": 10,
+        "length": 8
+      }
+    },
+    {
+      "id": "th-003",
+      "sentence": "Don’t give up now.",
+      "entryText": "don't give up",
+      "expected": {
+        "offset": 0,
+        "length": 13
+      },
+      "note": "typographic apostrophe folded"
+    },
+    {
+      "id": "th-004",
+      "sentence": "Running is fun, I love running.",
+      "entryText": "running",
+      "expected": {
+        "offset": 0,
+        "length": 7
+      },
+      "note": "first occurrence, case-insensitive"
+    },
+    {
+      "id": "th-005",
+      "sentence": "The carpet is red. A car passed.",
+      "entryText": "car",
+      "expected": {
+        "offset": 21,
+        "length": 3
+      },
+      "note": "word boundaries: not inside 'carpet'"
+    },
+    {
+      "id": "th-006",
+      "sentence": "He’s a self‐made man.",
+      "entryText": "self-made",
+      "expected": {
+        "offset": 7,
+        "length": 9
+      },
+      "note": "dash folded"
+    },
+    {
+      "id": "th-007",
+      "sentence": "😀 Break a leg!",
+      "entryText": "break a leg",
+      "expected": {
+        "offset": 3,
+        "length": 11
+      },
+      "note": "UTF-16 offsets"
+    },
+    {
+      "id": "th-008",
+      "sentence": "Anything at all.",
+      "entryText": "!!!",
+      "expected": null,
+      "note": "empty match key → no highlight"
+    },
+    {
+      "id": "th-009",
+      "sentence": "Ещё раз: try again.",
+      "entryText": "try again",
+      "expected": {
+        "offset": 9,
+        "length": 9
+      }
+    },
+    {
+      "id": "th-010",
+      "sentence": "state-of-the-art design",
+      "entryText": "art",
+      "expected": {
+        "offset": 13,
+        "length": 3
+      },
+      "note": "a hyphen is a word boundary"
+    },
+    {
+      "id": "th-011",
+      "sentence": "Give it a “shot”!",
+      "entryText": "“Shot”",
+      "expected": {
+        "offset": 11,
+        "length": 4
+      },
+      "note": "edge punctuation of the Entry text is not part of the match"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+// Values shared by all targets. No secrets live here.
+
+// Apple Developer Team ID (10 characters). Set your own before building for a device.
+DEVELOPMENT_TEAM = TEAMID0000
+
+TORI_APP_GROUP_ID = group.com.toriwords.app
+TORI_BG_REFRESH_TASK_ID = com.toriwords.app.refresh
+TORI_URL_SCHEME = toriwords
+
+// Google Sign-In (no SDK; ASWebAuthenticationSession + PKCE). iOS OAuth client ID and its reversed form.
+TORI_GOOGLE_CLIENT_ID = REPLACE_ME.apps.googleusercontent.com
+TORI_GOOGLE_REVERSED_CLIENT_ID = com.googleusercontent.apps.REPLACE_ME
+
+// Backend base URL (https only); empty until a backend exists (sync stays off).
+// `//` starts an xcconfig comment: write it as https:/$()/api.example.com
+TORI_API_BASE_URL =

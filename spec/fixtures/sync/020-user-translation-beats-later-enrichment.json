@@ -1,0 +1,126 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.3, §6.4",
+  "cases": [
+    {
+      "id": "020-user-translation-beats-later-enrichment",
+      "title": "A user-edited translation survives a later automatic fill",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "enrich",
+          "entry": "run",
+          "translation": "бег"
+        },
+        {
+          "t": 110,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 111,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 112,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 113,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 200,
+          "device": "B",
+          "op": "editField",
+          "entry": "run",
+          "field": "translation",
+          "value": "бежать"
+        },
+        {
+          "t": 300,
+          "device": "A",
+          "op": "enrich",
+          "entry": "run",
+          "translation": "бегство"
+        },
+        {
+          "t": 400,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 401,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 402,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 403,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "translations": [
+                  "бежать"
+                ]
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "translations": [
+                  "бежать"
+                ]
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

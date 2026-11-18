@@ -1,0 +1,468 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/sync-scenario.schema.json",
+  "title": "Multi-device sync scenario (doc 36 §11–12, §21)",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "const": "sync-scenario"
+    },
+    "source": {
+      "type": "string"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9]{3}(-[a-z0-9]+)+$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "start": {
+            "type": "integer",
+            "description": "Unix ms of t = 0"
+          },
+          "devices": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "clockOffsetSec": {
+                  "type": "integer"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "t": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Seconds after start; strictly increasing"
+                },
+                "device": {
+                  "type": "string"
+                },
+                "op": {
+                  "enum": [
+                    "capture",
+                    "editField",
+                    "enrich",
+                    "review",
+                    "exclude",
+                    "resume",
+                    "delete",
+                    "tag",
+                    "untag",
+                    "mergeByEdit",
+                    "signIn",
+                    "sync",
+                    "pullOnly",
+                    "pushOnly",
+                    "setSettings",
+                    "upgradeSchema",
+                    "accountChoice",
+                    "signOut",
+                    "deleteAccount",
+                    "network",
+                    "setClock"
+                  ]
+                },
+                "term": {
+                  "type": "string"
+                },
+                "translations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "sentence": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "as": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "entry": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "field": {
+                  "enum": [
+                    "text",
+                    "note",
+                    "ipa",
+                    "translation"
+                  ]
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "translation": {
+                  "type": "string"
+                },
+                "ipa": {
+                  "type": "string"
+                },
+                "rating": {
+                  "enum": [
+                    "forgot",
+                    "remembered"
+                  ]
+                },
+                "direction": {
+                  "enum": [
+                    "recognition",
+                    "recall"
+                  ]
+                },
+                "reason": {
+                  "enum": [
+                    "known",
+                    "paused"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "account": {
+                  "type": "string"
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "newWordsPerDay": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "desiredRetention": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "exclusiveMaximum": 1
+                },
+                "choice": {
+                  "enum": [
+                    "add",
+                    "remove",
+                    "cancel"
+                  ]
+                },
+                "removeLocal": {
+                  "type": "boolean"
+                },
+                "online": {
+                  "type": "boolean"
+                },
+                "offsetSec": {
+                  "type": "integer"
+                },
+                "records": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "schema": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "fields": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "v": {},
+                            "u": {
+                              "enum": [
+                                0,
+                                1
+                              ]
+                            }
+                          },
+                          "required": [
+                            "v",
+                            "u"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "schema",
+                      "fields"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "t",
+                "op"
+              ],
+              "additionalProperties": false,
+              "if": {
+                "properties": {
+                  "op": {
+                    "const": "upgradeSchema"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "account",
+                  "records"
+                ]
+              },
+              "else": {
+                "required": [
+                  "device"
+                ]
+              }
+            }
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "devices": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "words": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string"
+                          },
+                          "note": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "ipa": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "status": {
+                            "enum": [
+                              "active",
+                              "excluded"
+                            ]
+                          },
+                          "needsCheck": {
+                            "type": "boolean"
+                          },
+                          "translations": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "contexts": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "reviews": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "extra": {
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "text"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "settings": {
+                      "type": "object",
+                      "properties": {
+                        "newWordsPerDay": {
+                          "type": "integer"
+                        },
+                        "desiredRetention": {
+                          "type": "number"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "account": {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "enum": [
+                            "localOnly",
+                            "firstSync",
+                            "syncing",
+                            "synced",
+                            "waitingForNetwork",
+                            "unreachable",
+                            "clockSkew",
+                            "updateRequired",
+                            "paused"
+                          ]
+                        },
+                        "signedIn": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "lastSynced": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "pendingChoice": {
+                          "type": "boolean"
+                        },
+                        "outbox": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "notices": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^(accountPrompt:[0-9]+|mergeSummary:[0-9]+/[0-9]+/[0-9]+|backedUp|signedOut|accountDeletedElsewhere|removeNeedsNetwork)$"
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "hub": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "entries": {
+                      "type": "object",
+                      "properties": {
+                        "live": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "deleted": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "merged": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "live",
+                        "deleted",
+                        "merged"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "purged": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "types": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "converged": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "start",
+          "devices",
+          "steps",
+          "expected"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "source",
+    "cases"
+  ],
+  "additionalProperties": false
+}

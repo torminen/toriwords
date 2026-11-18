@@ -1,0 +1,101 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §6.4, §11.2",
+  "cases": [
+    {
+      "id": "019-enrichment-on-two-devices-same-autosense",
+      "title": "Automatic fills on two devices write one Sense; the later wins",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "enrich",
+          "entry": "run",
+          "translation": "бег"
+        },
+        {
+          "t": 200,
+          "device": "B",
+          "op": "enrich",
+          "entry": "run",
+          "translation": "бежать"
+        },
+        {
+          "t": 300,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 301,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 302,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 303,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "translations": [
+                  "бежать"
+                ],
+                "needsCheck": true
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "translations": [
+                  "бежать"
+                ],
+                "needsCheck": true
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "The automatic Sense has the deterministic ID v5(autosense:<entry>:0) on every device."
+    }
+  ]
+}

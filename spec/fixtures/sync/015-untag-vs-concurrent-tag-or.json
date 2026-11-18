@@ -1,0 +1,109 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.7 EntryTag membership",
+  "cases": [
+    {
+      "id": "015-untag-vs-concurrent-tag-or",
+      "title": "Untag of one EntryTag does not remove a concurrent tag merged into the same pair",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "tag",
+          "entry": "run",
+          "name": "Verbs"
+        },
+        {
+          "t": 200,
+          "device": "B",
+          "op": "tag",
+          "entry": "run",
+          "name": "verbs"
+        },
+        {
+          "t": 250,
+          "device": "A",
+          "op": "untag",
+          "entry": "run",
+          "name": "verbs"
+        },
+        {
+          "t": 300,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 301,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 302,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 303,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "tags": [
+                  "verbs"
+                ]
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "tags": [
+                  "verbs"
+                ]
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "A untags its own EntryTag (present = 0) before seeing B's; after the tags merge, membership = OR of present over both EntryTags, so the word stays tagged."
+    }
+  ]
+}

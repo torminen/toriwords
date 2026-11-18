@@ -1,0 +1,446 @@
+{
+  "kind": "queue",
+  "source": "doc 36 §7.7 daily queue and catch-up, Home states; day = dayNumber(now, utcOffsetMin). Card state comes from replaying the input logs (§7.6). Input entries are live; cards are live Cards. reshow is ordered by card id (unsigned bytes). dueToday.toReview = steps 1 + 3, dueToday.new = step 2",
+  "params": {
+    "w": [
+      0.212,
+      1.2931,
+      2.3065,
+      8.2956,
+      6.4133,
+      0.8334,
+      3.0194,
+      0.001,
+      1.8722,
+      0.1666,
+      0.796,
+      1.4835,
+      0.0614,
+      0.2629,
+      1.6483,
+      0.6014,
+      1.8729,
+      0.5425,
+      0.0912,
+      0.0658,
+      0.1542
+    ],
+    "desiredRetention": 0.9,
+    "maximumInterval": 36500
+  },
+  "cases": [
+    {
+      "id": "qn-001",
+      "note": "limit 2 counts Entries: two New Entries, one Card each",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 2
+        },
+        "entries": [
+          {
+            "id": "01a1b9be-0300-7001-8000-000000000001",
+            "createdAt": 1794117600000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "8e6f16df-817e-5f40-afa8-556e7749b0b6",
+                "direction": "recognition"
+              },
+              {
+                "id": "7e36e2e7-cb6e-57a7-b45e-1300b3e72e5d",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1bee4-5f00-7002-8000-000000000002",
+            "createdAt": 1794204000000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "445efa0a-a9fd-5047-807b-aa65954e6211",
+                "direction": "recognition"
+              },
+              {
+                "id": "ffe59beb-21f6-541e-b23f-cf8fa0f303c7",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1c40a-bb00-7003-8000-000000000003",
+            "createdAt": 1794290400000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "6f72e031-d3d8-5a70-8afb-260db8f2dffe",
+                "direction": "recognition"
+              },
+              {
+                "id": "5e84c924-dcbe-5641-87e0-8f0a261d4e1c",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1c931-1700-7004-8000-000000000004",
+            "createdAt": 1794376800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "06706fdb-7c3d-5abe-8d4c-61343672e137",
+                "direction": "recognition"
+              },
+              {
+                "id": "9d9fed4c-9295-59e4-b5fe-9977b41d15d1",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1ce57-7300-7005-8000-000000000005",
+            "createdAt": 1794463200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "c9255e51-2568-5601-91dc-59d0633bb605",
+                "direction": "recognition"
+              },
+              {
+                "id": "33b3c5fe-d966-55a1-88eb-9fe1b53d6bd4",
+                "direction": "recall"
+              }
+            ]
+          }
+        ],
+        "logs": []
+      },
+      "expected": {
+        "reviews": [],
+        "new": [
+          "8e6f16df-817e-5f40-afa8-556e7749b0b6",
+          "445efa0a-a9fd-5047-807b-aa65954e6211"
+        ],
+        "reshow": [],
+        "dueToday": {
+          "toReview": 0,
+          "new": 2
+        },
+        "waiting": 0,
+        "catchUp": false,
+        "normalLoad": 50,
+        "homeState": "due"
+      }
+    },
+    {
+      "id": "qn-002",
+      "note": "an Entry introduced today counts against the limit: limit 2 → one more",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 2
+        },
+        "entries": [
+          {
+            "id": "01a1b9be-0300-7001-8000-000000000001",
+            "createdAt": 1794117600000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "8e6f16df-817e-5f40-afa8-556e7749b0b6",
+                "direction": "recognition"
+              },
+              {
+                "id": "7e36e2e7-cb6e-57a7-b45e-1300b3e72e5d",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1bee4-5f00-7002-8000-000000000002",
+            "createdAt": 1794204000000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "445efa0a-a9fd-5047-807b-aa65954e6211",
+                "direction": "recognition"
+              },
+              {
+                "id": "ffe59beb-21f6-541e-b23f-cf8fa0f303c7",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1c40a-bb00-7003-8000-000000000003",
+            "createdAt": 1794290400000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "6f72e031-d3d8-5a70-8afb-260db8f2dffe",
+                "direction": "recognition"
+              },
+              {
+                "id": "5e84c924-dcbe-5641-87e0-8f0a261d4e1c",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1c931-1700-7004-8000-000000000004",
+            "createdAt": 1794376800000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "06706fdb-7c3d-5abe-8d4c-61343672e137",
+                "direction": "recognition"
+              },
+              {
+                "id": "9d9fed4c-9295-59e4-b5fe-9977b41d15d1",
+                "direction": "recall"
+              }
+            ]
+          }
+        ],
+        "logs": [
+          {
+            "id": "01a1e84e-2d80-7005-8000-000000000005",
+            "cardId": "8e6f16df-817e-5f40-afa8-556e7749b0b6",
+            "reviewedAt": 1794898800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          }
+        ]
+      },
+      "expected": {
+        "reviews": [],
+        "new": [
+          "445efa0a-a9fd-5047-807b-aa65954e6211"
+        ],
+        "reshow": [],
+        "dueToday": {
+          "toReview": 0,
+          "new": 1
+        },
+        "waiting": 0,
+        "catchUp": false,
+        "normalLoad": 50,
+        "homeState": "due"
+      }
+    },
+    {
+      "id": "qn-003",
+      "note": "limit already used up by Entries introduced today",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 2
+        },
+        "entries": [
+          {
+            "id": "01a1b9be-0300-7001-8000-000000000001",
+            "createdAt": 1794117600000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "8e6f16df-817e-5f40-afa8-556e7749b0b6",
+                "direction": "recognition"
+              },
+              {
+                "id": "7e36e2e7-cb6e-57a7-b45e-1300b3e72e5d",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1bee4-5f00-7002-8000-000000000002",
+            "createdAt": 1794204000000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "445efa0a-a9fd-5047-807b-aa65954e6211",
+                "direction": "recognition"
+              },
+              {
+                "id": "ffe59beb-21f6-541e-b23f-cf8fa0f303c7",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1c40a-bb00-7003-8000-000000000003",
+            "createdAt": 1794290400000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "6f72e031-d3d8-5a70-8afb-260db8f2dffe",
+                "direction": "recognition"
+              },
+              {
+                "id": "5e84c924-dcbe-5641-87e0-8f0a261d4e1c",
+                "direction": "recall"
+              }
+            ]
+          }
+        ],
+        "logs": [
+          {
+            "id": "01a1e84e-2d80-7004-8000-000000000004",
+            "cardId": "8e6f16df-817e-5f40-afa8-556e7749b0b6",
+            "reviewedAt": 1794898800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          },
+          {
+            "id": "01a1e84e-2d80-7005-8000-000000000005",
+            "cardId": "445efa0a-a9fd-5047-807b-aa65954e6211",
+            "reviewedAt": 1794898800000,
+            "utcOffsetMin": 180,
+            "rating": 3
+          }
+        ]
+      },
+      "expected": {
+        "reviews": [],
+        "new": [],
+        "reshow": [],
+        "dueToday": {
+          "toReview": 0,
+          "new": 0
+        },
+        "waiting": 0,
+        "catchUp": false,
+        "normalLoad": 50,
+        "homeState": "allDone"
+      }
+    },
+    {
+      "id": "qn-004",
+      "note": "limit 0 → no New Entries",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 0
+        },
+        "entries": [
+          {
+            "id": "01a1b9be-0300-7001-8000-000000000001",
+            "createdAt": 1794117600000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "8e6f16df-817e-5f40-afa8-556e7749b0b6",
+                "direction": "recognition"
+              },
+              {
+                "id": "7e36e2e7-cb6e-57a7-b45e-1300b3e72e5d",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1bee4-5f00-7002-8000-000000000002",
+            "createdAt": 1794204000000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "445efa0a-a9fd-5047-807b-aa65954e6211",
+                "direction": "recognition"
+              },
+              {
+                "id": "ffe59beb-21f6-541e-b23f-cf8fa0f303c7",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1c40a-bb00-7003-8000-000000000003",
+            "createdAt": 1794290400000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "6f72e031-d3d8-5a70-8afb-260db8f2dffe",
+                "direction": "recognition"
+              },
+              {
+                "id": "5e84c924-dcbe-5641-87e0-8f0a261d4e1c",
+                "direction": "recall"
+              }
+            ]
+          }
+        ],
+        "logs": []
+      },
+      "expected": {
+        "reviews": [],
+        "new": [],
+        "reshow": [],
+        "dueToday": {
+          "toReview": 0,
+          "new": 0
+        },
+        "waiting": 0,
+        "catchUp": false,
+        "normalLoad": 50,
+        "homeState": "nothingDue"
+      }
+    },
+    {
+      "id": "qn-005",
+      "note": "same createdAt: recognition before recall",
+      "input": {
+        "now": 1794927600000,
+        "utcOffsetMin": 180,
+        "settings": {
+          "newWordsPerDay": 10
+        },
+        "entries": [
+          {
+            "id": "01a1ce57-7300-7001-8000-000000000001",
+            "createdAt": 1794463200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "68881554-56b8-5ea9-bf64-27690112e4ea",
+                "direction": "recall"
+              }
+            ]
+          },
+          {
+            "id": "01a1ce57-7300-7002-8000-000000000002",
+            "createdAt": 1794463200000,
+            "status": "active",
+            "cards": [
+              {
+                "id": "fed3a63c-b325-5819-b597-5dc5396bf7f9",
+                "direction": "recognition"
+              }
+            ]
+          }
+        ],
+        "logs": []
+      },
+      "expected": {
+        "reviews": [],
+        "new": [
+          "fed3a63c-b325-5819-b597-5dc5396bf7f9",
+          "68881554-56b8-5ea9-bf64-27690112e4ea"
+        ],
+        "reshow": [],
+        "dueToday": {
+          "toReview": 0,
+          "new": 2
+        },
+        "waiting": 0,
+        "catchUp": false,
+        "normalLoad": 50,
+        "homeState": "due"
+      }
+    }
+  ]
+}

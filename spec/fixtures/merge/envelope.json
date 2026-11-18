@@ -1,0 +1,736 @@
+{
+  "kind": "merge-envelope",
+  "source": "doc 36 §11.1 envelope, §11.3 Envelope merge, §22.1: deleted = OR; mergedInto non-null beats null, smaller ID (unsigned bytes) beats larger; fields per field with the comparator; unknown fields kept; disjoint sets unioned; a tombstone drops all field values (fields = {}); schema = max; id, type, owner equal on both sides. Runners also assert merge(remote, local) == merge(local, remote) and, when remotePartial is present, merge(local, remotePartial) == expected",
+  "cases": [
+    {
+      "id": "env-001",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "бежать",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "бегать",
+            "c": "019a6e7ee00100000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "бегать",
+            "c": "019a6e7ee00100000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "per-field merge, later clock wins"
+    },
+    {
+      "id": "env-002",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "бежать",
+            "c": "019a6e7ee00500000123456789abcdef",
+            "u": 1
+          },
+          "position": {
+            "v": 0,
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "бегать",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          },
+          "position": {
+            "v": 2,
+            "c": "019a6e7ee00900000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "position": {
+            "v": 2,
+            "c": "019a6e7ee00900000123456789abcdef",
+            "u": 1
+          },
+          "translation": {
+            "v": "бежать",
+            "c": "019a6e7ee00500000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "fields merged independently: each side wins one field"
+    },
+    {
+      "id": "env-003",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "definition": {
+            "v": "b",
+            "c": "019a6e7ee00100000123456789abcdef",
+            "u": 0
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "definition": {
+            "v": "b",
+            "c": "019a6e7ee00100000123456789abcdef",
+            "u": 0
+          },
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "disjoint field sets are unioned"
+    },
+    {
+      "id": "env-004",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          },
+          "future_field": {
+            "v": [
+              1,
+              2
+            ],
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 0
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "future_field": {
+            "v": [
+              1,
+              2
+            ],
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 0
+          },
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "a field unknown to this app present on one side only is kept with its clock"
+    },
+    {
+      "id": "env-005",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00900000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": true,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "b",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": true,
+        "mergedInto": null,
+        "fields": {}
+      },
+      "note": "deleted = OR; a tombstone drops all field values, even newer ones"
+    },
+    {
+      "id": "env-006",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": true,
+        "mergedInto": null,
+        "fields": {}
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "b",
+            "c": "019a6e7ee00900000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": true,
+        "mergedInto": null,
+        "fields": {}
+      },
+      "note": "a tombstone is terminal: later edits do not bring the record back"
+    },
+    {
+      "id": "env-007",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": "0192f3d0-0000-7000-8000-000000000002",
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": "0192f3d0-0000-7000-8000-000000000002",
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "mergedInto: a value beats null"
+    },
+    {
+      "id": "env-008",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": "0192f3d0-0000-7000-8000-000000000002",
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": "0192f3d0-0000-7000-8000-000000000001",
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": "0192f3d0-0000-7000-8000-000000000001",
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "mergedInto: value vs value → the smaller ID (unsigned bytes) wins"
+    },
+    {
+      "id": "env-009",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": "0192f3d0-0000-7000-8000-000000000001",
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": "0192f3d0-0000-7000-8000-000000000001",
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "mergedInto: null never clears a redirect"
+    },
+    {
+      "id": "env-010",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 2,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 2,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "a",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "schema = max of both sides (AQ-7)"
+    },
+    {
+      "id": "env-011",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "бежать",
+            "c": "019a6e7ee00300000123456789abcdef",
+            "u": 1
+          },
+          "position": {
+            "v": 1,
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          },
+          "definition": {
+            "v": "to run",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 0
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "бегать",
+            "c": "019a6e7ee00700000123456789abcdef",
+            "u": 1
+          },
+          "position": {
+            "v": 1,
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          },
+          "definition": {
+            "v": "to run",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 0
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "definition": {
+            "v": "to run",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 0
+          },
+          "position": {
+            "v": 1,
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          },
+          "translation": {
+            "v": "бегать",
+            "c": "019a6e7ee00700000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "partial push equivalence: the server already holds the non-pending fields; merging only the pending field gives the same result as the full record",
+      "remotePartial": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "бегать",
+            "c": "019a6e7ee00700000123456789abcdef",
+            "u": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "env-012",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "user",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          },
+          "position": {
+            "v": 4,
+            "c": "019a6e7ee03c00000123456789abcdef",
+            "u": 0
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "auto",
+            "c": "019a6e7ee06400000123456789abcdef",
+            "u": 0
+          },
+          "position": {
+            "v": 4,
+            "c": "019a6e7ee03c00000123456789abcdef",
+            "u": 0
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "position": {
+            "v": 4,
+            "c": "019a6e7ee03c00000123456789abcdef",
+            "u": 0
+          },
+          "translation": {
+            "v": "user",
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "partial push with mixed ranks: the pending automatic translation is newer but loses to the user's value; same result as the full record",
+      "remotePartial": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "sense",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "translation": {
+            "v": "auto",
+            "c": "019a6e7ee06400000123456789abcdef",
+            "u": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "env-013",
+      "local": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "entry_tag",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "present": {
+            "v": true,
+            "c": "019a6e7ee00000000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "remote": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "entry_tag",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "present": {
+            "v": false,
+            "c": "019a6e7ee00100000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "expected": {
+        "id": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+        "type": "entry_tag",
+        "schema": 1,
+        "owner": "0192f3c0-0000-7000-8000-000000000001",
+        "deleted": false,
+        "mergedInto": null,
+        "fields": {
+          "present": {
+            "v": false,
+            "c": "019a6e7ee00100000123456789abcdef",
+            "u": 1
+          }
+        }
+      },
+      "note": "EntryTag membership: present flag is an ordinary LWW field (no tombstone)"
+    }
+  ]
+}

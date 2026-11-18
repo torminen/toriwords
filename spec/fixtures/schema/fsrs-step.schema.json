@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://toriwords.app/fixtures/schema/fsrs-step.schema.json",
+  "title": "One FSRS-6 step (doc 36 §7.3–7.6)",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "const": "fsrs-step"
+    },
+    "source": {
+      "type": "string"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "w": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 21,
+          "maxItems": 21
+        },
+        "desiredRetention": {
+          "type": "number"
+        },
+        "maximumInterval": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "w",
+        "desiredRetention",
+        "maximumInterval"
+      ],
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "cardId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "stability": {
+                    "type": "number"
+                  },
+                  "difficulty": {
+                    "type": "number"
+                  },
+                  "lastReviewDay": {
+                    "type": "integer"
+                  },
+                  "reps": {
+                    "type": "integer"
+                  },
+                  "lapses": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "stability",
+                  "difficulty",
+                  "lastReviewDay",
+                  "reps",
+                  "lapses"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reviewDay": {
+            "type": "integer"
+          },
+          "rating": {
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "stability": {
+                "type": "number"
+              },
+              "difficulty": {
+                "type": "number"
+              },
+              "lastReviewDay": {
+                "type": "integer"
+              },
+              "dueDay": {
+                "type": "integer"
+              },
+              "interval": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "reps": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "lapses": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "stage": {
+                "enum": [
+                  "learning",
+                  "known_well"
+                ]
+              }
+            },
+            "required": [
+              "stability",
+              "difficulty",
+              "lastReviewDay",
+              "dueDay",
+              "interval",
+              "reps",
+              "lapses",
+              "stage"
+            ],
+            "additionalProperties": false
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "cardId",
+          "state",
+          "reviewDay",
+          "rating",
+          "expected"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "source",
+    "params",
+    "cases"
+  ],
+  "additionalProperties": false
+}

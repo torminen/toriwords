@@ -1,0 +1,193 @@
+{
+  "kind": "capture-extract",
+  "source": "doc 36 §5.2 steps 4–5. Chips = whitespace tokens of the cleaned text with edge punctuation (P*) stripped, empty ones dropped; chosenChips = [first, last] chip index. Entry text = cleaned text from the first chip's start to the last chip's end. Sentence = from the boundary before the span start to the boundary after the span end (boundaries: . ! ? … + optional closers + whitespace, or a line break), trimmed. Over 500 code points: starting from the span's words, repeatedly try to add one word on the left, then one on the right, each only if the result with '…' marks for cut sides stays ≤ 500 code points, until neither side grows. Highlight in UTF-16 code units",
+  "cases": [
+    {
+      "id": "ex-001",
+      "input": "I was running late. Then the bus broke down and we had to walk.",
+      "chosenChips": [
+        7,
+        8
+      ],
+      "expected": {
+        "entryText": "broke down",
+        "sentence": "Then the bus broke down and we had to walk.",
+        "highlight": {
+          "offset": 13,
+          "length": 10
+        }
+      },
+      "note": "sentence boundary after '.' + space"
+    },
+    {
+      "id": "ex-002",
+      "input": "He looked up\nand smiled at her",
+      "chosenChips": [
+        4,
+        4
+      ],
+      "expected": {
+        "entryText": "smiled",
+        "sentence": "and smiled at her",
+        "highlight": {
+          "offset": 4,
+          "length": 6
+        }
+      },
+      "note": "a line break is a sentence boundary"
+    },
+    {
+      "id": "ex-003",
+      "input": "She said \"Go.\" Then she left the room quietly.",
+      "chosenChips": [
+        5,
+        5
+      ],
+      "expected": {
+        "entryText": "left",
+        "sentence": "Then she left the room quietly.",
+        "highlight": {
+          "offset": 9,
+          "length": 4
+        }
+      },
+      "note": "terminal + closing quote, then whitespace"
+    },
+    {
+      "id": "ex-004",
+      "input": "It was a real eye-opener, honestly.",
+      "chosenChips": [
+        4,
+        4
+      ],
+      "expected": {
+        "entryText": "eye-opener",
+        "sentence": "It was a real eye-opener, honestly.",
+        "highlight": {
+          "offset": 14,
+          "length": 10
+        }
+      },
+      "note": "chip text excludes edge punctuation"
+    },
+    {
+      "id": "ex-005",
+      "input": "😀 We finally got the hang of it.",
+      "chosenChips": [
+        5,
+        5
+      ],
+      "expected": {
+        "entryText": "hang",
+        "sentence": "😀 We finally got the hang of it.",
+        "highlight": {
+          "offset": 22,
+          "length": 4
+        }
+      },
+      "note": "offsets in UTF-16 code units (the emoji counts 2)"
+    },
+    {
+      "id": "ex-006",
+      "input": "Stop. Right now please.",
+      "chosenChips": [
+        0,
+        1
+      ],
+      "expected": {
+        "entryText": "Stop. Right",
+        "sentence": "Stop. Right now please.",
+        "highlight": {
+          "offset": 0,
+          "length": 11
+        }
+      },
+      "note": "a span across a boundary keeps both sentences"
+    },
+    {
+      "id": "ex-007",
+      "input": "[applause] JOHN: We should call it a day. Bye.",
+      "chosenChips": [
+        2,
+        5
+      ],
+      "expected": {
+        "entryText": "call it a day",
+        "sentence": "We should call it a day.",
+        "highlight": {
+          "offset": 10,
+          "length": 13
+        }
+      },
+      "note": "cleaning happens before extraction"
+    },
+    {
+      "id": "ex-008",
+      "input": "— Wait for it — he whispered, then laughed. What now?",
+      "chosenChips": [
+        1,
+        2
+      ],
+      "expected": {
+        "entryText": "for it",
+        "sentence": "— Wait for it — he whispered, then laughed.",
+        "highlight": {
+          "offset": 7,
+          "length": 6
+        }
+      },
+      "note": "punctuation-only tokens are not chips"
+    },
+    {
+      "id": "ex-009",
+      "input": "word000 word001 word002 word003 word004 word005 word006 word007 word008 word009 word010 word011 word012 word013 word014 word015 word016 word017 word018 word019 word020 word021 word022 word023 word024 word025 word026 word027 word028 word029 word030 word031 word032 word033 word034 word035 word036 word037 word038 word039 word040 word041 word042 word043 word044 word045 word046 word047 word048 word049 word050 word051 word052 word053 word054 word055 word056 word057 word058 word059 word060 word061 word062 word063 word064 word065 word066 word067 word068 word069 word070 word071 word072 word073 word074 word075 word076 word077 word078 word079 word080 word081 word082 word083 word084 word085 word086 word087 word088 word089 word090 word091 word092 word093 word094 word095 word096 word097 word098 word099.",
+      "chosenChips": [
+        50,
+        50
+      ],
+      "expected": {
+        "entryText": "word050",
+        "sentence": "…word019 word020 word021 word022 word023 word024 word025 word026 word027 word028 word029 word030 word031 word032 word033 word034 word035 word036 word037 word038 word039 word040 word041 word042 word043 word044 word045 word046 word047 word048 word049 word050 word051 word052 word053 word054 word055 word056 word057 word058 word059 word060 word061 word062 word063 word064 word065 word066 word067 word068 word069 word070 word071 word072 word073 word074 word075 word076 word077 word078 word079 word080…",
+        "highlight": {
+          "offset": 249,
+          "length": 7
+        }
+      },
+      "note": "800-code-point sentence, span in the middle: 31 words left, 30 right, both cuts marked"
+    },
+    {
+      "id": "ex-010",
+      "input": "word000 word001 word002 word003 word004 word005 word006 word007 word008 word009 word010 word011 word012 word013 word014 word015 word016 word017 word018 word019 word020 word021 word022 word023 word024 word025 word026 word027 word028 word029 word030 word031 word032 word033 word034 word035 word036 word037 word038 word039 word040 word041 word042 word043 word044 word045 word046 word047 word048 word049 word050 word051 word052 word053 word054 word055 word056 word057 word058 word059 word060 word061 word062 word063 word064 word065 word066 word067 word068 word069 word070 word071 word072 word073 word074 word075 word076 word077 word078 word079 word080 word081 word082 word083 word084 word085 word086 word087 word088 word089 word090 word091 word092 word093 word094 word095 word096 word097 word098 word099.",
+      "chosenChips": [
+        2,
+        2
+      ],
+      "expected": {
+        "entryText": "word002",
+        "sentence": "word000 word001 word002 word003 word004 word005 word006 word007 word008 word009 word010 word011 word012 word013 word014 word015 word016 word017 word018 word019 word020 word021 word022 word023 word024 word025 word026 word027 word028 word029 word030 word031 word032 word033 word034 word035 word036 word037 word038 word039 word040 word041 word042 word043 word044 word045 word046 word047 word048 word049 word050 word051 word052 word053 word054 word055 word056 word057 word058 word059 word060 word061…",
+        "highlight": {
+          "offset": 16,
+          "length": 7
+        }
+      },
+      "note": "span near the start: no leading mark"
+    },
+    {
+      "id": "ex-011",
+      "input": "word000 word001 word002 word003 word004 word005 word006 word007 word008 word009 word010 word011 word012 word013 word014 word015 word016 word017 word018 word019 word020 word021 word022 word023 word024 word025 word026 word027 word028 word029 word030 word031 word032 word033 word034 word035 word036 word037 word038 word039 word040 word041 word042 word043 word044 word045 word046 word047 word048 word049 word050 word051 word052 word053 word054 word055 word056 word057 word058 word059 word060 word061 word062 word063 word064 word065 word066 word067 word068 word069 word070 word071 word072 word073 word074 word075 word076 word077 word078 word079 word080 word081 word082 word083 word084 word085 word086 word087 word088 word089 word090 word091 word092 word093 word094 word095 word096 word097 word098 word099.",
+      "chosenChips": [
+        98,
+        98
+      ],
+      "expected": {
+        "entryText": "word098",
+        "sentence": "…word038 word039 word040 word041 word042 word043 word044 word045 word046 word047 word048 word049 word050 word051 word052 word053 word054 word055 word056 word057 word058 word059 word060 word061 word062 word063 word064 word065 word066 word067 word068 word069 word070 word071 word072 word073 word074 word075 word076 word077 word078 word079 word080 word081 word082 word083 word084 word085 word086 word087 word088 word089 word090 word091 word092 word093 word094 word095 word096 word097 word098 word099.",
+        "highlight": {
+          "offset": 481,
+          "length": 7
+        }
+      },
+      "note": "span near the end: no trailing mark"
+    }
+  ]
+}

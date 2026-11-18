@@ -1,0 +1,98 @@
+import SwiftUI
+import ToriEnrichment
+import ToriUI
+import Translation
+
+enum TranslationStatusText {
+    /// Settings root value and the On-device translation row.
+    static func short(_ status: LanguageAvailability.Status) -> LocalizedStringResource {
+        switch status {
+        case .installed: "Ready"
+        case .supported: "Not downloaded"
+        case .unsupported: "Not available"
+        @unknown default: "Not available"
+        }
+    }
+}
+
+/// Settings → Translation (doc 35 §3.10, wireframe 4-6 S6 TRANSLATION group; doc 36 §6.3): Apple Translation status
+/// with **Download**, and the bundled dictionary. When EN→RU becomes installed, words whose enrichment found nothing
+/// get another try (`retryUnavailable`).
+struct TranslationView: View {
+    @Environment(AppEnvironment.self) private var env
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var status: LanguageAvailability.Status?
+    @State private var download: TranslationSession.Configuration?
+
+    var body: some View {
+        List {
+            Section {
+                LabeledContent {
+                    if status == .supported {
+                        Button("Download") { requestDownload() }
+                    } else if let status {
+                        Text(TranslationStatusText.short(status))
+                    } else {
+                        ProgressView()
+                    }
+                } label: { Text("On-device translation") }
+                LabeledContent {
+                    Text("Bundled")
+                } label: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Dictionary (Wiktionary)")
+                        if let version = env.dictionary?.version {
+                            Text("Version \(version)").font(Typography.secondary).foregroundStyle(Palette.textSecondary)
+                        }
+                    }
+                }
+            } header: {
+                Text("Translation")
+            } footer: {
+                footer
+            }
+        }
+        .navigationTitle(Text("Translation"))
+        .navigationBarTitleDisplayMode(.inline)
+        // The system shows its own download prompt; `prepareTranslation` returns when the user answered.
+        .translationTask(download) { session in
+            try? await session.prepareTranslation()
+            await refresh()
+        }
+        // Also re-checked when coming back from iOS Settings, where the languages can be downloaded too.
+        .task(id: scenePhase == .active) { await refresh() }
+    }
+
+    @ViewBuilder
+    private var footer: some View {
+        switch status {
+        case .supported:
+            Text("""
+                English → Russian translation runs on this iPhone once its language data is downloaded. Tap Download, \
+                or add English and Russian in iOS Settings → Apps → Translate → Downloaded Languages. \
+                The dictionary works without it.
+                """)
+        case .unsupported:
+            Text("Apple Translation is not available on this device. The built-in dictionary still suggests translations.")
+        default:
+            Text("Translations for new words come from the built-in dictionary first, then from Apple Translation on this iPhone.")
+        }
+    }
+
+    private func requestDownload() {
+        if download == nil {
+            download = .init(source: AppleTranslator.source, target: AppleTranslator.target)
+        } else {
+            download?.invalidate()
+        }
+    }
+
+    private func refresh() async {
+        let previous = status
+        let current = await AppleTranslator.availability()
+        status = current
+        if current == .installed, let previous, previous != .installed {
+            _ = try? await env.enrichment?.retryUnavailable()
+        }
+    }
+}

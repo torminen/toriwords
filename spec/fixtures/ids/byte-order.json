@@ -1,0 +1,56 @@
+{
+  "kind": "uuid-order",
+  "source": "doc 36 \u00a74.1, \u00a711.2: IDs compared as unsigned bytes (smallest ID = survivor, sort tie-breaks). expected: -1 a<b, 0 equal, 1 a>b. Sort cases: input sorted ascending",
+  "cases": [
+    {
+      "id": "cmp-001",
+      "a": "00000000-0000-7000-8000-000000000001",
+      "b": "00000000-0000-7000-8000-000000000002",
+      "expected": -1
+    },
+    {
+      "id": "cmp-002",
+      "a": "7f000000-0000-7000-8000-000000000000",
+      "b": "80000000-0000-7000-8000-000000000000",
+      "expected": -1,
+      "note": "0x7f < 0x80 unsigned (a signed byte compare gets this wrong)"
+    },
+    {
+      "id": "cmp-003",
+      "a": "ff000000-0000-7000-8000-000000000000",
+      "b": "01000000-0000-7000-8000-000000000000",
+      "expected": 1,
+      "note": "0xff is the largest byte"
+    },
+    {
+      "id": "cmp-004",
+      "a": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+      "b": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+      "expected": 0
+    },
+    {
+      "id": "cmp-005",
+      "a": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01",
+      "b": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e81",
+      "expected": -1,
+      "note": "difference in the last byte, 0x01 < 0x81"
+    },
+    {
+      "id": "sort-001",
+      "input": [
+        "80000000-0000-7000-8000-000000000000",
+        "00000000-0000-7000-8000-0000000000ff",
+        "ff000000-0000-7000-8000-000000000000",
+        "7fffffff-ffff-7fff-bfff-ffffffffffff",
+        "00000000-0000-7000-8000-000000000080"
+      ],
+      "expected": [
+        "00000000-0000-7000-8000-000000000080",
+        "00000000-0000-7000-8000-0000000000ff",
+        "7fffffff-ffff-7fff-bfff-ffffffffffff",
+        "80000000-0000-7000-8000-000000000000",
+        "ff000000-0000-7000-8000-000000000000"
+      ]
+    }
+  ]
+}

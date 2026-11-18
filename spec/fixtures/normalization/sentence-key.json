@@ -1,0 +1,13 @@
+{
+  "kind": "text-key",
+  "function": "sentenceKey",
+  "source": "doc 36 §15.1 Sentence key: match-key steps 1–3, whitespace collapsed/trimmed, ё→е (and Ё→Е); case and punctuation kept",
+  "cases": [
+    { "id": "sk-001", "input": "He  said “Hi”.", "expected": "He said \"Hi\".", "note": "quotes mapped, punctuation and case kept" },
+    { "id": "sk-002", "input": "  Run!  ", "expected": "Run!" },
+    { "id": "sk-003", "input": "Ещё раз, Ёжик", "expected": "Еще раз, Ежик", "note": "ё→е and Ё→Е, case kept" },
+    { "id": "sk-004", "input": "co­op​era tion", "expected": "coopera tion", "note": "ignorables removed; NBSP becomes a space" },
+    { "id": "sk-005", "input": "Line one\nline—two", "expected": "Line one line-two" },
+    { "id": "sk-006", "input": "Café İ", "expected": "Café İ", "note": "NFC; no lowercasing" }
+  ]
+}

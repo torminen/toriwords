@@ -1,0 +1,88 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.6, §4.3",
+  "cases": [
+    {
+      "id": "012-orphans-across-pages",
+      "title": "Children pulled before their Entry (page size 1) resolve when the parent arrives",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "sentence": "I run every day.",
+          "tags": [
+            "sport"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "A",
+          "op": "editField",
+          "entry": "run",
+          "field": "note",
+          "value": "last write"
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 40,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice",
+          "limit": 1
+        },
+        {
+          "t": 50,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "translations": [
+                  "бежать"
+                ],
+                "contexts": [
+                  "I run every day."
+                ],
+                "tags": [
+                  "sport"
+                ],
+                "note": "last write"
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "The note edit gives the Entry the highest seq, so its Sense, Context, Cards and EntryTag arrive in earlier pages."
+    }
+  ]
+}

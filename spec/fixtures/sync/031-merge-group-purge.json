@@ -1,0 +1,132 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §21.4, §22.2",
+  "cases": [
+    {
+      "id": "031-merge-group-purge",
+      "title": "A merges X into Y while B deletes X: the whole group is purged on the server",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "y"
+        },
+        {
+          "t": 5,
+          "device": "A",
+          "op": "capture",
+          "term": "runn",
+          "translations": [
+            "мчаться"
+          ],
+          "as": "x"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "mergeByEdit",
+          "entry": "x",
+          "text": "run"
+        },
+        {
+          "t": 110,
+          "device": "A",
+          "op": "pushOnly"
+        },
+        {
+          "t": 120,
+          "device": "B",
+          "op": "delete",
+          "entry": "x"
+        },
+        {
+          "t": 130,
+          "device": "B",
+          "op": "pushOnly"
+        },
+        {
+          "t": 140,
+          "device": "A",
+          "op": "tag",
+          "entry": "y",
+          "name": "verbs"
+        },
+        {
+          "t": 150,
+          "device": "A",
+          "op": "pushOnly"
+        },
+        {
+          "t": 200,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 201,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 202,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 203,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": []
+          },
+          "B": {
+            "words": []
+          }
+        },
+        "hub": {
+          "alice": {
+            "entries": {
+              "live": 0,
+              "deleted": 2,
+              "merged": 0
+            },
+            "purged": [
+              "x",
+              "y"
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "The EntryTag pushed after the purge is acknowledged and discarded (empty payload)."
+    }
+  ]
+}

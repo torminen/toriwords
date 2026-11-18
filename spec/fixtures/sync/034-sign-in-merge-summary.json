@@ -1,0 +1,119 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §12.6",
+  "cases": [
+    {
+      "id": "034-sign-in-merge-summary",
+      "title": "First sign-in with local words into an account with words shows the merge summary",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "B",
+          "op": "capture",
+          "term": "walk",
+          "translations": [
+            "идти"
+          ],
+          "as": "bwalk"
+        },
+        {
+          "t": 1,
+          "device": "B",
+          "op": "capture",
+          "term": "swim",
+          "translations": [
+            "плавать"
+          ],
+          "as": "swim"
+        },
+        {
+          "t": 10,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 21,
+          "device": "A",
+          "op": "capture",
+          "term": "walk",
+          "translations": [
+            "гулять"
+          ],
+          "as": "awalk"
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 40,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run"
+              },
+              {
+                "text": "swim"
+              },
+              {
+                "text": "walk",
+                "translations": [
+                  "идти",
+                  "гулять"
+                ]
+              }
+            ],
+            "notices": [
+              "mergeSummary:1/1/1"
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run"
+              },
+              {
+                "text": "swim"
+              },
+              {
+                "text": "walk"
+              }
+            ],
+            "notices": [
+              "backedUp"
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      },
+      "note": "run: only this device; swim: only the account; walk: both (merged)."
+    }
+  ]
+}

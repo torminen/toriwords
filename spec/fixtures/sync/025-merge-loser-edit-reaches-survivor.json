@@ -1,0 +1,108 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §11.6 step 5",
+  "cases": [
+    {
+      "id": "025-merge-loser-edit-reaches-survivor",
+      "title": "An edit of a merged loser made elsewhere reaches the survivor",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "a"
+        },
+        {
+          "t": 5,
+          "device": "A",
+          "op": "capture",
+          "term": "runn",
+          "translations": [
+            "мчаться"
+          ],
+          "as": "b"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 100,
+          "device": "A",
+          "op": "mergeByEdit",
+          "entry": "b",
+          "text": "run"
+        },
+        {
+          "t": 200,
+          "device": "B",
+          "op": "editField",
+          "entry": "b",
+          "field": "note",
+          "value": "from B"
+        },
+        {
+          "t": 300,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 301,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 302,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 303,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "note": "from B"
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "note": "from B"
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

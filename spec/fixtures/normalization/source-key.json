@@ -1,0 +1,11 @@
+{
+  "kind": "source-key",
+  "source": "doc 36 §15.1 Source key without URL, §11.7 natural key: matchKey(title) (null title → \"\"), app exactly as stored (null stays null), suggested = (kind == \"suggested\") (CH-24, AQ-19)",
+  "cases": [
+    { "id": "src-001", "input": { "title": "The Bear S2", "app": null, "kind": "other" }, "expected": { "title": "the bear s2", "app": null, "suggested": false } },
+    { "id": "src-002", "input": { "title": "  The  Bear S2! ", "app": null, "kind": "app" }, "expected": { "title": "the bear s2", "app": null, "suggested": false }, "note": "kind other than suggested does not take part" },
+    { "id": "src-003", "input": { "title": "Run", "app": null, "kind": "suggested" }, "expected": { "title": "run", "app": null, "suggested": true } },
+    { "id": "src-004", "input": { "title": "Article", "app": "Safari", "kind": "web" }, "expected": { "title": "article", "app": "Safari", "suggested": false }, "note": "app kept as stored, not folded" },
+    { "id": "src-005", "input": { "title": null, "app": null, "kind": "other" }, "expected": { "title": "", "app": null, "suggested": false } }
+  ]
+}

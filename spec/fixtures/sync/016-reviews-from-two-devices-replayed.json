@@ -1,0 +1,104 @@
+{
+  "kind": "sync-scenario",
+  "source": "doc 36 §7.6",
+  "cases": [
+    {
+      "id": "016-reviews-from-two-devices-replayed",
+      "title": "Answers to the same Card on two devices are replayed in time order",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "signIn",
+          "account": "alice"
+        },
+        {
+          "t": 86400,
+          "device": "A",
+          "op": "review",
+          "entry": "run",
+          "rating": "remembered"
+        },
+        {
+          "t": 86460,
+          "device": "B",
+          "op": "review",
+          "entry": "run",
+          "rating": "forgot"
+        },
+        {
+          "t": 259200,
+          "device": "B",
+          "op": "review",
+          "entry": "run",
+          "rating": "remembered"
+        },
+        {
+          "t": 259300,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 259301,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 259302,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 259303,
+          "device": "B",
+          "op": "sync"
+        }
+      ],
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "reviews": 3
+              }
+            ]
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "reviews": 3
+              }
+            ]
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

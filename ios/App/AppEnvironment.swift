@@ -168,6 +168,7 @@ final class AppEnvironment {
     // MARK: Scene phase
 
     func didBecomeActive() {
+        translationBridge.isActive = true
         guard let store, let enrichment else { return }
         if let appGroup { _ = try? store.importInbox(appGroup.inbox) }
         Task {
@@ -239,6 +240,7 @@ final class AppEnvironment {
     func didEnterBackground() {
         activeReview?.commitPending()
         deletion.commit()
+        translationBridge.isActive = false
         translationBridge.cancelAll()
         speech.stop()
         appGroupRefresh?.cancel()

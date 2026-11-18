@@ -28,14 +28,15 @@ permissions:
   contents: read
 
 env:
-  # Project decision: iOS 26 deployment target, built with the iOS 27 SDK (Xcode 27, Swift 6.4 like `.swift-version`).
-  # Assumption: the GitHub `macos-26` image carries Xcode 27; setup-xcode picks the newest 27.x. Bump with `.swift-version`.
+  # Project decision: iOS 18 deployment target, built with the iOS 27 SDK (Xcode 27, Swift 6.4 like `.swift-version`).
+  # The `macos-26` image has no Xcode 27, so jobs run on the `xcode-27` runner label (arm64, public preview);
+  # setup-xcode picks the newest installed 27.x. Bump with `.swift-version`.
   XCODE_VERSION: "27"
 
 jobs:
   toriKit-package:
     name: ToriKit-Package (iOS Simulator)
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +69,7 @@ jobs:
 
   app-build:
     name: App build (Debug, simulator)
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 60
     defaults:
       run:

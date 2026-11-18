@@ -3,7 +3,7 @@ import ProjectDescription
 // Toriwords app + Share Extension + widget (doc 36 §2.2). Values come from Config/Shared.xcconfig; ToriKit tests run
 // from the ToriKit package itself (README), so the project has no test targets.
 
-let deploymentTargets = DeploymentTargets.iOS("26.0")
+let deploymentTargets = DeploymentTargets.iOS("18.0")
 let settings = Settings.settings(
     base: ["SWIFT_VERSION": "6.0", "SWIFT_STRICT_CONCURRENCY": "complete"],
     configurations: [

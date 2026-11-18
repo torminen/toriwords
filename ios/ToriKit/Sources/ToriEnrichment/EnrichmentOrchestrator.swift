@@ -115,7 +115,17 @@ public actor EnrichmentOrchestrator {
             guard let translator else { summary.deferred += 1; continue }
             if mtReady == nil { mtReady = await translator.isReady() }
             guard mtReady == true, !inBackoff(entry.id) else { summary.deferred += 1; continue }
-            let result = (try? await translator.translate(entry.text))?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let result: String?
+            do {
+                result = try await translator.translate(entry.text)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            } catch is CancellationError {
+                // MT went away mid-pass (the app left the foreground on iOS < 26): defer, never count a failure.
+                mtReady = false
+                summary.deferred += 1
+                continue
+            } catch {
+                result = nil
+            }
             if let result, !result.isEmpty {
                 mtFailures[entry.id] = nil
                 try store.fillAutomaticSense(entry.id, NewSense(translation: result, source: .mtApple))

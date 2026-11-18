@@ -65,7 +65,7 @@ jobs:
             -destination "id=${{ steps.sim.outputs.id }}" \
             -clonedSourcePackagesDirPath ~/spm-toriKit \
             -skipMacroValidation \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO 2>&1 | xcbeautify --renderer github-actions
 
   app-build:
     name: App build (Debug, simulator)
@@ -113,4 +113,4 @@ jobs:
             -configuration Debug \
             -destination "generic/platform=iOS Simulator" \
             -skipMacroValidation \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO 2>&1 | xcbeautify --renderer github-actions

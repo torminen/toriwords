@@ -71,5 +71,9 @@ final class SyncCoordinator: SyncCoordinating {
 
     func syncNow() async { await engine?.sync(.manual) }
     func deleteCloudData() async throws { try await engine?.deleteCloudData() }
+    /// Settings → Data → Remove all data: serialized with a running cycle by the engine; store-only before attach.
+    func removeAllDataFromDevice(store: ToriStore) async {
+        if let engine { try? await engine.removeAllDataFromDevice() } else { try? store.removeAllDataFromDevice() }
+    }
     func backUpAgain() async throws { try await engine?.backUpAgain() }
 }

@@ -17,7 +17,7 @@ struct DataView: View {
     @State private var removal: Removal?
 
     /// What the remove confirmation warns about, read when the row is tapped.
-    struct Removal { var syncActive: Bool }
+    struct Removal { var syncActive: Bool; var unsynced: Int }
 
     var body: some View {
         List {
@@ -29,7 +29,8 @@ struct DataView: View {
             }
             Section {
                 Button("Remove all data from this device", role: .destructive) {
-                    removal = Removal(syncActive: (try? store.isOutboxActive()) ?? false)
+                    removal = Removal(syncActive: (try? store.isOutboxActive()) ?? false,
+                                      unsynced: (try? store.pendingRecordCount()) ?? 0)
                 }
             }
         }
@@ -88,8 +89,11 @@ struct DataView: View {
     }
 
     private func removeAll() {
-        try? store.removeAllDataFromDevice()
-        env.didChangeData()
+        Task {
+            // Through the sync engine, so an in-flight cycle cannot write back the old change token or record meta.
+            await env.syncCoordinator.removeAllDataFromDevice(store: store)
+            env.didChangeData()
+        }
     }
 }
 
@@ -104,7 +108,9 @@ enum RestoreText {
         guard r.syncActive else {
             return Text("All your words, review history and tags are deleted from this device. This can't be undone.")
         }
-        return Text("Your words are deleted from this device. They stay in iCloud and come back at the next sync, unless you delete iCloud data in Settings → iCloud sync.")
+        let base = Text("Your words are deleted from this device. They stay in iCloud and come back at the next sync, unless you delete iCloud data in Settings → iCloud sync.")
+        guard r.unsynced > 0 else { return base }
+        return Text("\(base) \(Text("\(r.unsynced) unsynced changes will be lost."))")
     }
 }
 

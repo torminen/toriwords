@@ -95,6 +95,9 @@ public actor SyncEngine {
     private var continuations: [UUID: AsyncStream<SyncStatus>.Continuation] = [:]
     private var running = false
     private var rerun = false
+    /// Bumped by store resets (Remove all data, Delete iCloud data, Back up again). A cycle started under an older
+    /// epoch stops at its next await instead of writing a stale change token, meta or status.
+    private var epoch = 0
     private var backoffAttempt = 0
     private var retryTask: Task<Void, Never>?
     private var debounceTask: Task<Void, Never>?
@@ -186,9 +189,20 @@ public actor SyncEngine {
     /// The zone was replaced by another device's "Back up this device again" (a new `zone-info` generation).
     struct ZoneReplaced: Error {}
 
+    /// The cycle was superseded by a store reset while it was suspended.
+    struct Superseded: Error {}
+
+    /// Called after every `await` in a cycle, before it writes anything.
+    private func check(_ started: Int) throws {
+        if started != epoch { throw Superseded() }
+    }
+
     func cycle() async {
+        let started = epoch
         do {
-            guard case .available(let user) = try await cloud.accountStatus() else { return set(.iCloudOff) }
+            let account = try await cloud.accountStatus()
+            try check(started)
+            guard case .available(let user) = account else { return set(.iCloudOff) }
             // First availability or an iCloud account switch: the local data merges silently into this account.
             if try store.syncState(.cloudUser) != user { try store.activateCloud(user: user) }
             guard try store.syncState(.cloudDeleted) == nil else { return set(.cloudDeleted) }
@@ -196,15 +210,20 @@ public actor SyncEngine {
             if let last = try store.syncState(.lastServerTime).flatMap({ Int64($0) }) {
                 try store.recoverClockAhead(lastServerTime: last)
             }
-            try await prepareZone()
-            try await pull()
-            try await push()
-            try await deleteQueued()
+            try await prepareZone(started)
+            try await pull(started)
+            try await push(started)
+            try await deleteQueued(started)
+            try check(started)
             backoffAttempt = 0
             let at = deps.now()
             try store.setSyncState([.lastSyncAt: String(at)])
             set(.synced(at: at))
             await deps.afterCycle()
+        } catch is Superseded {
+            return
+        } catch where started != epoch {
+            return  // a reset happened while this cycle was suspended; its error is stale
         } catch CloudError.zoneNotFound, CloudError.zoneDeleted {
             zoneGone()
         } catch is ZoneReplaced {
@@ -257,25 +276,28 @@ public actor SyncEngine {
     }
 
     /// Zone created once per `cloudUser`; the first writer's `zone-info` generation is adopted by every device.
-    private func prepareZone() async throws {
+    private func prepareZone(_ started: Int) async throws {
         if try store.syncState(.zoneCreated) == nil {
             try await cloud.ensureZone()
+            try check(started)
             try store.setSyncState([.zoneCreated: "1"])
         }
         if try store.syncState(.zoneGeneration) == nil {
             let generation = try await cloud.claimZoneGeneration(deps.newGeneration())
+            try check(started)
             try store.setSyncState([.zoneGeneration: generation])
         }
     }
 
-    private func pull() async throws {
+    private func pull(_ started: Int) async throws {
         var token = try store.syncState(.changeToken).flatMap { Data(base64Encoded: $0) }
         var refetched = false
         while true {
             let changes: CloudChanges
             do {
                 changes = try await cloud.fetchChanges(token: token)
-            } catch CloudError.changeTokenExpired where !refetched {
+                try check(started)
+            } catch CloudError.changeTokenExpired where !refetched && started == epoch {
                 refetched = true
                 token = nil
                 try store.setSyncState([.changeToken: nil])
@@ -290,7 +312,7 @@ public actor SyncEngine {
         }
     }
 
-    private func push() async throws {
+    private func push(_ started: Int) async throws {
         var excluded = try excludedRecords()
         var maxRecords = Self.maxBatchRecords
         var stalled = 0
@@ -311,7 +333,8 @@ public actor SyncEngine {
             let outcomes: [ToriID: SaveOutcome]
             do {
                 outcomes = try await cloud.save(batch.records.map { CloudRecord(envelope: $0, meta: meta[$0.id], modifiedAt: 0) })
-            } catch CloudError.limitExceeded where maxRecords > 1 {
+                try check(started)
+            } catch CloudError.limitExceeded where maxRecords > 1 && started == epoch {
                 maxRecords = max(1, batch.records.count / 2)
                 continue
             }
@@ -340,11 +363,12 @@ public actor SyncEngine {
     }
 
     /// Children of deleted Entry groups, removed from the cloud (tombstones stay).
-    private func deleteQueued() async throws {
+    private func deleteQueued(_ started: Int) async throws {
         while true {
             let ids = try store.pendingCloudDeletes(limit: Self.maxBatchRecords)
             guard !ids.isEmpty else { return }
             try await cloud.delete(ids)
+            try check(started)
             try store.cloudDeletesDone(ids)
         }
     }
@@ -397,15 +421,32 @@ public actor SyncEngine {
     /// Settings → iCloud sync → "Delete iCloud data…": deletes the zone (needs the network; throws `CloudError`).
     /// This device keeps its words and stops syncing; other devices stop when they next see the zone gone.
     public func deleteCloudData() async throws {
+        epoch += 1  // a suspended cycle must not mark records saved or show "Synced" afterwards
+        retryTask?.cancel()
         do { try await cloud.deleteZone() } catch CloudError.zoneNotFound {}
+        epoch += 1  // also a cycle that started while the zone was being deleted
         retryTask?.cancel()
         try store.markCloudDeleted()
         set(.cloudDeleted)
     }
 
+    /// Settings → Data → "Remove all data from this device": the store reset (records, outbox, change token, cloud
+    /// meta) with any suspended cycle superseded, so the next cycle downloads everything again.
+    public func removeAllDataFromDevice() throws {
+        epoch += 1
+        retryTask?.cancel()
+        debounceTask?.cancel()
+        debounceTask = nil
+        try store.removeAllDataFromDevice()
+        try store.setSyncState([.lastSyncAt: nil])  // nothing on the device is synced any more
+        status.clockWarning = false
+        set(.idle)
+    }
+
     /// "Back up this device again": a new zone generation (or the one another device already re-created), every record
     /// pending, then a cycle.
     public func backUpAgain() async throws {
+        epoch += 1
         try store.backUpAgain()
         await sync(.manual)
     }

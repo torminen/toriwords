@@ -162,6 +162,59 @@
         }
       }
     },
+    "%lld unsynced changes will be lost.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld unsynced change will be lost."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld unsynced changes will be lost."
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld несинхронизированное изменение будет потеряно."
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld несинхронизированных изменения будут потеряны."
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld несинхронизированных изменений будут потеряны."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld несинхронизированных изменения будут потеряны."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld words": {
       "extractionState": "manual",
       "localizations": {

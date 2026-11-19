@@ -409,3 +409,38 @@ func isSynced(_ s: SyncState) -> Bool { if case .synced = s { true } else { fals
     #expect(isSynced(await a.state))
     #expect(await a.engine.status.clockWarning)
 }
+
+// MARK: Store resets during a cycle (validation 48/2)
+
+@Test func removeAllDataDuringACycleLeavesNoStaleTokenOrMeta() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A"), b = try await rig.device("B")
+    let walk = try b.capture("walk")
+    await b.sync()
+    let run = try a.capture("run")
+    await a.sync()
+    let jump = try a.capture("jump")
+    rig.cloud.beforeNextSave { try? await a.engine.removeAllDataFromDevice() }
+    await a.sync()
+
+    #expect(try a.count("cloud_record_meta") == 0)
+    #expect(try a.store.syncState(.changeToken) == nil)
+    #expect(try a.entry(run) == nil)
+    #expect(!isSynced(await a.state), "the superseded cycle must not report Synced")
+
+    await a.sync()
+    #expect(isSynced(await a.state))
+    #expect(try a.entry(walk) != nil && a.entry(run) != nil && a.entry(jump) != nil, "everything comes back from iCloud")
+}
+
+@Test func deleteCloudDataDuringASaveKeepsCloudDeleted() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A")
+    try a.capture("run")
+    await a.sync()
+    try a.capture("jump")
+    rig.cloud.beforeNextSave { try? await a.engine.deleteCloudData() }
+    await a.sync()
+    #expect(await a.state == .cloudDeleted)
+    #expect(try a.store.syncState(.cloudDeleted) != nil)
+}

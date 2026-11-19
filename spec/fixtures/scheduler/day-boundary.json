@@ -1,6 +1,6 @@
 {
   "kind": "day-boundary",
-  "source": "doc 36 §7.2: dayNumber(t_ms, offsetMin) = floorDiv(floorDiv(t_ms, 1000) + offsetMin*60 − 4*3600, 86400), 64-bit, floor toward −∞",
+  "source": "Day model: dayNumber(t_ms, offsetMin) = floorDiv(floorDiv(t_ms, 1000) + offsetMin*60 − 4*3600, 86400), 64-bit, floor toward −∞",
   "cases": [
     {
       "id": "db-001",

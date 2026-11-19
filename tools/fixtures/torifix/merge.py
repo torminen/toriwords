@@ -1,4 +1,4 @@
-"""Field comparator and envelope merge, doc 36 §11.3."""
+"""Field comparator and envelope merge."""
 
 import uuid
 

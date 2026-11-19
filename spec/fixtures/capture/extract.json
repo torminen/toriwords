@@ -1,6 +1,6 @@
 {
   "kind": "capture-extract",
-  "source": "doc 36 §5.2 steps 4–5. Chips = whitespace tokens of the cleaned text with edge punctuation (P*) stripped, empty ones dropped; chosenChips = [first, last] chip index. Entry text = cleaned text from the first chip's start to the last chip's end. Sentence = from the boundary before the span start to the boundary after the span end (boundaries: . ! ? … + optional closers + whitespace, or a line break), trimmed. Over 500 code points: starting from the span's words, repeatedly try to add one word on the left, then one on the right, each only if the result with '…' marks for cut sides stays ≤ 500 code points, until neither side grows. Highlight in UTF-16 code units",
+  "source": "Capture sentence extraction and highlight. Chips = whitespace tokens of the cleaned text with edge punctuation (P*) stripped, empty ones dropped; chosenChips = [first, last] chip index. Entry text = cleaned text from the first chip's start to the last chip's end. Sentence = from the boundary before the span start to the boundary after the span end (boundaries: . ! ? … + optional closers + whitespace, or a line break), trimmed. Over 500 code points: starting from the span's words, repeatedly try to add one word on the left, then one on the right, each only if the result with '…' marks for cut sides stays ≤ 500 code points, until neither side grows. Highlight in UTF-16 code units",
   "cases": [
     {
       "id": "ex-001",

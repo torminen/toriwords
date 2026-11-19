@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §7.6",
+  "source": "Card state = replay of its logs: reviews from two devices replayed in (reviewedAt, id) order",
   "cases": [
     {
       "id": "016-reviews-from-two-devices-replayed",

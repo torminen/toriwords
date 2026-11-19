@@ -1,5 +1,5 @@
 """Validates spec/fixtures: JSON Schema per fixture kind, unique case ids, and only code points
-assigned in Unicode 13.0 (Android's floor, doc 38 §15). Exit code 1 on any problem.
+assigned in Unicode 13.0 (Android's floor). Exit code 1 on any problem.
 
     uv run python validate.py [fixtures-dir]
 """

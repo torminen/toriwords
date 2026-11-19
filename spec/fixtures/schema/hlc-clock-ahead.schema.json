@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/hlc-clock-ahead.schema.json",
-  "title": "Clock-ahead recovery before push (doc 36 §11.5 step 2)",
+  "title": "Clock-ahead recovery before push",
   "type": "object",
   "properties": {
     "kind": {

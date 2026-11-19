@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.3",
+  "source": "Per-field merge: different fields edited on two devices are both kept",
   "cases": [
     {
       "id": "005-different-fields-both-kept",

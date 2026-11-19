@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.7",
+  "source": "Duplicate merge by natural key: Senses of merged Entries dedupe by translation match key",
   "cases": [
     {
       "id": "007-duplicate-capture-dedupes-senses",

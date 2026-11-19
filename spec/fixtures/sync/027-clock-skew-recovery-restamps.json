@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.5 step 2",
+  "source": "Clock-ahead recovery before push: reset the HLC and re-stamp every pending outbox field",
   "cases": [
     {
       "id": "027-clock-skew-recovery-restamps",

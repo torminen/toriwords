@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §12.4, §12.6",
+  "source": "First sign-in: all local records marked pending, pushed, then pulled; local data uploaded to an empty account shows \"Your vocabulary is backed up.\"",
   "cases": [
     {
       "id": "001-first-sign-in-backs-up",

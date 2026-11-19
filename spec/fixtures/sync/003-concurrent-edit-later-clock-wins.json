@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.3",
+  "source": "Field comparator: with the same rank the later clock wins",
   "cases": [
     {
       "id": "003-concurrent-edit-later-clock-wins",

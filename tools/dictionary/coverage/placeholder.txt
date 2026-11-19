@@ -1,4 +1,4 @@
-# Placeholder coverage list for the AQ-14 check (doc 36 §8.1). NOT the owner's real content.
+# Placeholder coverage list for the dictionary coverage check. NOT the owner's real content.
 # Words: the 500 most frequent alphabetic English tokens from wordfreq 3.1.1 (top_n_list("en"),
 # 2+ letters, contraction fragments and two names removed). Phrases: 200 common phrasal verbs and idioms.
 # Format (also for coverage/owner.txt, which replaces this file when present): one item per line,

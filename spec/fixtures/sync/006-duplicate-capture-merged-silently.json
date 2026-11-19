@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.7, §12.6",
+  "source": "Duplicate merge by natural key: survivor = smallest ID, losers get mergedInto; nothing asked",
   "cases": [
     {
       "id": "006-duplicate-capture-merged-silently",

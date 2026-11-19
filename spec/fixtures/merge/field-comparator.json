@@ -1,6 +1,6 @@
 {
   "kind": "merge-field",
-  "source": "doc 36 §11.3 Comparator: wins(a, b) = (a.u, a.c) > (b.u, b.c) (rank first, then clock string); merge(local, remote) = wins(remote, local) ? remote : local; §22.1",
+  "source": "Field comparator: wins(a, b) = (a.u, a.c) > (b.u, b.c) (rank first, then clock string); merge(local, remote) = wins(remote, local) ? remote : local",
   "cases": [
     {
       "id": "fc-001",

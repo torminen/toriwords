@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.6, §4.3",
+  "source": "Orphans: a child pulled before its parent stays hidden; the result equals receiving everything in one page",
   "cases": [
     {
       "id": "012-orphans-across-pages",

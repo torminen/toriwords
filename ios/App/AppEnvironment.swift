@@ -91,11 +91,9 @@ final class AppEnvironment {
     // Slots wired by later steps.
     @ObservationIgnored var sync: (any SyncCoordinating)?
     @ObservationIgnored var dictionaryInstaller: (any DictionaryInstalling)? = AppDictionaryInstaller()
-    /// The installed dictionary (search, autocomplete); nil until launch installed it or when none is bundled.
-    var dictionary: BundledDictionary? { (dictionaryInstaller as? AppDictionaryInstaller)?.dictionary }
     @ObservationIgnored var reminders: (any ReminderScheduling)?
     /// Dictionary searches for Add / Entry over `dictionary` (set by the installer at launch); empty while it is nil.
-    var dictionarySearch: DictionarySearch { DictionarySearch(dictionary) }
+    var dictionarySearch: DictionarySearch { DictionarySearch(dictionary as? BundledDictionary) }
 
     /// The open Review session, so going to the background commits its undoable answer.
     @ObservationIgnored weak var activeReview: ReviewModel?

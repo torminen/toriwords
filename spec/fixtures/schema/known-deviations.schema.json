@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/known-deviations.schema.json",
-  "title": "Known platform deviations (must be empty before release, doc 36 §15.2)",
+  "title": "Known platform deviations (must be empty before release)",
   "type": "array",
   "items": {
     "type": "object",

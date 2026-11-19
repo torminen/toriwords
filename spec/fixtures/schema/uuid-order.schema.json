@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/uuid-order.schema.json",
-  "title": "Unsigned byte order of IDs (doc 36 §4.1)",
+  "title": "Unsigned byte order of IDs",
   "type": "object",
   "properties": {
     "kind": {

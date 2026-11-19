@@ -1,4 +1,4 @@
-"""Join, rank, prune and lay out rows for dictionary.sqlite (doc 36 §8.1–8.2)."""
+"""Join, rank, prune and lay out rows for dictionary.sqlite."""
 
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
@@ -9,8 +9,8 @@ from .text import match_key, search_fold
 PHRASE_POS = {"phrase", "prep_phrase", "adv_phrase", "proverb"}
 RELATED_ORDER = {"synonym": 0, "related": 1, "derived": 2, "phrase": 3}
 ORIGIN_ORDER = {"enwikt": 0, "ruwikt": 1}
-# Prune ladder, §8.1: examples → related → headwords without RU translation and freq_rank > 100,000.
-# The tighter thresholds after it are our extension, used only if §8.1's ladder still misses the budget.
+# Prune ladder from the architecture spec: examples → related → headwords without RU translation and freq_rank > 100,000.
+# The tighter thresholds after it are our extension, used only if that ladder still misses the budget.
 PRUNE_STEPS = ["none", "examples", "related", "rare-untranslated", "untranslated-50k", "untranslated-20k",
                "untranslated-10k"]
 UNTRANSLATED_MAX_RANK = {"rare-untranslated": 100_000, "untranslated-50k": 50_000, "untranslated-20k": 20_000,

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/merge-field.schema.json",
-  "title": "Field comparator (doc 36 §11.3, §22.1)",
+  "title": "Field comparator",
   "type": "object",
   "properties": {
     "kind": {

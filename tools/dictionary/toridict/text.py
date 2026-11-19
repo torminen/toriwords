@@ -1,6 +1,6 @@
 """Text rules for the dictionary build.
 
-`match_key` and `search_fold` are a port of doc 36 §15.1 (same explicit character lists as
+`match_key` and `search_fold` are a port of the shared text rules (same explicit character lists as
 spec/fixtures/README.md and tools/fixtures/torifix/text.py); tests run them against
 spec/fixtures/normalization/*.json.
 """
@@ -64,7 +64,7 @@ def search_fold(s: str) -> str:
     return _yo(collapse(_lower(_steps_1_to_3(s))))
 
 
-# --- Cleaning source text (§8.1 "normalise") ----------------------------------------------------
+# --- Cleaning source text ("normalise") ---------------------------------------------------------
 
 _MARKUP = [
     (re.compile(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]"), r"\1"),  # [[target|label]] → label

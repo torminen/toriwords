@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.7",
+  "source": "Duplicate merge: Tags merge by tag key",
   "cases": [
     {
       "id": "013-tags-merge-by-key",

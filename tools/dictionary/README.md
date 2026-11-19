@@ -1,6 +1,6 @@
 # tools/dictionary — Wiktionary → `dictionary.sqlite`
 
-Builds the offline English→Russian dictionary bundled in the apps (doc 36 §8). Dev tool, not app code.
+Builds the offline English→Russian dictionary bundled in the apps. Dev tool, not app code.
 
 ## Sources
 
@@ -22,7 +22,7 @@ The database is an **adaptation** of Wiktionary content, so it is distributed un
 - say it was modified (filtered, merged, normalised) — `meta.licence_text` holds the wording;
 - publish it share-alike: every release asset is public on GitHub Releases together with this script.
 
-In the app (doc 36 §8.4): Settings → About attribution, the "Wiktionary" mark on Wiktionary-provenance values,
+In the app: Settings → About attribution, the "Wiktionary" mark on Wiktionary-provenance values,
 attribution in exports.
 
 ## Build
@@ -70,14 +70,14 @@ tools/dictionary/fetch.sh
 Downloads `release.json.asset_url` to `ios/Resources/dictionary.sqlite` and checks it against the committed
 `dictionary.sqlite.sha256`; on mismatch the file is deleted and the script fails.
 
-## Coverage list (AQ-14)
+## Coverage list
 
 `coverage/owner.txt` is used when present, otherwise `coverage/placeholder.txt` (frequent words + common phrasal
 verbs/idioms, **not** the owner's content). Format: UTF-8, one word or phrase per line, `#` starts a comment, blank
 lines ignored; an item whose match key contains a space counts as a phrase. Covered = exact headword key, or a form
 key leading to a base headword, with ≥ 1 Russian translation. Target ≥ 90 % words, ≥ 60 % phrases.
 
-## Build rules (summary of doc 36 §8.1 as implemented)
+## Build rules (as implemented)
 
 - enwikt: English lemma senses only; `form_of`/`alt_of` senses become `form` rows of the base headword (same POS);
   obsolete/archaic/rare senses dropped when other senses exist; proper names (`name`) kept only with an RU
@@ -89,7 +89,7 @@ key leading to a base headword, with ≥ 1 Russian translation. Target ≥ 90 % 
   the POS table in `toridict/parse.py` (`phrase` may match an enwikt verb/noun/…; `unknown` matches any);
   unmatched ruwikt entries become headwords of their own (headword-level translations, no senses).
 - Text: NFC, quotes/dashes/spaces to ASCII, default-ignorables and wiki markup removed, Russian stress marks removed.
-  `key` = match key (doc 36 §15.1, tested against `spec/fixtures/normalization/`), `text_folded` = search fold.
+  `key` = match key (tested against `spec/fixtures/normalization/`), `text_folded` = search fold.
 - `translation_ru.rank` per headword: sense ordinal (headword-level last), then enwikt (table order) before ruwikt
   (first sense first); duplicates by translation key removed (first kept).
 - `freq_rank` = 1 + number of wordfreq `large` entries more frequent than the key, only when the key itself is a
@@ -99,8 +99,8 @@ key leading to a base headword, with ≥ 1 Russian translation. Target ≥ 90 % 
   archaic/obsolete/nonstandard forms dropped.
 - ruwikt variants longer than 100 characters are dropped (encyclopedic definitions, not translations); `;` splits
   only outside parentheses.
-- Size budget 60 MiB. Prune ladder: §8.1 (`examples` → `related` → `rare-untranslated`: drop headwords without an RU
-  translation and `freq_rank` > 100,000 or NULL), then — our extension, because §8.1's ladder ends at ~64 MiB —
+- Size budget 60 MiB. Prune ladder: base (`examples` → `related` → `rare-untranslated`: drop headwords without an RU
+  translation and `freq_rank` > 100,000 or NULL), then — our extension, because the base ladder ends at ~64 MiB —
   the same rule with thresholds 50k → 20k → 10k. The first step that fits is used and recorded in `meta.prune`.
   The ladder is cumulative: once headwords are pruned, examples and related are already gone.
 - IDs in (key, pos, text) order; rows inserted in key/id order; `encoding = 'UTF-8'` asserted; `page_size = 4096`; `VACUUM`.

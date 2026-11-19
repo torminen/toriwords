@@ -1,4 +1,4 @@
-"""Deterministic writer for dictionary.sqlite. Schema is normative: doc 36 §8.2."""
+"""Deterministic writer for dictionary.sqlite. Schema is normative (shared with the apps)."""
 
 import os
 import sqlite3
@@ -57,7 +57,7 @@ def write(rows: Rows, meta: dict[str, str], path: Path) -> None:
         con.executemany("INSERT INTO related VALUES (?, ?, ?)", rows.related)
         con.execute("COMMIT")
         con.executescript(INDEXES)
-        assert con.execute("PRAGMA encoding").fetchone()[0] == "UTF-8", "dictionary.sqlite must be UTF-8 (doc 36 §4.1)"
+        assert con.execute("PRAGMA encoding").fetchone()[0] == "UTF-8", "dictionary.sqlite must be UTF-8"
         con.execute("VACUUM")
         assert con.execute("PRAGMA page_size").fetchone()[0] == 4096
         assert con.execute("PRAGMA integrity_check").fetchone()[0] == "ok"

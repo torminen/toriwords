@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §12.5",
+  "source": "Foreign account prompt, \"Add to this account\": all records marked pending, then push and full pull",
   "cases": [
     {
       "id": "032-foreign-account-add",

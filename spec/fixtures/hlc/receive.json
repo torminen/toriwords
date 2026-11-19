@@ -1,6 +1,6 @@
 {
   "kind": "hlc-receive",
-  "source": "doc 36 §11.3 Receive: standard HLC receive with ms' = max(ms, r.ms, pt); a remote r.ms more than 24 h (86,400,000 ms) ahead of pt is not adopted (state unchanged). Server skew check (§11.3, §22.1): clock ms − serverTime > 1 h (3,600,000 ms) → clock_skew",
+  "source": "HLC receive: standard HLC receive with ms' = max(ms, r.ms, pt); a remote r.ms more than 24 h (86,400,000 ms) ahead of pt is not adopted (state unchanged). Server skew check: clock ms − serverTime > 1 h (3,600,000 ms) → clock_skew",
   "cases": [
     {
       "id": "rc-001",

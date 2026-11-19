@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/day-boundary.schema.json",
-  "title": "Day number with the 04:00 boundary (doc 36 §7.2)",
+  "title": "Day number with the 04:00 boundary",
   "type": "object",
   "properties": {
     "kind": {

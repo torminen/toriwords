@@ -1,4 +1,4 @@
-"""Streaming parsers for the two kaikki.org / wiktextract JSONL shapes (doc 36 §8.1).
+"""Streaming parsers for the two kaikki.org / wiktextract JSONL shapes.
 
 enwiktionary: English entries; Russian translations live in `translations` (top level, mapped to a sense
 via `_dis1`, or inside a sense). ruwiktionary: English entries whose sense glosses are Russian definitions.

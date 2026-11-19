@@ -1,4 +1,4 @@
-"""Text keys, doc 36 §15.1. Character sets are explicit lists (see spec/fixtures/README.md)."""
+"""Text keys. Character sets are explicit lists (see spec/fixtures/README.md)."""
 
 import unicodedata
 
@@ -79,7 +79,7 @@ def search_fold(s: str) -> str:
 
 
 def source_key(title: str | None, app: str | None, kind: str) -> dict:
-    """Natural key of a Source without URL (§11.7): matchKey(title), app as stored, suggested flag."""
+    """Natural key of a Source without URL: matchKey(title), app as stored, suggested flag."""
     return {"title": match_key(title or ""), "app": app, "suggested": kind == "suggested"}
 
 

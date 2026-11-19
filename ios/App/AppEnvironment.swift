@@ -9,15 +9,13 @@ import ToriStore
 import UIKit
 import WidgetKit
 
-/// Slot for ToriSync (wired in a later step): token purge on a fresh install, launch reconciliation, sync triggers.
+/// Slot for ToriSync: sync triggers.
 @MainActor protocol SyncCoordinating: AnyObject {
-    /// Fresh install: delete Session tokens left in the Keychain by a previous installation.
-    func purgeLeftoverTokens()
-    /// Last launch step: account-state reconciliation, then a sync when signed in.
-    func syncIfSignedIn() async
-    /// Scene went to the background (ends the foreground for the session check).
+    /// Last launch step and foreground: a cycle (it checks iCloud availability itself).
+    func syncIfActive() async
+    /// Scene went to the background: pending local edits go out now.
     func didEnterBackground() async
-    /// BG app refresh: one cycle if signed in and not paused.
+    /// BG app refresh: one cycle.
     func backgroundRefresh() async
 }
 
@@ -102,7 +100,7 @@ final class AppEnvironment {
     @ObservationIgnored private var vocabularyObserver: Task<Void, Never>?
     @ObservationIgnored private var inboxObserver: InboxNotification.Observer?
 
-    /// Concrete services behind the slots, for the Account and Settings screens (9c).
+    /// Concrete services behind the slots, for the iCloud sync and Settings screens.
     let syncCoordinator = SyncCoordinator()
     let reminderScheduler = ReminderScheduler()
 
@@ -129,13 +127,11 @@ final class AppEnvironment {
                                                       appropriateFor: nil, create: true)
             let deviceName = UIDevice.current.model
             // 1–3: open/migrate, then fresh install / restore detection. Off the main actor: may migrate.
-            let (store, outcome) = try await Task.detached {
+            let store = try await Task.detached {
                 let store = try ToriStore(path: support.appending(path: "user.sqlite").path)
-                let outcome = try store.launch(deviceMarker: support.appending(path: "device-marker"),
-                                               displayName: deviceName, purgeKeychain: {})
-                return (store, outcome)
+                try store.launch(deviceMarker: support.appending(path: "device-marker"), displayName: deviceName)
+                return store
             }.value
-            if outcome == .freshInstall { sync?.purgeLeftoverTokens() }
             // 4: dictionary into the App Group.
             let dictionary = try? await dictionaryInstaller?.installIfNeeded(into: appGroup)
             // 5: inbox import, then pending enrichment, then sync.
@@ -155,7 +151,7 @@ final class AppEnvironment {
                 // After a dictionary version change `unavailable` Entries get another chance (also runs pending).
                 if dictionaryChanged { _ = try? await enrichment.updateDictionary(dictionary) }
                 else { _ = try? await enrichment.runPending() }
-                await sync?.syncIfSignedIn()
+                await sync?.syncIfActive()
             }
             scheduleAppGroupRefresh(delay: .zero)
         } catch {
@@ -171,7 +167,7 @@ final class AppEnvironment {
         if let appGroup { _ = try? store.importInbox(appGroup.inbox) }
         Task {
             _ = try? await enrichment.runPending()
-            await sync?.syncIfSignedIn()
+            await sync?.syncIfActive()
         }
     }
 

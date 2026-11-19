@@ -17,7 +17,7 @@ enum Route: Hashable {
     case accent
     case translation
     case language
-    case account
+    case cloudSync
     case data
     case export
     case tags
@@ -57,7 +57,7 @@ struct RouteView: View {
         case .accent: AccentView()
         case .translation: TranslationView()
         case .language: LanguageView()
-        case .account: AccountView(store: store)
+        case .cloudSync: CloudSyncView(store: store)
         case .data: DataView(store: store)
         case .export: ExportView(store: store)
         case .tags: TagsView(store: store)

@@ -39,7 +39,7 @@ struct AboutView: View {
             }
             Section {
                 Text("""
-                    Your vocabulary is stored on this device and, when you sign in, on the ToriWords server. \
+                    Your words are stored on this device and, if iCloud is on, in your private iCloud. Nobody else, including us, can read them. \
                     No analytics, tracking or crash-reporting SDKs; no usage data is collected. \
                     Only the crash and performance reports of iOS itself exist, if you allowed them in iOS Settings.
                     """)

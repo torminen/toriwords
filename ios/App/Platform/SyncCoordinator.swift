@@ -1,35 +1,33 @@
+import CloudKit
 import Foundation
 import Network
 import Observation
 import ToriStore
 import ToriSync
 
-/// What the Account screen (9c) binds to. `status` is nil when sync is not configured (local-only build).
+/// What Settings → iCloud sync binds to. `status` is nil until the store is open.
 @MainActor @Observable
 final class SyncStatusModel {
     fileprivate(set) var status: SyncStatus?
-    var isAvailable: Bool { status != nil }
 }
 
-/// Real `SyncCoordinating`: owns the `SyncEngine` and its triggers.
+/// Real `SyncCoordinating`: owns the `SyncEngine` over the iCloud private database and its triggers.
 @MainActor
 final class SyncCoordinator: SyncCoordinating {
+    static let container = "iCloud.com.toriwords.app"
+
     let model = SyncStatusModel()
-    let google = AppConfig.google
     private(set) var engine: SyncEngine?
-    private let baseURL = AppConfig.apiBaseURL
-    private let sessionStore = KeychainSessionStore(service: "com.toriwords.app.session")
     private var started: Task<Void, Never>?
     private var tasks: [Task<Void, Never>] = []
     private let pathMonitor = NWPathMonitor()
+    private var accountObserver: NSObjectProtocol?
 
-    func purgeLeftoverTokens() { try? sessionStore.clear() }
-
-    /// After the store opened (launch step 3). Builds the engine only when a backend is configured.
+    /// After the store opened (launch step 3).
     func attach(store: ToriStore) {
-        guard engine == nil, let baseURL, let deviceID = try? store.thisDeviceID() else { return }
-        let engine = SyncEngine(.init(store: store, transport: URLSessionTransport(baseURL: baseURL),
-                                      sessionStore: sessionStore, appVersion: AppConfig.appVersion, deviceID: deviceID))
+        guard engine == nil else { return }
+        let engine = SyncEngine(.init(store: store, cloud: CloudKitDatabase(container: Self.container),
+                                      appVersion: AppConfig.appVersion))
         self.engine = engine
         started = Task { try? await engine.start() }
         tasks.append(Task { [model] in
@@ -51,9 +49,13 @@ final class SyncCoordinator: SyncCoordinating {
             Task { await engine.networkPathChanged(satisfied: satisfied) }
         }
         pathMonitor.start(queue: DispatchQueue(label: "com.toriwords.path"))
+        // iCloud signed in/out or switched: the cycle's account check handles it.
+        accountObserver = NotificationCenter.default.addObserver(forName: .CKAccountChanged, object: nil, queue: nil) { _ in
+            Task { await engine.sync(.foreground) }
+        }
     }
 
-    func syncIfSignedIn() async {
+    func syncIfActive() async {
         await started?.value
         await engine?.foreground()
     }
@@ -65,16 +67,9 @@ final class SyncCoordinator: SyncCoordinating {
         await engine?.sync(.backgroundRefresh)
     }
 
-    // MARK: Account screen (9c)
+    // MARK: iCloud sync screen
 
-    func signIn(_ credential: SignInCredential) async throws -> SignInResult? {
-        await started?.value
-        return try await engine?.signIn(credential)
-    }
-
-    func resolveAccountChoice(_ choice: AccountChoice) async -> ChoiceResult? { await engine?.resolveAccountChoice(choice) }
-    func signOut() async throws { try await engine?.signOut() }
-    func deleteAccount(removeLocalData: Bool) async throws { try await engine?.deleteAccount(removeLocalData: removeLocalData) }
     func syncNow() async { await engine?.sync(.manual) }
-    func dismissNotice() async { await engine?.dismissNotice() }
+    func deleteCloudData() async throws { try await engine?.deleteCloudData() }
+    func backUpAgain() async throws { try await engine?.backUpAgain() }
 }

@@ -3,8 +3,7 @@ import ToriStore
 import ToriUI
 import UniformTypeIdentifiers
 
-/// Settings → Data: Export, Restore from backup, Tags, and the red
-/// "Remove all data from this device" (it also signs out).
+/// Settings → Data: Export, Restore from backup, Tags, and the red "Remove all data from this device".
 struct DataView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(Router.self) private var router
@@ -18,7 +17,7 @@ struct DataView: View {
     @State private var removal: Removal?
 
     /// What the remove confirmation warns about, read when the row is tapped.
-    struct Removal { var signedIn: Bool; var unsynced: Int }
+    struct Removal { var syncActive: Bool }
 
     var body: some View {
         List {
@@ -30,8 +29,7 @@ struct DataView: View {
             }
             Section {
                 Button("Remove all data from this device", role: .destructive) {
-                    removal = Removal(signedIn: (env.syncCoordinator.model.status?.state ?? .localOnly) != .localOnly,
-                                      unsynced: (try? store.pendingRecordCount()) ?? 0)
+                    removal = Removal(syncActive: (try? store.isOutboxActive()) ?? false)
                 }
             }
         }
@@ -72,15 +70,15 @@ struct DataView: View {
         restoring = true
         Task {
             defer { restoring = false }
-            // One sync cycle first, so words deleted on the account count as "deleted earlier".
-            await env.sync?.syncIfSignedIn()
+            // One sync cycle first, so words deleted on other devices count as "deleted earlier".
+            await env.sync?.syncIfActive()
             let scoped = url.startAccessingSecurityScopedResource()
             defer { if scoped { url.stopAccessingSecurityScopedResource() } }
             do {
                 let summary = try await Task.detached { [store] in try store.restore(try Data(contentsOf: url)) }.value
                 restored = summary
                 env.didChangeData()
-                await env.sync?.syncIfSignedIn()
+                await env.sync?.syncIfActive()
             } catch let error as StoreError {
                 restoreError = error
             } catch {
@@ -90,12 +88,8 @@ struct DataView: View {
     }
 
     private func removeAll() {
-        Task {
-            // Signing out first stops sync; then the wipe (it also clears the auth keys of sync_state).
-            try? await env.syncCoordinator.signOut()
-            try? store.removeAllDataFromDevice(signOut: {})
-            env.didChangeData()
-        }
+        try? store.removeAllDataFromDevice()
+        env.didChangeData()
     }
 }
 
@@ -107,12 +101,10 @@ enum RestoreText {
     }
 
     static func removalWarning(_ r: DataView.Removal) -> Text {
-        if !r.signedIn {
+        guard r.syncActive else {
             return Text("All your words, review history and tags are deleted from this device. This can't be undone.")
         }
-        let base = Text("Your words are deleted from this device and you are signed out. They stay in your account.")
-        guard r.unsynced > 0 else { return base }
-        return Text("\(base) \(Text("\(r.unsynced) unsynced changes will be lost."))")
+        return Text("Your words are deleted from this device. They stay in iCloud and come back at the next sync, unless you delete iCloud data in Settings → iCloud sync.")
     }
 }
 

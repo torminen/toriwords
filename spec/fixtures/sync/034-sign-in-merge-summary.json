@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §12.6",
+  "source": "Merge summary after the first sync of a sign-in: counts from this device, from the account, and in both",
   "cases": [
     {
       "id": "034-sign-in-merge-summary",

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/hlc-local-write.schema.json",
-  "title": "HLC local write (doc 36 §11.3)",
+  "title": "HLC local write",
   "type": "object",
   "properties": {
     "kind": {

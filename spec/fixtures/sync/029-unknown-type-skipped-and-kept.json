@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.8",
+  "source": "Schema evolution: unknown record types are skipped on pull and kept on the server",
   "cases": [
     {
       "id": "029-unknown-type-skipped-and-kept",

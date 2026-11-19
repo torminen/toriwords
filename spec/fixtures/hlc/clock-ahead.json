@@ -1,6 +1,6 @@
 {
   "kind": "hlc-clock-ahead",
-  "source": "doc 36 §11.5 step 2: if hlc.ms − lastServerTime > 1 h: hlc = {ms: max(lastServerTime, now), counter: 0}, then every pending outbox field gets a new local-write clock (§11.3) in outbox order. expected.state is the state after re-stamping",
+  "source": "Clock-ahead recovery before push: if hlc.ms − lastServerTime > 1 h: hlc = {ms: max(lastServerTime, now), counter: 0}, then every pending outbox field gets a new local-write clock in outbox order. expected.state is the state after re-stamping",
   "node": "0123456789abcdef",
   "cases": [
     {

@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §21.4, §22.2",
+  "source": "Server merge-group purge on delete: fields of a deleted group are cleared and later pushes into it discarded",
   "cases": [
     {
       "id": "031-merge-group-purge",

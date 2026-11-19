@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.6 step 5",
+  "source": "A field change on a merged loser re-runs the survivor field merge, so a newer user value reaches the survivor",
   "cases": [
     {
       "id": "025-merge-loser-edit-reaches-survivor",

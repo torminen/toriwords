@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §12.4, §12.5 (N = 0)",
+  "source": "Foreign account with N = 0 local words: no prompt, silent Remove",
   "cases": [
     {
       "id": "018-foreign-account-empty-silent-remove",

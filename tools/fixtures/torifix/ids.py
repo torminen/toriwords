@@ -1,4 +1,4 @@
-"""IDs, doc 36 §11.2."""
+"""IDs: UUIDv5 names, UUIDv7 layout, unsigned byte order."""
 
 import uuid
 

@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §6.4, §11.2",
+  "source": "Enrichment on two devices creates the same auto Sense through deterministic UUIDv5 IDs",
   "cases": [
     {
       "id": "019-enrichment-on-two-devices-same-autosense",

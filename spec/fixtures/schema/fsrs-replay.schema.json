@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/fsrs-replay.schema.json",
-  "title": "Card state replay (doc 36 §7.6)",
+  "title": "Card state replay",
   "type": "object",
   "properties": {
     "kind": {

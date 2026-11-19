@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.7 EntryTag membership",
+  "source": "EntryTag membership = OR of present over all EntryTag records of the pair; untag writes present = 0 to every one",
   "cases": [
     {
       "id": "015-untag-vs-concurrent-tag-or",

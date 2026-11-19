@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.3",
+  "source": "Field comparator: a user edit (rank 1) beats a later automatic value (rank 0)",
   "cases": [
     {
       "id": "004-user-edit-beats-later-automatic",

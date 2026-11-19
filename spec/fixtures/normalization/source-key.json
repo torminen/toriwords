@@ -1,6 +1,6 @@
 {
   "kind": "source-key",
-  "source": "doc 36 §15.1 Source key without URL, §11.7 natural key: matchKey(title) (null title → \"\"), app exactly as stored (null stays null), suggested = (kind == \"suggested\") (CH-24, AQ-19)",
+  "source": "Natural key of a Source without URL: matchKey(title) (null title → \"\"), app exactly as stored (null stays null), suggested = (kind == \"suggested\")",
   "cases": [
     { "id": "src-001", "input": { "title": "The Bear S2", "app": null, "kind": "other" }, "expected": { "title": "the bear s2", "app": null, "suggested": false } },
     { "id": "src-002", "input": { "title": "  The  Bear S2! ", "app": null, "kind": "app" }, "expected": { "title": "the bear s2", "app": null, "suggested": false }, "note": "kind other than suggested does not take part" },

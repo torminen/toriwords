@@ -1,6 +1,6 @@
 {
   "kind": "fsrs-step",
-  "source": "doc 36 §7.3–7.5 (FSRS-6 step, intervals, fuzz), §7.6 stage. state = previous state or null for a new card. expected.interval = rounded interval before fuzz (null when dueDay = reviewDay). S and D within 1e-9 relative; everything else exact",
+  "source": "FSRS-6 step, intervals, fuzz and stage. state = previous state or null for a new card. expected.interval = rounded interval before fuzz (null when dueDay = reviewDay). S and D within 1e-9 relative; everything else exact",
   "params": {
     "w": [
       0.212,

@@ -1,6 +1,6 @@
 {
   "kind": "merge-envelope",
-  "source": "doc 36 §11.1 envelope, §11.3 Envelope merge, §22.1: deleted = OR; mergedInto non-null beats null, smaller ID (unsigned bytes) beats larger; fields per field with the comparator; unknown fields kept; disjoint sets unioned; a tombstone drops all field values (fields = {}); schema = max; id, type, owner equal on both sides. Runners also assert merge(remote, local) == merge(local, remote) and, when remotePartial is present, merge(local, remotePartial) == expected",
+  "source": "Envelope merge: deleted = OR; mergedInto non-null beats null, smaller ID (unsigned bytes) beats larger; fields per field with the comparator; unknown fields kept; disjoint sets unioned; a tombstone drops all field values (fields = {}); schema = max; id, type, owner equal on both sides. Runners also assert merge(remote, local) == merge(local, remote) and, when remotePartial is present, merge(local, remotePartial) == expected",
   "cases": [
     {
       "id": "env-001",
@@ -508,7 +508,7 @@
           }
         }
       },
-      "note": "schema = max of both sides (AQ-7)"
+      "note": "schema = max of both sides (pending owner confirmation)"
     },
     {
       "id": "env-011",

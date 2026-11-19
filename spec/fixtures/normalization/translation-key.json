@@ -1,7 +1,7 @@
 {
   "kind": "text-key",
   "function": "translationKey",
-  "source": "doc 36 §15.1 (translation key = match key), §11.7 Sense natural key",
+  "source": "Translation key = match key; Sense natural key",
   "cases": [
     { "id": "tk-001", "input": "Бежать", "expected": "бежать", "note": "Бежать" },
     { "id": "tk-002", "input": "  Взлететь!", "expected": "взлететь", "note": "  Взлететь!" },

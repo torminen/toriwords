@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/fsrs-step.schema.json",
-  "title": "One FSRS-6 step (doc 36 §7.3–7.6)",
+  "title": "One FSRS-6 step",
   "type": "object",
   "properties": {
     "kind": {

@@ -1,7 +1,7 @@
 {
   "kind": "text-key",
   "function": "sentenceKey",
-  "source": "doc 36 §15.1 Sentence key: match-key steps 1–3, whitespace collapsed/trimmed, ё→е (and Ё→Е); case and punctuation kept",
+  "source": "Sentence key: match-key steps 1–3, whitespace collapsed/trimmed, ё→е (and Ё→Е); case and punctuation kept",
   "cases": [
     { "id": "sk-001", "input": "He  said “Hi”.", "expected": "He said \"Hi\".", "note": "quotes mapped, punctuation and case kept" },
     { "id": "sk-002", "input": "  Run!  ", "expected": "Run!" },

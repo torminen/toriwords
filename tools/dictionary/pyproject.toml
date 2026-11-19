@@ -1,7 +1,7 @@
 [project]
 name = "toridict"
 version = "0.1.0"
-description = "Toriwords dictionary build: kaikki.org en/ru Wiktionary JSONL + wordfreq -> deterministic dictionary.sqlite (doc 36 §8)"
+description = "Toriwords dictionary build: kaikki.org en/ru Wiktionary JSONL + wordfreq -> deterministic dictionary.sqlite"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "wordfreq==3.1.1",

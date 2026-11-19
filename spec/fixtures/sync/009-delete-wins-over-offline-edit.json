@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.7 (S4)",
+  "source": "Delete wins: a deleted record never comes back, even after an offline edit",
   "cases": [
     {
       "id": "009-delete-wins-over-offline-edit",

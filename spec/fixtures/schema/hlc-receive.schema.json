@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/hlc-receive.schema.json",
-  "title": "HLC receive and server skew check (doc 36 §11.3, §22.1)",
+  "title": "HLC receive and server skew check",
   "type": "object",
   "properties": {
     "kind": {

@@ -1,6 +1,6 @@
 {
   "kind": "uuid-order",
-  "source": "doc 36 \u00a74.1, \u00a711.2: IDs compared as unsigned bytes (smallest ID = survivor, sort tie-breaks). expected: -1 a<b, 0 equal, 1 a>b. Sort cases: input sorted ascending",
+  "source": "IDs compared as unsigned bytes (smallest ID = survivor, sort tie-breaks). expected: -1 a<b, 0 equal, 1 a>b. Sort cases: input sorted ascending",
   "cases": [
     {
       "id": "cmp-001",

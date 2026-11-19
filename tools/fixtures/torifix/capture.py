@@ -1,4 +1,4 @@
-"""Capture text rules, doc 36 §5.2. Lengths and cuts count Unicode code points;
+"""Capture text rules. Lengths and cuts count Unicode code points;
 highlight offsets/lengths are UTF-16 code units of the stored sentence."""
 
 import re
@@ -156,7 +156,7 @@ def _is_word_char(c: str) -> bool:
 
 
 def typed_highlight(sentence: str, entry_text: str) -> dict | None:
-    """§5.2 item 6: first occurrence of the Entry text at word boundaries, match-key folded."""
+    """Highlight for typed sentences: first occurrence of the Entry text at word boundaries, match-key folded."""
     key = match_key(entry_text)
     if not key:
         return None

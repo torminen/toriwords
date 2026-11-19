@@ -1,1 +1,1 @@
-"""Toriwords dictionary build (doc 36 §8)."""
+"""Toriwords dictionary build."""

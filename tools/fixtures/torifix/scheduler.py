@@ -1,4 +1,4 @@
-"""FSRS-6, day model, replay, daily queue and widget snapshot: doc 36 §7.2–7.7, §10.1."""
+"""FSRS-6, day model, replay, daily queue and widget snapshot."""
 
 import hashlib
 import math
@@ -13,13 +13,13 @@ MAX_INTERVAL = 36500
 DIRECTION_ORDER = {"recognition": 0, "recall": 1, "cloze": 2}
 
 
-# --- day model (§7.2) ---------------------------------------------------------------------------
+# --- day model ---------------------------------------------------------------------------------
 
 def day_number(t_ms: int, offset_min: int) -> int:
     return (t_ms // 1000 + offset_min * 60 - 4 * 3600) // 86400  # Python // is floor division
 
 
-# --- FSRS-6 (§7.3–7.5) --------------------------------------------------------------------------
+# --- FSRS-6 --------------------------------------------------------------------------------------
 
 def round_half_up(x: float) -> int:
     return math.floor(x + 0.5)
@@ -89,7 +89,7 @@ def step(state: CardState | None, card_id: str, day: int, g: int, w=W, r=DESIRED
         d_new = _clamp(w[7] * _d0(4, w) + (1 - w[7]) * d_prime, 1, 10)
         if t == 0:
             inc = math.exp(w[17] * (g - 3 + w[18])) * math.pow(s, -w[19])
-            if g >= 2:  # py-fsrs 6.3.3 (AQ-17): Hard, Good and Easy; doc 36 §7.3 said G ≥ 3
+            if g >= 2:  # as py-fsrs 6.3.3: the same-day floor applies to Hard, Good and Easy
                 inc = max(inc, 1.0)
             s_new = s * inc
         else:
@@ -112,7 +112,7 @@ def step(state: CardState | None, card_id: str, day: int, g: int, w=W, r=DESIRED
     return CardState(s_new, d_new, day, due, reps, lapses, g, ivl)
 
 
-# --- replay (§7.6) ------------------------------------------------------------------------------
+# --- replay ------------------------------------------------------------------------------------
 
 @dataclass(frozen=True)
 class Log:
@@ -138,7 +138,7 @@ def replay(card_id: str, logs: list[Log], w=W, r=DESIRED_RETENTION) -> CardState
     return state
 
 
-# --- daily queue (§7.7) and snapshot (§10.1) -----------------------------------------------------
+# --- daily queue and snapshot -------------------------------------------------------------------
 
 @dataclass
 class Card:

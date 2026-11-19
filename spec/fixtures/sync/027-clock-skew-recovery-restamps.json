@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "Clock-ahead recovery before push: reset the HLC and re-stamp every pending outbox field",
+  "source": "Clock-ahead recovery at cycle start: the HLC is more than 1 h ahead of the last cloud modification date (lastServerTime), so it is reset and every pending outbox field is re-stamped",
   "cases": [
     {
       "id": "027-clock-skew-recovery-restamps",
@@ -24,13 +24,13 @@
         {
           "t": 10,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
           "t": 20,
           "device": "B",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
@@ -46,11 +46,6 @@
           "entry": "run",
           "field": "note",
           "value": "ahead"
-        },
-        {
-          "t": 120,
-          "device": "A",
-          "op": "sync"
         },
         {
           "t": 200,
@@ -106,11 +101,8 @@
                 "note": "later on B"
               }
             ],
-            "account": {
+            "sync": {
               "state": "synced",
-              "signedIn": "alice",
-              "lastSynced": "alice",
-              "pendingChoice": false,
               "outbox": 0
             }
           },
@@ -121,11 +113,8 @@
                 "note": "later on B"
               }
             ],
-            "account": {
+            "sync": {
               "state": "synced",
-              "signedIn": "alice",
-              "lastSynced": "alice",
-              "pendingChoice": false,
               "outbox": 0
             }
           }
@@ -135,7 +124,7 @@
           "B"
         ]
       },
-      "note": "The re-stamped clock is the real time of the sync, so B's later edit wins."
+      "note": "A's clock runs 2 h ahead while it edits; the edit stays pending. lastServerTime is the cloud modification date of A's first save (t = 10, cloud now). After the clock is fixed the cycle re-stamps the pending field with the real time, so B's later edit wins."
     }
   ]
 }

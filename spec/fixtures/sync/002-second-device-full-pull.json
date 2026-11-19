@@ -4,7 +4,7 @@
   "cases": [
     {
       "id": "002-second-device-full-pull",
-      "title": "A new device signs in and gets everything by a full pull",
+      "title": "A new device enables sync and gets everything by a full fetch",
       "start": 1762776000000,
       "devices": {
         "A": {},
@@ -35,13 +35,13 @@
         {
           "t": 10,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
           "t": 20,
           "device": "B",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
@@ -70,20 +70,12 @@
                 ]
               }
             ],
-            "account": {
+            "sync": {
               "state": "synced",
-              "signedIn": "alice",
-              "lastSynced": "alice",
-              "pendingChoice": false,
               "outbox": 0
-            },
-            "notices": []
+            }
           },
-          "A": {
-            "notices": [
-              "backedUp"
-            ]
-          }
+          "A": {}
         },
         "converged": [
           "A",

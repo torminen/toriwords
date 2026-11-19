@@ -34,13 +34,13 @@
         {
           "t": 8,
           "device": "B",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
           "t": 20,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
@@ -84,7 +84,7 @@
             "words": []
           }
         },
-        "hub": {
+        "cloud": {
           "alice": {
             "entries": {
               "live": 0,
@@ -102,7 +102,7 @@
           "B"
         ]
       },
-      "note": "A merged B's 'run' into its own (smaller ID). B, unaware, deleted its record; the tombstone lands on a merge group member, so the client writes the tombstone on the survivor (rank 0, outbox) and pushes it next cycle."
+      "note": "A merged B's 'run' into its own (smaller ID). B, unaware, deleted its record; the tombstone lands on a merge group member, so the client writes the tombstone on the survivor (rank 0, outbox) and pushes it next cycle. Once that tombstone is saved, the client deletes the group's child records from the cloud and the other Entry becomes a value-less tombstone."
     }
   ]
 }

@@ -1,10 +1,10 @@
 {
   "kind": "sync-scenario",
-  "source": "First sign-in: all local records marked pending, pushed, then pulled; local data uploaded to an empty account shows \"Your vocabulary is backed up.\"",
+  "source": "First sync for an iCloud user: all local records marked pending, saved to the cloud, then fetched; the zone and its generation are created",
   "cases": [
     {
-      "id": "001-first-sign-in-backs-up",
-      "title": "First sign-in uploads local words to an empty account",
+      "id": "001-first-sync-backs-up",
+      "title": "First sync uploads local words to an empty iCloud zone",
       "start": 1762776000000,
       "devices": {
         "A": {}
@@ -23,7 +23,7 @@
         {
           "t": 10,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         }
       ],
@@ -39,19 +39,13 @@
                 "reviews": 0
               }
             ],
-            "account": {
+            "sync": {
               "state": "synced",
-              "signedIn": "alice",
-              "lastSynced": "alice",
-              "pendingChoice": false,
               "outbox": 0
-            },
-            "notices": [
-              "backedUp"
-            ]
+            }
           }
         },
-        "hub": {
+        "cloud": {
           "alice": {
             "entries": {
               "live": 1,

@@ -1,0 +1,110 @@
+{
+  "kind": "sync-scenario",
+  "source": "Conflict: a save with a stale change tag is rejected; the client merges the server copy (HLC per field), stores its system fields and re-sends the merged record",
+  "cases": [
+    {
+      "id": "037-conflicting-save-merges-and-resends",
+      "title": "A save that loses the race to another device merges and re-sends",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "enableSync",
+          "account": "alice"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "enableSync",
+          "account": "alice"
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "editField",
+          "entry": "run",
+          "field": "note",
+          "value": "from A"
+        },
+        {
+          "t": 40,
+          "device": "B",
+          "op": "editField",
+          "entry": "run",
+          "field": "ipa",
+          "value": "rʌn"
+        },
+        {
+          "t": 50,
+          "device": "B",
+          "op": "sync",
+          "racedBy": "A"
+        },
+        {
+          "t": 60,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "note": "A's sync runs between B's fetch and B's save, so B's change tag for the Entry is stale.",
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run",
+                "note": "from A",
+                "ipa": "rʌn"
+              }
+            ],
+            "sync": {
+              "state": "synced",
+              "outbox": 0
+            }
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run",
+                "note": "from A",
+                "ipa": "rʌn"
+              }
+            ],
+            "sync": {
+              "state": "synced",
+              "outbox": 0
+            }
+          }
+        },
+        "cloud": {
+          "alice": {
+            "entries": {
+              "live": 1,
+              "deleted": 0,
+              "merged": 0
+            }
+          }
+        },
+        "converged": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  ]
+}

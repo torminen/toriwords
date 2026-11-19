@@ -34,13 +34,13 @@
         {
           "t": 10,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
           "t": 20,
           "device": "B",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
@@ -75,9 +75,6 @@
                   "снять"
                 ]
               }
-            ],
-            "notices": [
-              "backedUp"
             ]
           },
           "B": {
@@ -89,13 +86,10 @@
                   "снять"
                 ]
               }
-            ],
-            "notices": [
-              "mergeSummary:0/0/1"
             ]
           }
         },
-        "hub": {
+        "cloud": {
           "alice": {
             "entries": {
               "live": 1,

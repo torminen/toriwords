@@ -1,10 +1,10 @@
 {
   "kind": "sync-scenario",
-  "source": "Server merge-group purge on delete: fields of a deleted group are cleared and later pushes into it discarded",
+  "source": "Cloud purge: once an Entry tombstone is saved, the client deletes the merge group's child records from the cloud and writes the group's other Entries as value-less tombstones",
   "cases": [
     {
-      "id": "031-merge-group-purge",
-      "title": "A merges X into Y while B deletes X: the whole group is purged on the server",
+      "id": "038-merge-vs-delete-purges-group-in-cloud",
+      "title": "A merges X into Y while B deletes X: the group's children leave the cloud",
       "start": 1762776000000,
       "devices": {
         "A": {},
@@ -25,7 +25,7 @@
           "t": 5,
           "device": "A",
           "op": "capture",
-          "term": "runn",
+          "term": "sprint",
           "translations": [
             "мчаться"
           ],
@@ -34,81 +34,81 @@
         {
           "t": 10,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
           "t": 20,
           "device": "B",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
-          "t": 100,
+          "t": 30,
           "device": "A",
           "op": "mergeByEdit",
           "entry": "x",
           "text": "run"
         },
         {
-          "t": 110,
-          "device": "A",
-          "op": "pushOnly"
-        },
-        {
-          "t": 120,
+          "t": 40,
           "device": "B",
           "op": "delete",
           "entry": "x"
         },
         {
-          "t": 130,
-          "device": "B",
-          "op": "pushOnly"
-        },
-        {
-          "t": 140,
-          "device": "A",
-          "op": "tag",
-          "entry": "y",
-          "name": "verbs"
-        },
-        {
-          "t": 150,
-          "device": "A",
-          "op": "pushOnly"
-        },
-        {
-          "t": 200,
+          "t": 50,
           "device": "A",
           "op": "sync"
         },
         {
-          "t": 201,
+          "t": 60,
           "device": "B",
           "op": "sync"
         },
         {
-          "t": 202,
+          "t": 70,
           "device": "A",
           "op": "sync"
         },
         {
-          "t": 203,
+          "t": 80,
           "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 90,
+          "device": "A",
           "op": "sync"
         }
       ],
+      "note": "The cloud never merges or purges; the device that saves the tombstone deletes the children, and a device that fetches it purges its own copies.",
       "expected": {
         "devices": {
           "A": {
-            "words": []
+            "words": [],
+            "tombstones": [
+              "x",
+              "y"
+            ],
+            "sync": {
+              "state": "synced",
+              "outbox": 0
+            }
           },
           "B": {
-            "words": []
+            "words": [],
+            "tombstones": [
+              "x",
+              "y"
+            ],
+            "sync": {
+              "state": "synced",
+              "outbox": 0
+            }
           }
         },
-        "hub": {
+        "cloud": {
           "alice": {
             "entries": {
               "live": 0,
@@ -125,8 +125,7 @@
           "A",
           "B"
         ]
-      },
-      "note": "The EntryTag pushed after the purge is acknowledged and discarded (empty payload)."
+      }
     }
   ]
 }

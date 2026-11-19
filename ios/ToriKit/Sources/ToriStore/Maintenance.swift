@@ -267,6 +267,14 @@ enum Replay {
         guard !cards.isEmpty else { return }
         let (p, paramsID) = try parameters(db)
         for id in cards {
+            // A merged-away card has no cache, however it got here (merged locally or pulled already merged).
+            if let canonical = try ToriID.fetchOne(db, sql: "SELECT canonical_card_id FROM card WHERE id = ?", arguments: [id]), canonical != id {
+                try db.execute(sql: """
+                    UPDATE card SET stability = NULL, difficulty = NULL, last_review_day = NULL, due_day = NULL, reps = NULL, lapses = NULL,
+                    stage = NULL, params_id = NULL WHERE id = ?
+                    """, arguments: [id])
+                continue
+            }
             let logs = try Row.fetchAll(db, sql: """
                 SELECT id, reviewed_at, utc_offset_min, rating FROM review_log WHERE canonical_card_id = ? AND reviewed_at IS NOT NULL
                 """, arguments: [id]).map { r in

@@ -28,13 +28,13 @@
         {
           "t": 10,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
           "t": 20,
           "device": "B",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {

@@ -28,7 +28,7 @@
         {
           "t": 10,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
@@ -47,7 +47,7 @@
         {
           "t": 40,
           "device": "B",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice",
           "limit": 1
         },

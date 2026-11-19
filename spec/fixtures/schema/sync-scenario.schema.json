@@ -70,15 +70,14 @@
                     "tag",
                     "untag",
                     "mergeByEdit",
-                    "signIn",
+                    "enableSync",
                     "sync",
-                    "pullOnly",
-                    "pushOnly",
                     "setSettings",
                     "upgradeSchema",
-                    "accountChoice",
-                    "signOut",
-                    "deleteAccount",
+                    "cloudOff",
+                    "cloudSwitch",
+                    "deleteCloudData",
+                    "backUpAgain",
                     "network",
                     "setClock"
                   ]
@@ -157,11 +156,25 @@
                   "type": "string"
                 },
                 "account": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "enableSync / upgradeSchema: the iCloud user"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "cloudSwitch: the new iCloud user"
+                },
+                "inSettings": {
+                  "type": "boolean",
+                  "description": "deleteCloudData: deleted in iOS Settings (userDeletedZone) instead of in the app"
+                },
+                "racedBy": {
+                  "type": "string",
+                  "description": "sync: this device's whole sync runs between the step device's fetch and its first save"
                 },
                 "limit": {
                   "type": "integer",
-                  "minimum": 1
+                  "minimum": 1,
+                  "description": "enableSync / sync: cloud page limit for this step"
                 },
                 "newWordsPerDay": {
                   "type": "integer",
@@ -171,16 +184,6 @@
                   "type": "number",
                   "exclusiveMinimum": 0,
                   "exclusiveMaximum": 1
-                },
-                "choice": {
-                  "enum": [
-                    "add",
-                    "remove",
-                    "cancel"
-                  ]
-                },
-                "removeLocal": {
-                  "type": "boolean"
                 },
                 "online": {
                   "type": "boolean"
@@ -240,24 +243,56 @@
                 "op"
               ],
               "additionalProperties": false,
-              "if": {
-                "properties": {
-                  "op": {
-                    "const": "upgradeSchema"
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "op": {
+                        "const": "upgradeSchema"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "account",
+                      "records"
+                    ]
+                  },
+                  "else": {
+                    "required": [
+                      "device"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "op": {
+                        "const": "enableSync"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "account"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "op": {
+                        "const": "cloudSwitch"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "to"
+                    ]
                   }
                 }
-              },
-              "then": {
-                "required": [
-                  "account",
-                  "records"
-                ]
-              },
-              "else": {
-                "required": [
-                  "device"
-                ]
-              }
+              ]
             }
           },
           "expected": {
@@ -341,36 +376,34 @@
                       },
                       "additionalProperties": false
                     },
-                    "account": {
+                    "tombstones": {
+                      "type": "array",
+                      "description": "Aliases whose Entry is a value-less tombstone on this device",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "sync": {
                       "type": "object",
                       "properties": {
                         "state": {
                           "enum": [
-                            "localOnly",
-                            "firstSync",
+                            "idle",
                             "syncing",
                             "synced",
                             "waitingForNetwork",
-                            "unreachable",
-                            "clockSkew",
-                            "updateRequired",
-                            "paused"
+                            "iCloudOff",
+                            "quotaFull",
+                            "cloudDeleted"
                           ]
                         },
-                        "signedIn": {
+                        "user": {
                           "type": [
                             "string",
                             "null"
-                          ]
-                        },
-                        "lastSynced": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "pendingChoice": {
-                          "type": "boolean"
+                          ],
+                          "description": "The iCloud user the outbox syncs to (cloudUser)"
                         },
                         "outbox": {
                           "type": "integer",
@@ -378,19 +411,12 @@
                         }
                       },
                       "additionalProperties": false
-                    },
-                    "notices": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "pattern": "^(accountPrompt:[0-9]+|mergeSummary:[0-9]+/[0-9]+/[0-9]+|backedUp|signedOut|accountDeletedElsewhere|removeNeedsNetwork)$"
-                      }
                     }
                   },
                   "additionalProperties": false
                 }
               },
-              "hub": {
+              "cloud": {
                 "type": "object",
                 "additionalProperties": {
                   "type": "object",
@@ -423,7 +449,8 @@
                       "items": {
                         "type": "string",
                         "minLength": 1
-                      }
+                      },
+                      "description": "Aliases whose Entry has no child records left in the cloud and is a value-less tombstone there"
                     },
                     "types": {
                       "type": "object",
@@ -434,7 +461,8 @@
                     }
                   },
                   "additionalProperties": false
-                }
+                },
+                "description": "Records in the in-memory cloud, per iCloud user"
               },
               "converged": {
                 "type": "array",

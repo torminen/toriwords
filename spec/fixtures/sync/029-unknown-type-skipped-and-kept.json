@@ -1,10 +1,10 @@
 {
   "kind": "sync-scenario",
-  "source": "Schema evolution: unknown record types are skipped on pull and kept on the server",
+  "source": "Schema evolution: unknown record types are skipped on pull and kept in the cloud",
   "cases": [
     {
       "id": "029-unknown-type-skipped-and-kept",
-      "title": "A record type from a newer app is skipped on pull and kept on the server",
+      "title": "A record type from a newer app is skipped on pull and kept in the cloud",
       "start": 1762776000000,
       "devices": {
         "A": {}
@@ -23,7 +23,7 @@
         {
           "t": 10,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
@@ -72,16 +72,13 @@
                 "note": "still syncing"
               }
             ],
-            "account": {
+            "sync": {
               "state": "synced",
-              "signedIn": "alice",
-              "lastSynced": "alice",
-              "pendingChoice": false,
               "outbox": 0
             }
           }
         },
-        "hub": {
+        "cloud": {
           "alice": {
             "types": {
               "deck": 1

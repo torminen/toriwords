@@ -72,15 +72,15 @@ final class InMemoryCloud: @unchecked Sendable {
         }
     }
 
-    private var interleaved: (@Sendable () -> Void)?
+    private var interleaved: (@Sendable () async -> Void)?
 
     /// Runs `body` once, right before the next save (another device writing between this device's pull and push).
-    func beforeNextSave(_ body: @escaping @Sendable () -> Void) { lock.withLock { interleaved = body } }
+    func beforeNextSave(_ body: @escaping @Sendable () async -> Void) { lock.withLock { interleaved = body } }
 
     /// Every save request's size, including failed ones.
     func noteBatch(_ size: Int) { lock.withLock { savedBatchSizes.append(size) } }
 
-    func takeInterleaved() -> (@Sendable () -> Void)? {
+    func takeInterleaved() -> (@Sendable () async -> Void)? {
         lock.withLock {
             defer { interleaved = nil }
             return interleaved
@@ -253,7 +253,7 @@ final class CloudLink: CloudDatabase, @unchecked Sendable {
     func claimZoneGeneration(_ generation: String) async throws -> String { try run(.claimZoneGeneration) { try cloud.claim($0, generation) } }
     func fetchChanges(token: Data?) async throws -> CloudChanges { try run(.fetchChanges) { try cloud.fetch($0, token: token) } }
     func save(_ records: [CloudRecord]) async throws -> [ToriID: SaveOutcome] {
-        cloud.takeInterleaved()?()
+        if let interleaved = cloud.takeInterleaved() { await interleaved() }
         cloud.noteBatch(records.count)
         return try run(.save) { try cloud.save($0, records) }
     }

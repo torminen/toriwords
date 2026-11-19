@@ -48,13 +48,13 @@
         {
           "t": 300,
           "device": "A",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {
           "t": 310,
           "device": "B",
-          "op": "signIn",
+          "op": "enableSync",
           "account": "alice"
         },
         {

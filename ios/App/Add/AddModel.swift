@@ -124,7 +124,7 @@ final class AddModel {
         existing = saved.map { Existing(id: $0.id, status: $0.status) }
         resumeLearning = false
         let suggestions = await env.enrichment?.suggestions(for: word) ?? []
-        ipa = saved?.ipa ?? (await env.enrichment?.ipa(for: word))
+        if let savedIPA = saved?.ipa { ipa = savedIPA } else { ipa = await env.enrichment?.ipa(for: word) }
         d.setSuggestions(suggestions, existing: saved?.senses.compactMap(\.translation) ?? [], existingEntry: saved?.id)
         draft = d
         sentenceChanged()

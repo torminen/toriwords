@@ -1,13 +1,13 @@
 # ToriWords for iOS
 
-The native iOS app (SwiftUI, iOS 26+) and its Swift package **ToriKit**. The architecture spec is doc 36. The product
+The native iOS app (SwiftUI, iOS 18+) and its Swift package **ToriKit**. The architecture spec is doc 36. The product
 spec is doc 34 and the UI spec is doc 35.
 
 ## Prerequisites
 
 | Tool | Version | Pinned in |
 |---|---|---|
-| Xcode | 27.x (iOS 27 SDK; deployment target iOS 26) | `.github/workflows/ios.yml` (`XCODE_VERSION`) |
+| Xcode | 27.x (iOS 27 SDK; deployment target iOS 18) | `.github/workflows/ios.yml` (`XCODE_VERSION`) |
 | Tuist | see file | `ios/.tuist-version` |
 | Swift on Linux (ToriKit tests only) | see file | repo-root `.swift-version` |
 | uv + Python 3.12 (fixtures, dictionary tools) | — | `tools/*/pyproject.toml` |
@@ -107,7 +107,7 @@ The app reads these values from Info.plist keys (`ToriAPIBaseURL`, `ToriGoogleCl
 | `ToriwordsShare` | `com.toriwords.app.share` | Share Extension (text, one web URL, Safari web page with `ExtensionPreprocessing.js`). Entitlement: App Group. |
 | `ToriwordsWidget` | `com.toriwords.app.widget` | WidgetKit (small, medium, lock-screen circular and rectangular). Entitlement: App Group. |
 
-All three targets: iOS 26.0, Swift 6 language mode, `CFBundleLocalizations` en + ru. The app sets
+All three targets: iOS 18.0, Swift 6 language mode, `CFBundleLocalizations` en + ru. The app sets
 `ITSAppUsesNonExemptEncryption = NO` and is portrait-only on iPhone (all orientations on iPad). The Keychain session
 item uses the app's default access group, so no Keychain Sharing entitlement is needed.
 

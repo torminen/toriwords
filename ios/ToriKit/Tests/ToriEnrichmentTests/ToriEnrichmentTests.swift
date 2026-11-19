@@ -17,13 +17,17 @@ final class FakeTranslator: MachineTranslator, @unchecked Sendable {
     private var _ready: Bool
     private var _results: [String: String?]
     private var _calls = 0
+    private var _cancelled = false
     init(ready: Bool = true, results: [String: String?] = [:]) { _ready = ready; _results = results }
+    /// Every `translate` throws `CancellationError`, like the bridge once the app leaves the foreground.
+    var cancelled: Bool { get { lock.withLock { _cancelled } } set { lock.withLock { _cancelled = newValue } } }
     var ready: Bool { get { lock.withLock { _ready } } set { lock.withLock { _ready = newValue } } }
     var calls: Int { lock.withLock { _calls } }
     func isReady() async -> Bool { ready }
     func translate(_ text: String) async throws -> String? {
         try lock.withLock {
             _calls += 1
+            if _cancelled { throw CancellationError() }
             guard let r = _results[text] else { throw URLError(.notConnectedToInternet) }
             return r
         }
@@ -116,6 +120,23 @@ struct Harness {
     for _ in 0..<5 { #expect(try await o.runPending().deferred == 1) }
     #expect(mt.calls == 0)
     #expect(try h.entry(id).translation == .pending)
+}
+
+@Test func cancelledMTDefersWithoutCountingAttempts() async throws {
+    let h = try Harness()
+    let ids = try ["gobbledygook", "flibbertigibbet", "brouhaha"].map { try h.capture($0) }
+    let mt = FakeTranslator(results: ["gobbledygook": "тарабарщина"])
+    mt.cancelled = true
+    let o = h.orchestrator(FakeDictionary(), mt)
+    for _ in 0..<4 {
+        let summary = try await o.runPending()
+        #expect(summary.deferred == 3 && summary.failed == 0)
+    }
+    #expect(mt.calls == 4) // One cancelled attempt per pass; the rest of the pass is deferred.
+    for id in ids { #expect(try h.entry(id).translation == .pending) }
+    // MT is back: no backoff was recorded, so the next pass fills at once.
+    mt.cancelled = false
+    #expect(try await o.runPending().filled == 1)
 }
 
 @Test func threeMTFailuresMakeUnavailableWithBackoff() async throws {

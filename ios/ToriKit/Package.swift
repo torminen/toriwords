@@ -9,7 +9,7 @@ let crypto = Target.Dependency.product(
 
 let package = Package(
     name: "ToriKit",
-    platforms: [.iOS(.v26), .macOS(.v15)],
+    platforms: [.iOS(.v18), .macOS(.v15)],
     products: [
         .library(name: "ToriCore", targets: ["ToriCore"]),
         .library(name: "ToriShared", targets: ["ToriShared"]),

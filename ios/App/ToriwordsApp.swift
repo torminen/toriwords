@@ -52,7 +52,7 @@ struct RootView: View {
             await env.translationBridge.serve(session)
         }
         .task { await env.launch() }
-        .onChange(of: scenePhase) { _, phase in
+        .onChange(of: scenePhase, initial: true) { _, phase in
             switch phase {
             case .active: env.didBecomeActive()
             case .background: env.didEnterBackground()

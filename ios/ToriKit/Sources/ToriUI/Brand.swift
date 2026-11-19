@@ -1,7 +1,7 @@
 #if canImport(SwiftUI)
 import SwiftUI
 
-/// Logo B: a T-bar roof over a W (doc 35 §4).
+/// Logo B: a T-bar roof over a W.
 public struct LogoMark: View {
     public var size: CGFloat
 

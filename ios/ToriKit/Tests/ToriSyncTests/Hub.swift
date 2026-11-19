@@ -2,8 +2,8 @@ import Foundation
 import ToriCore
 @testable import ToriSync
 
-/// In-memory backend for tests: the server side of doc 36 §21 (envelope merge only, per-user `seq` cursor,
-/// merge-group purge, validation) plus the session rules of §19.3/§20.4 that the client depends on.
+/// In-memory backend for tests: the server side of sync (envelope merge only, per-user `seq` cursor,
+/// merge-group purge, validation) plus the auth and session rules that the client depends on.
 /// Google `idToken` / Apple `identityToken` = `"acct:<name>"`.
 final class Hub: @unchecked Sendable {
     static let knownTypes: Set<String> = ["language_pair", "entry", "sense", "context", "source", "card", "review_log", "tag",
@@ -18,7 +18,7 @@ final class Hub: @unchecked Sendable {
         let id: String
         var seq = 0
         var records: [ToriID: Stored] = [:]
-        /// Entries of purged merge groups (§21.4).
+        /// Entries of purged merge groups.
         var purged: Set<ToriID> = []
         var deleted = false
         init(id: String) { self.id = id }
@@ -174,7 +174,7 @@ final class Hub: @unchecked Sendable {
                    "refreshToken": s.refresh])
     }
 
-    // MARK: Sync (§21.2–§21.4)
+    // MARK: Sync
 
     private func push(_ acc: Account, _ r: HTTPRequest) -> HTTPResponse {
         struct Body: Decodable { var deviceId: String; var records: [SyncRecord] }
@@ -201,7 +201,7 @@ final class Hub: @unchecked Sendable {
     private func merge(_ acc: Account, _ records: [SyncRecord]) {
         var changedEntries: [ToriID] = []
         for var rec in records {
-            // §21.4 step 3: payloads into a purged group are acknowledged and discarded; the envelope still merges.
+            // Payloads into a purged group are acknowledged and discarded; the envelope still merges.
             if acc.purged.contains(rec.id) || rec.owner.map(acc.purged.contains) == true { rec.fields = [:] }
             let old = acc.records[rec.id]?.record
             let merged = old.map { SyncRecord.merge(local: $0, remote: rec) } ?? rec
@@ -227,7 +227,7 @@ final class Hub: @unchecked Sendable {
         guard group.contains(where: { acc.records[$0]?.record.deleted == true }) else { return }
         acc.purged.formUnion(group)
         for (rid, stored) in acc.records where group.contains(rid) || stored.record.owner.map(group.contains) == true {
-            acc.records[rid]?.record.fields = [:]  // no new seq (§21.4 step 4)
+            acc.records[rid]?.record.fields = [:]  // no new seq
         }
     }
 

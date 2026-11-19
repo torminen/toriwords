@@ -19,7 +19,7 @@ func tempDir() throws -> URL {
     return dir
 }
 
-/// A minimal dictionary file with the §8.2 tables the queries touch.
+/// A minimal dictionary file with the tables the queries touch.
 func makeDictionary(at url: URL, version: String, keys: [String] = []) throws {
     let q = try DatabaseQueue(path: url.path)
     try q.write { db in
@@ -169,7 +169,7 @@ func autocompleteOnFullDictionaryUnder10ms() throws {
     #expect(worst < 10)
 }
 
-/// Prints the other §16.2-relevant timings on the full file (no assertion beyond sanity; budgets are per-screen).
+/// Prints the other performance-target timings on the full file (no assertion beyond sanity; budgets are per-screen).
 @Test(.enabled(if: FileManager.default.fileExists(atPath: fullDictionary.path)))
 func otherTimingsOnFullDictionary() throws {
     let dict = try BundledDictionary(path: fullDictionary.path)

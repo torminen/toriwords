@@ -1,14 +1,14 @@
-// ToriUI: shared SwiftUI components and design tokens (doc 36 §2.3, doc 35 §4).
+// ToriUI: shared SwiftUI components and design tokens.
 // SwiftUI files are wrapped in `#if canImport(SwiftUI)` so ToriKit builds on Linux; this file is plain Swift.
 import ToriCore
 
-/// A sentence split around its highlighted Entry text (`highlight` is in UTF-16 code units, doc 36 §4.2).
+/// A sentence split around its highlighted Entry text (`highlight` is in UTF-16 code units).
 public struct SentenceMarkup: Hashable, Sendable {
     public var before: String
     public var word: String
     public var after: String
 
-    /// Recall fronts replace the whole word or phrase with this (doc 35 §3.4).
+    /// Recall fronts replace the whole word or phrase with this.
     public static let blank = "______"
 
     /// nil when there is no highlight or it does not fall on character boundaries inside the sentence.

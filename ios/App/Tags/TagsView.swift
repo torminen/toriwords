@@ -3,7 +3,7 @@ import ToriCore
 import ToriStore
 import ToriUI
 
-/// Settings → Data → Tags (P1, doc 35 §3.6; 10-3 T3, T4): tags A–Z with word counts; tap to rename, swipe to delete;
+/// Settings → Data → Tags: tags A–Z with word counts; tap to rename, swipe to delete;
 /// renaming to an existing name offers a merge.
 struct TagsView: View {
     let store: ToriStore

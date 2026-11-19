@@ -587,7 +587,7 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     #expect(try s.store.read { try $0.words(WordsQuery()) }.count == 1)
 }
 
-// MARK: Bulk actions (Words select mode, §14.3)
+// MARK: Bulk actions (Words select mode)
 
 @Test func bulkStatusAppliesToEverySelectedEntry() throws {
     let s = try TestStore()

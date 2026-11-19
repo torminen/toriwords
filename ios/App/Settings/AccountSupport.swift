@@ -11,7 +11,7 @@ enum AccountStatusText {
         }
     }
 
-    /// Account → Status (doc 36 §11.10).
+    /// Account → Status.
     static func status(_ status: SyncStatus) -> Text {
         if status.clockWarning { return Text("Check your device time") }
         switch status.state {

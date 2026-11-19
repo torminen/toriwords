@@ -11,7 +11,7 @@ extension ToriID: DatabaseValueConvertible {
     }
 }
 
-/// How a synced column maps to the wire (doc 36 §4.1, §11.1).
+/// How a synced column maps to the wire.
 enum FieldKind {
     case text, int, real, bool, id, json
 
@@ -54,7 +54,7 @@ struct RecordType: Hashable, Sendable {
     let fields: [String: FieldKind]
     /// Column that is the envelope `owner` (kept on tombstones).
     let ownerColumn: String?
-    /// Types whose duplicates merge (§11.7) and that carry a `canonical_id`.
+    /// Types whose duplicates merge and that carry a `canonical_id`.
     var mergeable: Bool { ["entry", "sense", "context", "tag", "source"].contains(name) }
 
     static func == (a: Self, b: Self) -> Bool { a.name == b.name }
@@ -166,7 +166,7 @@ enum RecordIO {
     }
 }
 
-/// Derived local columns computed from the row itself (§4.2): keys, folds, review day.
+/// Derived local columns computed from the row itself: keys, folds, review day.
 enum Derived {
     static func rowLocal(_ db: Database, _ type: RecordType, _ id: ToriID) throws {
         func update(_ sql: String, _ args: [DatabaseValueConvertible?]) throws {

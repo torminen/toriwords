@@ -11,13 +11,13 @@ import WidgetKit
 
 /// Slot for ToriSync (wired in a later step): token purge on a fresh install, launch reconciliation, sync triggers.
 @MainActor protocol SyncCoordinating: AnyObject {
-    /// Fresh install: delete Session tokens left in the Keychain by a previous installation (§4.7).
+    /// Fresh install: delete Session tokens left in the Keychain by a previous installation.
     func purgeLeftoverTokens()
-    /// §4.7 step 5 / §12.5: launch reconciliation and a sync when signed in.
+    /// Last launch step: account-state reconciliation, then a sync when signed in.
     func syncIfSignedIn() async
-    /// Scene went to the background (ends the foreground for the session check, §12.3).
+    /// Scene went to the background (ends the foreground for the session check).
     func didEnterBackground() async
-    /// BG app refresh: one cycle if signed in and not paused (§10.4).
+    /// BG app refresh: one cycle if signed in and not paused.
     func backgroundRefresh() async
 }
 
@@ -26,7 +26,7 @@ extension SyncCoordinating {
     func backgroundRefresh() async {}
 }
 
-/// What About and Translation show from the bundled dictionary (doc 36 §8.4): `meta.dictionary_version` and
+/// What About and Translation show from the bundled dictionary: `meta.dictionary_version` and
 /// `meta.licence_text`. `BundledDictionary` conforms (AboutView.swift).
 protocol DictionaryAttribution {
     var version: String { get }
@@ -34,7 +34,7 @@ protocol DictionaryAttribution {
 }
 
 /// Slot for the dictionary step: copy the bundled `dictionary.sqlite` into the App Group when its version changed
-/// (§8.3) and open it. Returns nil when no dictionary is available.
+/// and open it. Returns nil when no dictionary is available.
 @MainActor protocol DictionaryInstalling: AnyObject {
     func installIfNeeded(into group: AppGroup?) async throws -> (any DictionaryLookup)?
 }
@@ -52,7 +52,7 @@ enum Now {
     static var today: Int { DayModel.dayNumber(unixMs: ms, utcOffsetMin: utcOffsetMin) }
 }
 
-/// Per-device settings in `UserDefaults` (§3, §4.5).
+/// Per-device settings in `UserDefaults`.
 @MainActor @Observable
 final class DeviceSettings {
     private let defaults: UserDefaults
@@ -71,7 +71,7 @@ final class DeviceSettings {
     }
 }
 
-/// Composition root: owns the services and runs the launch sequence (§4.7) before any data is shown.
+/// Composition root: owns the services and runs the launch sequence before any data is shown.
 @MainActor @Observable
 final class AppEnvironment {
     enum Phase: Equatable { case launching, ready, failed(String) }
@@ -97,7 +97,7 @@ final class AppEnvironment {
     /// Dictionary searches for Add / Entry over `dictionary` (set by the installer at launch); empty while it is nil.
     var dictionarySearch: DictionarySearch { DictionarySearch(dictionary) }
 
-    /// The open Review session, so going to the background commits its undoable answer (§7.8).
+    /// The open Review session, so going to the background commits its undoable answer.
     @ObservationIgnored weak var activeReview: ReviewModel?
     @ObservationIgnored private var appGroupRefresh: Task<Void, Never>?
     @ObservationIgnored private var launchTask: Task<Void, Never>?
@@ -116,7 +116,7 @@ final class AppEnvironment {
         reminderScheduler.snapshot = { [weak self] in self?.currentSnapshot() }
     }
 
-    // MARK: Launch (§4.7)
+    // MARK: Launch
 
     /// Idempotent: the scene's `.task` and a background refresh launch may both call it.
     func launch() async {
@@ -154,7 +154,7 @@ final class AppEnvironment {
             observe(store)
             let dictionaryChanged = (dictionaryInstaller as? AppDictionaryInstaller)?.versionChanged == true
             Task {
-                // §8.3: after a version change `unavailable` Entries get another chance (also runs pending).
+                // After a dictionary version change `unavailable` Entries get another chance (also runs pending).
                 if dictionaryChanged { _ = try? await enrichment.updateDictionary(dictionary) }
                 else { _ = try? await enrichment.runPending() }
                 await sync?.syncIfSignedIn()
@@ -177,8 +177,8 @@ final class AppEnvironment {
         }
     }
 
-    /// Snapshot + vocab index after any vocabulary change, including sync applies (§10.1); inbox import on the
-    /// Share Extension's Darwin notification while running (§5.6).
+    /// Snapshot + vocab index after any vocabulary change, including sync applies; inbox import on the
+    /// Share Extension's Darwin notification while running.
     private func observe(_ store: ToriStore) {
         vocabularyObserver = Task { [weak self] in
             for await _ in store.vocabularyChanges() { self?.scheduleAppGroupRefresh(delay: .seconds(2)) }
@@ -192,7 +192,7 @@ final class AppEnvironment {
         Task { _ = try? await enrichment.runPending() }
     }
 
-    // MARK: Deep links (§10.2, §10.3)
+    // MARK: Deep links
 
     /// `toriwords://review` (widget, reminder) and `toriwords://add?text=…`.
     func open(_ url: URL) {
@@ -210,7 +210,7 @@ final class AppEnvironment {
         }
     }
 
-    // MARK: Background refresh (§10.4)
+    // MARK: Background refresh
 
     /// `BGAppRefreshTask`: inbox → sync → enrichment → snapshot + widget → reminders. Cancellation (expiration) stops
     /// between steps; every step is safe to cut short.
@@ -236,7 +236,7 @@ final class AppEnvironment {
         try? BGTaskScheduler.shared.submit(request)
     }
 
-    /// Background: commit the undoable answer, flush the App Group files, checkpoint the WAL (§3, §7.8).
+    /// Background: commit the undoable answer, flush the App Group files, checkpoint the WAL.
     func didEnterBackground() {
         activeReview?.commitPending()
         deletion.commit()
@@ -253,7 +253,7 @@ final class AppEnvironment {
 
     // MARK: After a write
 
-    /// After a review commit: debounced snapshot + vocab index (§7.8, 2 s) and reminders.
+    /// After a review commit: debounced snapshot + vocab index (2 s) and reminders.
     func didCommitAnswer() { didChangeData() }
 
     /// After any bulk write (restore, remove all data): same refresh as after an answer.
@@ -261,7 +261,7 @@ final class AppEnvironment {
         scheduleAppGroupRefresh(delay: .seconds(2))
     }
 
-    /// Speaks with the per-device accent (§9).
+    /// Speaks with the per-device accent.
     func speak(_ text: String, _ trigger: SpeechPlayer.Trigger) {
         speech.accent = settings.accent
         speech.speak(text, trigger: trigger)

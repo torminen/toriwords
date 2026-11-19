@@ -2,7 +2,7 @@ import Foundation
 import ToriCore
 import ToriStore
 
-/// One autocomplete row on Add (§6.2 items 1–2): a saved Entry ("In your vocabulary") or a dictionary headword.
+/// One autocomplete row on Add: a saved Entry ("In your vocabulary") or a dictionary headword.
 public struct Completion: Hashable, Sendable {
     public var text: String
     public var partOfSpeech: String?
@@ -26,7 +26,7 @@ public enum Autocomplete {
     public enum Input: Equatable, Sendable {
         case tooShort
         case english(String)
-        /// Cyrillic and no Latin letters: reverse lookup (P1, §6.2 item 2).
+        /// Cyrillic and no Latin letters: reverse lookup.
         case russian(String)
     }
 
@@ -51,7 +51,7 @@ public enum Autocomplete {
     }
 }
 
-/// The Add preview form (§5.1, doc 35 §3.2): variants to check, own translation, sentence, source, tags.
+/// The Add preview form: variants to check, own translation, sentence, source, tags.
 public struct AddDraft: Equatable, Sendable {
     public struct Variant: Hashable, Sendable {
         public var sense: NewSense
@@ -95,10 +95,10 @@ public struct AddDraft: Equatable, Sendable {
 
     private var cleaned: Capture.Cleaned { Capture.clean(text) }
 
-    /// Save needs a Latin letter; text of only spaces or punctuation is rejected (§5.1, §5.2).
+    /// Save needs a Latin letter; text of only spaces or punctuation is rejected.
     public var canSave: Bool { cleaned.isSaveable }
 
-    /// More than 6 words or sentence punctuation: offer to keep it as the sentence and pick the word (§5.1).
+    /// More than 6 words or sentence punctuation: offer to keep it as the sentence and pick the word.
     public var looksLikeSentence: Bool { cleaned.isSaveable && cleaned.kind == .sentence }
 
     /// "Tap the word to save": takes chips `first...last` of the typed sentence as the word, the sentence as context.

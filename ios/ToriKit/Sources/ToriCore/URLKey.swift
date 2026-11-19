@@ -1,4 +1,4 @@
-/// URL key for Sources with a URL (doc 36 §15.1). Explicit split per code point, never a platform URL
+/// URL key for Sources with a URL. Explicit split per code point, never a platform URL
 /// parser (they differ in IDN, percent-encoding and port handling):
 /// `scheme ':' '//' [userinfo '@'] host [':' port] path ['?' query] ['#' fragment]`.
 extension TextKey {

@@ -4,7 +4,7 @@ import ToriEnrichment
 import ToriStore
 import ToriUI
 
-/// Add (doc 35 §3.2; wireframes 1-10 iOS 2–3, 8-6 A1–A2, 10-3 RW2).
+/// Add screen.
 struct AddView: View {
     let store: ToriStore
     let initialText: String?
@@ -133,7 +133,7 @@ private struct TypingStep: View {
         .buttonStyle(.plain)
     }
 
-    /// A typed sentence: tap one word, or adjacent words for a phrase (as in capture, §5.2).
+    /// A typed sentence: tap one word, or adjacent words for a phrase (as in capture).
     private var sentencePicker: some View {
         Section {
             if !model.containedPhrases.isEmpty {

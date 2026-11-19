@@ -12,7 +12,7 @@ enum AppLinks {
     static let kaikki = URL(string: "https://kaikki.org/")!
 }
 
-/// Settings → About (doc 35 §3.10, wireframe 4-6 S7; Product §5.9; doc 36 §8.4, §13).
+/// Settings → About.
 struct AboutView: View {
     @Environment(AppEnvironment.self) private var env
 

@@ -1,8 +1,8 @@
-/// What the widget shows for a snapshot at a render instant (doc 36 §10.2, UI doc §3.12, UQ-4 closed).
+/// What the widget shows for a snapshot at a render instant.
 public enum WidgetDisplay: Hashable, Sendable {
     /// "12 to review · 5 new".
     case due(reviews: Int, new: Int)
-    /// "Next review: tomorrow" (or a date; never a time). `day` is a §7.2 day number.
+    /// "Next review: tomorrow" (or a date; never a time). `day` is a review-day number (days start at 04:00).
     case next(day: Int, isTomorrow: Bool)
     /// Missing, stale (> 7 days), nothing scheduled, or past the snapshot's days: "Open ToriWords".
     case openApp

@@ -11,7 +11,7 @@ final class SyncStatusModel {
     var isAvailable: Bool { status != nil }
 }
 
-/// Real `SyncCoordinating`: owns the `SyncEngine` and its triggers (doc 36 §11.5, §12).
+/// Real `SyncCoordinating`: owns the `SyncEngine` and its triggers.
 @MainActor
 final class SyncCoordinator: SyncCoordinating {
     let model = SyncStatusModel()

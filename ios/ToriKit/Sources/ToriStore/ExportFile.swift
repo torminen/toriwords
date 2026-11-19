@@ -1,6 +1,6 @@
 import Foundation
 
-/// Settings → Data → Export (doc 36 §14.2, doc 35 §3.11): the two formats and the file handed to the share sheet.
+/// Settings → Data → Export: the two formats and the file handed to the share sheet.
 public enum ExportFormat: String, CaseIterable, Sendable {
     /// "Backup (JSON)": everything, restorable.
     case backup
@@ -9,7 +9,7 @@ public enum ExportFormat: String, CaseIterable, Sendable {
 }
 
 public enum ExportFile {
-    /// Used when the bundled dictionary's own `meta.licence_text` is not available (doc 36 §8.4).
+    /// Used when the bundled dictionary's own `meta.licence_text` is not available.
     public static let defaultAttribution = """
         Dictionary data from Wiktionary (en.wiktionary.org, ru.wiktionary.org), Wiktionary contributors, \
         CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), extracted with wiktextract (kaikki.org). \
@@ -32,13 +32,13 @@ public enum ExportFile {
             return try store.exportBackup(attribution: attribution)
         case .csv:
             let (csv, wiktionary) = try store.exportCSV(utcOffsetMin: utcOffsetMin)
-            // ponytail: attribution as a trailing one-cell row (form is Architecture AQ-11); spreadsheets show it last.
+            // ponytail: attribution as a trailing one-cell row; spreadsheets show it last.
             return Data((wiktionary ? csv + ToriStore.csvField(attribution) + "\r\n" : csv).utf8)
         }
     }
 }
 
 extension ToriStore {
-    /// Settings → New words per day (Product §5.9): counts words, not cards.
+    /// Settings → New words per day: counts words, not cards.
     public static let newWordsPerDayRange = 0...50
 }

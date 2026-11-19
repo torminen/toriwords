@@ -327,7 +327,7 @@ final class World {
     }
 
     /// Synced and derived state of visible records (no device-local columns), for convergence checks. Children of a
-    /// deleted Entry are hidden and purged "later" (§4.3), so when that happens may differ per device.
+    /// deleted Entry are hidden and purged "later", so when that happens may differ per device.
     func dump(_ d: Device) throws -> [String] {
         let local: Set<String> = ["is_this_device", "enrich_attempts"]
         var out: [String] = []

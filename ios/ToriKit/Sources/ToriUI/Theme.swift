@@ -6,7 +6,7 @@ import UIKit
 import AppKit
 #endif
 
-/// Theme tokens (doc 35 §4). Light values are the wireframe tokens; dark values are the iOS system dark equivalents
+/// Theme tokens. Light values are the wireframe tokens; dark values are the iOS system dark equivalents
 /// (UQ-5 is open: no dark palette is drawn, the assignment asks for system semantics).
 public enum Palette {
     public static let accent = Color.dynamic(light: 0x007AFF, dark: 0x0A84FF)
@@ -29,7 +29,7 @@ public enum Palette {
     public static let neutralFill = Color.dynamic(light: 0xE5E5EA, dark: 0x2C2C2E)
 }
 
-/// Text styles follow Dynamic Type; sizes in comments are the doc 35 §4 approximations at the default size.
+/// Text styles follow Dynamic Type; sizes in comments are the UI spec's approximations at the default size.
 public enum Typography {
     /// Card word, 28–32 bold.
     public static let cardWord = Font.title.weight(.bold)

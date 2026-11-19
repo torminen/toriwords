@@ -4,7 +4,7 @@ import ToriCore
 import ToriShared
 import UserNotifications
 
-/// The one optional daily reminder (doc 36 §10.3). Per device: on/off and time live in UserDefaults.
+/// The one optional daily reminder. Per device: on/off and time live in UserDefaults.
 /// Settings (9c) binds to `isEnabled`, `hour`, `minute`, `isDenied` and calls `setEnabled` / `setTime`.
 @MainActor @Observable
 final class ReminderScheduler: NSObject, ReminderScheduling, UNUserNotificationCenterDelegate {
@@ -67,7 +67,7 @@ final class ReminderScheduler: NSObject, ReminderScheduling, UNUserNotificationC
                                              utcOffsetMin: Now.utcOffsetMin)
         for r in requests {
             let content = UNMutableNotificationContent()
-            // N counts cards (reviews + new), as Home's Due today; hence not "words" (Product OQ-18).
+            // N counts cards (reviews + new), as Home's Due today; hence not "words".
             content.body = String(localized: "\(r.count) to review")
             content.sound = .default
             content.userInfo = ["url": DeepLink.review.url.absoluteString]

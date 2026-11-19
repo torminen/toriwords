@@ -1,7 +1,7 @@
 // swift-tools-version: 6.2
 import PackageDescription
 
-// Module graph: doc 36 §2.3. Arrows are allowed dependencies; nothing else.
+// Module graph. Arrows are allowed dependencies; nothing else.
 let grdb = Target.Dependency.product(name: "GRDB", package: "GRDB.swift")
 // CryptoKit on Apple platforms; swift-crypto only so the package builds and tests on Linux.
 let crypto = Target.Dependency.product(

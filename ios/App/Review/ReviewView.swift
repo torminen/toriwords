@@ -3,7 +3,7 @@ import ToriCore
 import ToriStore
 import ToriUI
 
-/// Review session, presented full screen (doc 35 §3.4; wireframes 1-10 iOS 5–7, 9-4 R1–R4). It has its own
+/// Review session, presented full screen. It has its own
 /// navigation stack so ••• Edit returns to the same card.
 struct ReviewView: View {
     let store: ToriStore
@@ -99,7 +99,7 @@ private struct ReviewContent: View {
         .frame(minHeight: 44)
     }
 
-    /// ✕: leaves immediately, no confirmation; given answers are kept (§5.6).
+    /// ✕: leaves immediately, no confirmation; given answers are kept.
     private func close() {
         model.close()
         router.isReviewPresented = false
@@ -170,7 +170,7 @@ private struct CardSession: View {
         model.grade(rating)
     }
 
-    /// Once, on the first flipped card ever: nudge right (Remembered), then left (Forgot), spring back (§5.6).
+    /// Once, on the first flipped card ever: nudge right (Remembered), then left (Forgot), spring back.
     private func swipeDemoIfFirst() async {
         guard model.isFlipped, !env.settings.swipeDemoShown else { return }
         env.settings.swipeDemoShown = true
@@ -303,7 +303,7 @@ private struct CardBack: View {
     }
 }
 
-/// ••• on the back: Edit, I already know this, Pause, Delete (§5.6).
+/// ••• on the back: Edit, I already know this, Pause, Delete.
 private struct CardMenu: View {
     let model: ReviewModel
     let word: String

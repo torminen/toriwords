@@ -2,7 +2,7 @@ import Foundation
 import GRDB
 import Testing
 
-/// Gate: FTS5 and an immutable read-only open of a prebuilt dictionary file (doc 36 §8.2–8.3).
+/// Gate: FTS5 and an immutable read-only open of a prebuilt dictionary file.
 @Test func fts5MatchOnImmutableReadOnlyFile() throws {
     let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

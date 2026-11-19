@@ -1,6 +1,6 @@
 import Foundation
 
-/// Finds the shared parity fixtures (`<repo>/spec/fixtures`, doc 36 §15) without copying them:
+/// Finds the shared parity fixtures (`<repo>/spec/fixtures`) without copying them:
 /// env `TORI_FIXTURES` wins, otherwise the path is derived from this file's location in the repo.
 public enum FixtureLocator {
     public static var root: URL {

@@ -3,7 +3,7 @@ import GRDB
 import ToriCore
 import ToriShared
 
-/// One capture (Add screen, Share Extension inbox): the §5.6 use case.
+/// One capture (Add screen, Share Extension inbox).
 public struct CaptureInput: Hashable, Sendable {
     public var term: String
     public var capturedAt: Int64
@@ -110,7 +110,7 @@ extension ToriStore {
         return entry
     }
 
-    /// §5.6: imports every inbox file in capture-ID order, one transaction each, idempotent via `inbox_import`;
+    /// Imports every inbox file in capture-ID order, one transaction each, idempotent via `inbox_import`;
     /// files are deleted after commit; unknown formats stay.
     public func importInbox(_ inbox: Inbox) throws -> InboxImportResult {
         var result = InboxImportResult()

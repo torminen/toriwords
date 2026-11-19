@@ -2,7 +2,7 @@ import Foundation
 import ToriCore
 import ToriStore
 
-/// Sync state machine of doc 36 §11.10.
+/// Sync state machine.
 public enum SyncState: Equatable, Sendable {
     case localOnly
     case firstSync
@@ -18,7 +18,7 @@ public enum SyncState: Equatable, Sendable {
 
 /// One-time messages for the UI, shown in order and removed with `dismissNotice()`.
 public enum SyncNotice: Equatable, Sendable {
-    /// §12.5 prompt "Words from another account".
+    /// Account prompt "Words from another account".
     case accountPrompt(words: Int)
     /// "No internet connection" / "Connect to the internet to remove these words. Nothing was changed."
     case removeNeedsNetwork
@@ -26,7 +26,7 @@ public enum SyncNotice: Equatable, Sendable {
     case signedOut
     /// "Your ToriWords account was deleted on another device. Your words stay on this device only."
     case accountDeletedElsewhere
-    /// "Vocabulary merged — X words from this device, Y from your account, Z in both." (§12.6)
+    /// "Vocabulary merged — X words from this device, Y from your account, Z in both."
     case mergeSummary(fromDevice: Int, fromAccount: Int, inBoth: Int)
     /// "Your vocabulary is backed up."
     case backedUp
@@ -35,7 +35,7 @@ public enum SyncNotice: Equatable, Sendable {
 /// The observable value for the Account screen: a plain struct, so an `@Observable` model can mirror it.
 public struct SyncStatus: Equatable, Sendable {
     public var state: SyncState
-    /// §11.3 device-time check: response `Date` more than 1 h off. Shows "Check your device time"; never blocks sync.
+    /// Device-time check: response `Date` more than 1 h off. Shows "Check your device time"; never blocks sync.
     public var clockWarning: Bool
     /// Unix ms.
     public var lastSyncAt: Int64?
@@ -71,7 +71,7 @@ public enum ChoiceResult: Equatable, Sendable {
     case noPendingChoice
 }
 
-/// §11.9 network backoff: 5 s, 10 s, 20 s … 15 min, ±20 % jitter.
+/// Network backoff: 5 s, 10 s, 20 s … 15 min, ±20 % jitter.
 public enum Backoff {
     public static func delayMs(attempt: Int, jitter: Double) -> Int64 {
         let base = min(5_000 * pow(2, Double(min(attempt, 20))), 900_000)
@@ -79,7 +79,7 @@ public enum Backoff {
     }
 }
 
-/// `pendingAccountChoice` value (§12.4).
+/// `pendingAccountChoice` value.
 struct PendingChoice: Codable, Equatable {
     var newAccountId: String
     var previousAccountId: String
@@ -91,7 +91,7 @@ struct Excluded: Codable {
     var ids: Set<ToriID>
 }
 
-/// One sync at a time (push, then paged pull), the account flows that gate it, and the status (§11.5–§11.10, §12).
+/// One sync at a time (push, then paged pull), the account flows that gate it, and the status.
 public actor SyncEngine {
     public struct Dependencies: Sendable {
         public var store: ToriStore
@@ -104,7 +104,7 @@ public actor SyncEngine {
         /// Suspends for the given ms (backoff, debounce, Retry-After). Throwing cancels the scheduled work.
         public var sleep: @Sendable (Int64) async throws -> Void
         public var jitter: @Sendable () -> Double
-        /// §11.5 step 6: vocab index, widget snapshot and reload, reminders.
+        /// After each cycle: vocab index, widget snapshot and reload, reminders.
         public var afterCycle: @Sendable () async -> Void
         public var pageLimit: Int
 
@@ -197,7 +197,7 @@ public actor SyncEngine {
 
     // MARK: Launch and triggers
 
-    /// Launch reconciliation (§12.5) and the initial state. Call once after `ToriStore.launch`.
+    /// Launch reconciliation of the account keys and the initial state. Call once after `ToriStore.launch`.
     public func start() async throws {
         await sessions.setLossHandler { [weak self] loss in await self?.sessionLost(loss) }
         let session = await sessions.current
@@ -210,14 +210,14 @@ public actor SyncEngine {
         let account = try store.syncState(.accountId)
         if session == nil, account != nil { try store.enterLocalOnly() }
         if let session, account != session.accountId {
-            // Sign-in interrupted before the account was stored (§12.4): nothing was synced, start over.
+            // Sign-in interrupted before the account was stored: nothing was synced, start over.
             await sessions.discard()
             if account != nil { try store.enterLocalOnly() }
         }
         try refreshState()
     }
 
-    /// App foreground: session check (also while paused), then a cycle (§11.5, §12.3).
+    /// App foreground: session check (also while paused), then a cycle.
     public func foreground() async {
         await sessions.foregroundCheck()
         await sync(.foreground)
@@ -255,7 +255,7 @@ public actor SyncEngine {
         } while rerun
     }
 
-    // MARK: Cycle (§11.5)
+    // MARK: Cycle
 
     /// `push: false` / `pull: false` only for tests (`pullOnly`, `pushOnly` fixture ops).
     func cycle(push doPush: Bool = true, pull doPull: Bool = true) async {
@@ -317,7 +317,7 @@ public actor SyncEngine {
         }
     }
 
-    /// After any successful push or pull (§11.5 step 5).
+    /// After any successful push or pull.
     private func markSynced() throws {
         guard let account = try store.syncState(.accountId) else { return }
         try store.setSyncState([.lastSyncedAccountId: account, .adoptedAccountId: nil, .lastSyncAt: String(deps.now())])
@@ -408,7 +408,7 @@ public actor SyncEngine {
         try store.setSyncState([.excludedRecords: String(decoding: data, as: UTF8.self)])
     }
 
-    // MARK: Sign-in (§12.4)
+    // MARK: Sign-in
 
     public func signIn(_ credential: SignInCredential) async throws -> SignInResult {
         let response = try await sessions.signIn(credential)
@@ -443,7 +443,7 @@ public actor SyncEngine {
         return .silentRemove
     }
 
-    /// §12.5 pre-sync guard; true when it set the choice instead of syncing.
+    /// Pre-sync guard (foreign-account data on the device); true when it set the choice instead of syncing.
     private func guardFires() async throws -> Bool {
         guard let account = try store.syncState(.accountId), let last = try store.syncState(.lastSyncedAccountId),
               last != account, try store.hasUserRecordsBeyondDefaults(),
@@ -454,7 +454,7 @@ public actor SyncEngine {
         return true
     }
 
-    /// "Add these N words to this account" / "Remove all N words from this device" (§12.5). Cancel needs no call.
+    /// "Add these N words to this account" / "Remove all N words from this device". Cancel needs no call.
     public func resolveAccountChoice(_ choice: AccountChoice) async -> ChoiceResult {
         guard (try? pendingChoice()) ?? nil != nil else { return .noPendingChoice }
         switch choice {
@@ -493,7 +493,7 @@ public actor SyncEngine {
         return .done
     }
 
-    // MARK: Merge summary (§12.6)
+    // MARK: Merge summary
 
     private func showMergeSummaryIfPending() throws {
         guard let text = try store.syncState(.signInBaseline) else { return }
@@ -517,7 +517,7 @@ public actor SyncEngine {
         }
     }
 
-    // MARK: Sign-out, deletion, loss (§12.7, §12.3)
+    // MARK: Sign-out, deletion, loss
 
     /// Local-first: logout is best effort; tokens, cursor, choice keys and outbox go; data and `lastSyncedAccountId` stay.
     public func signOut() async throws {
@@ -573,7 +573,7 @@ public actor SyncEngine {
     }
 }
 
-/// §11.3 device-time check from response `Date` headers; also stores `lastServerTime` (§11.5 step 7).
+/// Device-time check from response `Date` headers; also stores `lastServerTime`.
 final class DeviceTimeCheck: @unchecked Sendable {
     private let lock = NSLock()
     private var _warning = false

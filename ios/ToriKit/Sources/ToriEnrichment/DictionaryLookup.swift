@@ -1,6 +1,6 @@
-// ToriEnrichment: enrichment orchestrator, Apple Translation adapter, TTS player (doc 36 §2.3, §6, §9).
+// ToriEnrichment: enrichment orchestrator, Apple Translation adapter, TTS player.
 
-/// What enrichment needs from the bundled dictionary (doc 36 §8.2). `ToriDictionary` conforms to it.
+/// What enrichment needs from the bundled dictionary. `ToriDictionary` conforms to it.
 public protocol DictionaryLookup: Sendable {
     /// `meta.dictionary_version`, e.g. `2026.11.1`; stored as Sense provenance.
     var version: String { get }
@@ -44,7 +44,7 @@ public struct DictionarySense: Hashable, Sendable {
 
 /// Machine translation EN→RU (Apple Translation on iOS; a fake in tests).
 public protocol MachineTranslator: Sendable {
-    /// Language data installed: background fills run only then and never prompt for a download (§6.3).
+    /// Language data installed: background fills run only then and never prompt for a download.
     func isReady() async -> Bool
     /// One machine variant; nil or empty = "returned nothing".
     func translate(_ text: String) async throws -> String?

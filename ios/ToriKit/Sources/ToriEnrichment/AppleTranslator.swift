@@ -3,7 +3,7 @@ import Foundation
 import Observation
 import Translation
 
-/// Apple Translation EN→RU (doc 36 §6.3). Background fills use the UI-less session when the OS has it; otherwise they
+/// Apple Translation EN→RU. Background fills use the UI-less session when the OS has it; otherwise they
 /// go through `TranslationBridge`, which the app serves from a hidden `.translationTask` on its root view.
 public struct AppleTranslator: MachineTranslator {
     public static let source = Locale.Language(identifier: "en")

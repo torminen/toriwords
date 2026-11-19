@@ -7,7 +7,7 @@ public enum LaunchOutcome: Equatable, Sendable {
 }
 
 extension ToriStore {
-    /// §4.7 steps 2–3, after the migration in `init`. `deviceMarker` lives in Application Support and is excluded from
+    /// Launch: fresh install or restored-from-backup handling, after the migration in `init`. `deviceMarker` lives in Application Support and is excluded from
     /// backup; `purgeKeychain` deletes Session tokens left by a previous installation (fresh install only).
     @discardableResult
     public func launch(deviceMarker: URL, displayName: String, purgeKeychain: () -> Void) throws -> LaunchOutcome {
@@ -52,7 +52,7 @@ extension ToriStore {
         try db.read { try ToriID.fetchOne($0, sql: "SELECT id FROM device WHERE is_this_device = 1") }
     }
 
-    /// §12.5 "Remove from this device" (stays signed in): one transaction deleting every synced user record, re-creating
+    /// Account prompt "Remove from this device" (stays signed in): one transaction deleting every synced user record, re-creating
     /// the LanguagePair and Settings defaults, deleting the outbox, resetting `cursor` and clearing `pendingAccountChoice`.
     public func removeAllUserRecords() throws {
         try write { tx in
@@ -62,7 +62,7 @@ extension ToriStore {
         }
     }
 
-    /// Settings → Data → "Remove all data from this device" (§12.7): deletes all user records, recreates defaults and
+    /// Settings → Data → "Remove all data from this device": deletes all user records, recreates defaults and
     /// signs out (auth keys of `sync_state` cleared; `signOut` deletes the Keychain tokens after commit).
     public func removeAllDataFromDevice(signOut: () -> Void) throws {
         try write { tx in
@@ -97,7 +97,7 @@ enum Account {
         try tx.db.execute(sql: "DELETE FROM pending_changes")
     }
 
-    /// Sign-out state (§12.7): session keys, cursor and outbox gone; data and `lastSyncedAccountId` kept.
+    /// Sign-out state: session keys, cursor and outbox gone; data and `lastSyncedAccountId` kept.
     static func signedOutState(_ db: Database) throws {
         for key in [SyncStateKey.accountId, .cursor, .adoptedAccountId, .pendingAccountChoice] { try SyncStateStore.set(db, key, nil) }
         try db.execute(sql: "DELETE FROM pending_changes")

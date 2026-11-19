@@ -13,7 +13,7 @@ struct HomeSnapshot: Equatable, Sendable {
     /// Days from today to the next due day; nil when nothing is scheduled.
     var nextDueInDays: Int?
     var recent: [WordRow]
-    /// Only for `noneReviewable`: "N words need a translation" (Product OQ-6).
+    /// Only for `noneReviewable`: "N words need a translation".
     var needsTranslation: Int
 
     static let recentLimit = 5

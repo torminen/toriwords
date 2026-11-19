@@ -4,7 +4,7 @@ import ToriCore
 import ToriStore
 import ToriUI
 
-/// Every pushed screen of doc 35 §1. Sheets (tag filter, tag picker, related-word preview, share sheet), alerts and the
+/// Every pushed screen. Sheets (tag filter, tag picker, related-word preview, share sheet), alerts and the
 /// Words select mode belong to their screens; Review is a full-screen cover (`Router.isReviewPresented`).
 enum Route: Hashable {
     case add(text: String?)
@@ -31,7 +31,7 @@ final class Router {
 
     func push(_ route: Route) { path.append(route) }
 
-    /// Reminder, widget and the Home Review button all land here (§1: never Progress).
+    /// Reminder, widget and the Home Review button all land here (never Progress).
     func openReview() { isReviewPresented = true }
 }
 

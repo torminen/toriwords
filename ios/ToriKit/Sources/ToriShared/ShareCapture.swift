@@ -1,7 +1,7 @@
 import Foundation
 import ToriCore
 
-/// What the Share Extension received (doc 36 §5.1): text/URL items, plus the Safari JavaScript preprocessing result
+/// What the Share Extension received: text/URL items, plus the Safari JavaScript preprocessing result
 /// (`ExtensionPreprocessing.js`: `selection`, `title`, `url`, `sentence`) when the share came from Safari.
 public struct SharePayload: Hashable, Sendable {
     public var text: String?
@@ -9,7 +9,7 @@ public struct SharePayload: Hashable, Sendable {
     public var title: String?
     /// The sentence around the selection (Safari only).
     public var sentence: String?
-    /// The preprocessing result was present: only Safari runs it (§4 `source.app`, CH-23).
+    /// The preprocessing result was present: only Safari runs it.
     public var fromSafari: Bool
 
     public init(text: String? = nil, url: String? = nil, title: String? = nil, sentence: String? = nil, fromSafari: Bool = false) {
@@ -57,7 +57,7 @@ public struct SharePayload: Hashable, Sendable {
     }
 }
 
-/// The capture sheet's text state (doc 36 §5.2): cleaned text, word chips and the picked span, the sentence and
+/// The capture sheet's text state: cleaned text, word chips and the picked span, the sentence and
 /// its highlight, and the inbox file it saves.
 public struct CaptureDraft: Equatable, Sendable {
     public private(set) var cleaned: Capture.Cleaned
@@ -71,7 +71,7 @@ public struct CaptureDraft: Equatable, Sendable {
     public private(set) var sentence: String?
     public private(set) var highlight: Capture.Highlight?
     private var sentenceTyped = false
-    /// Dictionary offers for the captured text (P1, §6.2, Product §5.1 item 9): its base form ("took" → "take") and
+    /// Dictionary offers for the captured text: its base form ("took" → "take") and
     /// the dictionary phrases inside it ("looked after" → "look after"). Set by the sheet after each lookup.
     public private(set) var baseForm: String?
     public private(set) var phrases: [String] = []
@@ -99,7 +99,7 @@ public struct CaptureDraft: Equatable, Sendable {
     public var entryText: String? { term == nil ? nil : savedAs ?? term }
 
     /// Offers for the current term. Offers equal to the captured text (match key) are dropped; a base form is
-    /// preselected (PD-14 default), a phrase only when the user picks it.
+    /// preselected by default, a phrase only when the user picks it.
     public mutating func setOffers(baseForm: String?, phrases: [String]) {
         let key = term.map(TextKey.matchKey)
         func useful(_ s: String) -> Bool { key != nil && TextKey.matchKey(s) != key }
@@ -151,7 +151,7 @@ public struct CaptureDraft: Equatable, Sendable {
         }
     }
 
-    /// A sentence typed or edited in the sheet (term sources): highlight = first occurrence of the term (§5.2 step 6).
+    /// A sentence typed or edited in the sheet (term sources): highlight = first occurrence of the term.
     public mutating func editSentence(_ text: String) {
         let s = text.trimmingCharacters(in: .whitespacesAndNewlines)
         sentenceTyped = true
@@ -188,7 +188,7 @@ public struct CaptureDraft: Equatable, Sendable {
         (sentence, highlight) = (c.text, Capture.typedHighlight(sentence: c.text, entryText: term))
     }
 
-    /// The inbox file for Save (§5.3.1); nil when the draft cannot be saved. Blank title/typed translation are dropped.
+    /// The inbox file for Save; nil when the draft cannot be saved. Blank title/typed translation are dropped.
     public func inboxFile(captureId: ToriID, capturedAt: Int64, utcOffsetMin: Int, payload: SharePayload,
                           sourceTitle: String?, tags: [String], chosenSenses: [InboxFile.ChosenSense],
                           typedTranslation: String?, resume: Bool) -> InboxFile? {
@@ -226,7 +226,7 @@ public enum TagInput {
 }
 
 extension CaptureSticky {
-    /// After Save (§5.5): this capture's title and tags are offered for 30 minutes; the tip flag is kept.
+    /// After Save: this capture's title and tags are offered for 30 minutes; the tip flag is kept.
     public static func afterSave(now: Int64, sourceTitle: String?, tags: [String], previous: CaptureSticky?) -> CaptureSticky {
         CaptureSticky(updatedAt: now, sourceTitle: sourceTitle.flatMap(CaptureDraft.nonBlank), tags: tags,
                       tipShown: previous?.tipShown ?? false)

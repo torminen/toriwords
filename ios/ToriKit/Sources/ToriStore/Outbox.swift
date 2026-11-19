@@ -2,7 +2,7 @@ import Foundation
 import GRDB
 import ToriCore
 
-/// Outbox reads and bookkeeping (§11.4, §11.5).
+/// Outbox reads and bookkeeping.
 enum Outbox {
     static func batch(_ db: Database, maxRecords: Int, excluding: Set<ToriID>) throws -> PushBatch {
         let ids = try Row.fetchAll(db, sql: """
@@ -61,7 +61,7 @@ enum Outbox {
     }
 }
 
-/// Applying a pulled page (§11.6); also used by restore (§14.2).
+/// Applying a pulled page; also used by restore.
 enum Apply {
     static func page(_ tx: Tx, _ records: [SyncRecord]) throws -> PulledPageResult {
         var skipped = Set<String>()
@@ -81,7 +81,7 @@ enum Apply {
         let merged = local.map { SyncRecord.merge(local: $0, remote: remote) } ?? remote
         guard merged != local else { return .unchanged }
         try tx.storeLocal(type, merged, before: local)
-        // A newer value on a merged loser reaches the survivor (§11.6 step 5).
+        // A newer value on a merged loser reaches the survivor.
         if let into = merged.mergedInto, !merged.deleted, type.mergeable,
            merged.fields != local?.fields || local?.mergedInto == nil {
             let survivor = try ToriID.fetchOne(tx.db, sql: "SELECT canonical_id FROM \(type.name) WHERE id = ?", arguments: [into]) ?? into

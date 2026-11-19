@@ -1,7 +1,7 @@
 import Foundation
 import ToriCore
 
-/// One pending capture written by the Share Extension, format 1 (doc 36 §5.3.1).
+/// One pending capture written by the Share Extension, format 1.
 public struct InboxFile: Codable, Hashable, Sendable {
     public struct LanguagePair: Codable, Hashable, Sendable {
         public var native: String
@@ -15,7 +15,7 @@ public struct InboxFile: Codable, Hashable, Sendable {
     public struct Source: Codable, Hashable, Sendable {
         public var url: String?
         public var title: String?
-        /// "Safari" only when the Safari preprocessing result was present (§4 `source.app`, CH-23); else absent.
+        /// "Safari" only when the Safari preprocessing result was present; else absent.
         public var app: String?
         public init(url: String? = nil, title: String? = nil, app: String? = nil) {
             self.url = url

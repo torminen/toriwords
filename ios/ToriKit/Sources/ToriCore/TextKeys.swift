@@ -1,6 +1,6 @@
 import Foundation
 
-/// Text keys, doc 36 §15.1. Character sets are the explicit lists in `spec/fixtures/README.md`,
+/// Text keys. Character sets are the explicit lists in `spec/fixtures/README.md`,
 /// never a Unicode property lookup or a locale-dependent call, so all platforms agree.
 public enum TextKey {
     /// Key for duplicate detection of Entry texts and dictionary lookups.
@@ -107,7 +107,7 @@ public enum TextKey {
     }
 }
 
-/// Natural key of a Source without URL (doc 36 §11.7, §15.1).
+/// Natural key of a Source without URL.
 public struct SourceKey: Hashable, Sendable {
     public var title: String
     public var app: String?

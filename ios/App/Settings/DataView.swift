@@ -3,8 +3,8 @@ import ToriStore
 import ToriUI
 import UniformTypeIdentifiers
 
-/// Settings → Data (doc 35 §3.10–3.11, wireframe 11-1 SD6, E3, E4): Export, Restore from backup, Tags, and the red
-/// "Remove all data from this device" (Product OQ-16 closed: it also signs out).
+/// Settings → Data: Export, Restore from backup, Tags, and the red
+/// "Remove all data from this device" (it also signs out).
 struct DataView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(Router.self) private var router
@@ -72,7 +72,7 @@ struct DataView: View {
         restoring = true
         Task {
             defer { restoring = false }
-            // §14.2: one sync cycle first, so words deleted on the account count as "deleted earlier".
+            // One sync cycle first, so words deleted on the account count as "deleted earlier".
             await env.sync?.syncIfSignedIn()
             let scoped = url.startAccessingSecurityScopedResource()
             defer { if scoped { url.stopAccessingSecurityScopedResource() } }

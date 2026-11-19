@@ -1,4 +1,4 @@
-/// Hybrid logical clock, doc 36 §11.3 and §11.5 step 2.
+/// Hybrid logical clock, with the clock-ahead reset against the last server time.
 public struct HLCTimestamp: Hashable, Comparable, Sendable, CustomStringConvertible {
     public var ms: Int64
     public var counter: UInt16

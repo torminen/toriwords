@@ -5,7 +5,7 @@ import ToriSync
 import ToriUI
 import Translation
 
-/// Settings root (doc 35 §3.10, wireframe 4-6 S1; 11-1 SD2/SD3 for reminders): a native grouped list.
+/// Settings root: a native grouped list.
 struct SettingsView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(Router.self) private var router

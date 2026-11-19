@@ -1,4 +1,4 @@
-/// In-memory review session (doc 36 §7.8): the card list, the one uncommitted answer (undo), Forgot re-shows and the
+/// In-memory review session: the card list, the one uncommitted answer (undo), Forgot re-shows and the
 /// session summary. Pure: the caller persists each `Answer` it gets back and passes the clock in.
 public struct ReviewSession: Sendable {
     public struct Card: Hashable, Sendable {
@@ -103,7 +103,7 @@ public struct ReviewSession: Sendable {
     }
 }
 
-/// Which sentence a card shows (doc 36 §7.8): index `reps mod count` over the eligible Contexts ordered by
+/// Which sentence a card shows: index `reps mod count` over the eligible Contexts ordered by
 /// (`captured_at`, `id`). Recall and cloze use only Contexts with a highlight.
 public enum SentenceRotation {
     public struct Context: Hashable, Sendable {

@@ -3,7 +3,7 @@ import ToriCore
 import ToriStore
 import ToriUI
 
-/// Home (doc 35 §3.1, wireframes 1-10 iOS 1/4, 9-4 H1–H3).
+/// Home screen.
 struct HomeView: View {
     @Environment(Router.self) private var router
     @Environment(\.scenePhase) private var scenePhase
@@ -21,7 +21,7 @@ struct HomeView: View {
                         FirstRunCard { router.push(.add(text: nil)) }
                     } else {
                         DueTodayBlock(snapshot: s)
-                        // Rows pending deletion are hidden during the Undo window (§5.7).
+                        // Rows pending deletion are hidden during the Undo window.
                         recentlyAdded(s.recent.filter { !deletion.hidden.contains($0.id) })
                     }
                 }
@@ -80,7 +80,7 @@ struct HomeView: View {
     }
 }
 
-/// Second line of a word row (Architecture §6.4 "Translation state shown in the UI").
+/// Second line of a word row: the translation state.
 enum TranslationLine {
     static func text(_ state: TranslationState) -> Text {
         switch state {
@@ -103,7 +103,7 @@ enum NextReview {
 // MARK: Due today
 
 /// The Due today block: one tap target opening Progress (or the Needs translation filter), with Review as a separate
-/// button (Product OQ-1…6, OQ-9 closed 2026-11-17).
+/// button; the catch-up message is shown inside it.
 private struct DueTodayBlock: View {
     let snapshot: HomeSnapshot
     @Environment(Router.self) private var router
@@ -179,7 +179,7 @@ private struct DueTodayBlock: View {
     }
 }
 
-/// "12 to review · 5 new" (§7.7); a zero part is left out.
+/// "12 to review · 5 new"; a zero part is left out.
 enum DueCounts {
     static func text(toReview: Int, new: Int) -> LocalizedStringResource {
         switch (toReview, new) {
@@ -203,7 +203,7 @@ private struct RowPressStyle: ButtonStyle {
 
 // MARK: First run
 
-/// Empty vocabulary (1-10 iOS 1, Product §5.10).
+/// Empty vocabulary.
 private struct FirstRunCard: View {
     let add: () -> Void
 

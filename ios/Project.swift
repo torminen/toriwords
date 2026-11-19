@@ -1,6 +1,6 @@
 import ProjectDescription
 
-// Toriwords app + Share Extension + widget (doc 36 §2.2). Values come from Config/Shared.xcconfig; ToriKit tests run
+// Toriwords app + Share Extension + widget. Values come from Config/Shared.xcconfig; ToriKit tests run
 // from the ToriKit package itself (README), so the project has no test targets.
 
 let deploymentTargets = DeploymentTargets.iOS("18.0")
@@ -12,17 +12,17 @@ let settings = Settings.settings(
     ]
 )
 
-/// App Group shared by the app, the Share Extension and the widget (doc 36 §2.2).
+/// App Group shared by the app, the Share Extension and the widget.
 let appGroup: Plist.Value = .array([.string("$(TORI_APP_GROUP_ID)")])
 let extensionEntitlements: Entitlements = .dictionary(["com.apple.security.application-groups": appGroup])
-/// The app also signs in with Apple (§12.1). Keychain: the session item uses the app's default access group, so no
-/// `keychain-access-groups` entry (extensions never see tokens, §2.2).
+/// The app also signs in with Apple. Keychain: the session item uses the app's default access group, so no
+/// `keychain-access-groups` entry (extensions never see tokens).
 let appEntitlements: Entitlements = .dictionary([
     "com.apple.security.application-groups": appGroup,
     "com.apple.developer.applesignin": .array([.string("Default")]),
 ])
 
-/// UI in English and Russian (§2.1), on every target.
+/// UI in English and Russian, on every target.
 let localizations: Plist.Value = .array([.string("en"), .string("ru")])
 
 let project = Project(
@@ -39,14 +39,14 @@ let project = Project(
                 "CFBundleDisplayName": "ToriWords",
                 "CFBundleLocalizations": localizations,
                 "UILaunchScreen": [:],
-                // Phone-first portrait layouts; iPad runs the same adaptive layouts in every orientation (§2.1).
+                // Phone-first portrait layouts; iPad runs the same adaptive layouts in every orientation.
                 "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
                 "UISupportedInterfaceOrientations~ipad": [
                     "UIInterfaceOrientationPortrait", "UIInterfaceOrientationPortraitUpsideDown",
                     "UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight",
                 ],
                 "ITSAppUsesNonExemptEncryption": false,
-                // toriwords:// deep links (§2.2) and the Google OAuth redirect (reversed client ID, §12.2).
+                // toriwords:// deep links and the Google OAuth redirect (reversed client ID).
                 "CFBundleURLTypes": [
                     ["CFBundleURLName": "com.toriwords.app", "CFBundleURLSchemes": ["$(TORI_URL_SCHEME)"]],
                     ["CFBundleURLName": "google-oauth", "CFBundleURLSchemes": ["$(TORI_GOOGLE_REVERSED_CLIENT_ID)"]],
@@ -58,7 +58,7 @@ let project = Project(
                 "ToriGoogleReversedClientID": "$(TORI_GOOGLE_REVERSED_CLIENT_ID)",
             ]),
             sources: ["App/**"],
-            // §8.3: the full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app
+            // The full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app
             // installs the full file when present, else the sample (Debug/CI). Release fails without the full file.
             resources: ["App/**/*.xcstrings", "Resources/dictionary*.sqlite"],
             entitlements: appEntitlements,
@@ -100,7 +100,7 @@ let project = Project(
                         "NSExtensionActivationRule": [
                             "NSExtensionActivationSupportsText": true,
                             "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
-                            // Safari runs ExtensionPreprocessing.js for web pages (§5.1, P1).
+                            // Safari runs ExtensionPreprocessing.js for web pages.
                             "NSExtensionActivationSupportsWebPageWithMaxCount": 1,
                         ],
                         "NSExtensionJavaScriptPreprocessingFile": "ExtensionPreprocessing",

@@ -2,7 +2,7 @@ import Foundation
 import GRDB
 import ToriCore
 
-/// Canonical-ID resolution and child re-linking (§4.3, §11.7 step 5).
+/// Canonical-ID resolution and child re-linking.
 enum Canonical {
     static let mergeable: [RecordType] = [.entry, .sense, .context, .tag, .source]
 
@@ -89,7 +89,7 @@ enum Canonical {
         }
     }
 
-    /// A merge group is deleted when any member carries a tombstone: write it on the live survivor (§11.6 step 4).
+    /// A merge group is deleted when any member carries a tombstone: write it on the live survivor.
     static func propagateTombstones(_ tx: Tx) throws {
         for type in mergeable where !(tx.touched[type.name] ?? []).isEmpty {
             let survivors = try ToriID.fetchAll(tx.db, sql: """
@@ -101,7 +101,7 @@ enum Canonical {
     }
 }
 
-/// Deterministic duplicate merge (§11.7). Returns whether anything merged (the caller repeats until stable).
+/// Deterministic duplicate merge. Returns whether anything merged (the caller repeats until stable).
 enum DuplicateMerge {
     static let live = "deleted = 0 AND merged_into IS NULL"
 
@@ -204,7 +204,7 @@ enum DuplicateMerge {
         return true
     }
 
-    /// Field merge into the survivor: original clocks and ranks copied, no outbox (§11.7 step 4). The owner never changes.
+    /// Field merge into the survivor: original clocks and ranks copied, no outbox. The owner never changes.
     static func absorb(_ tx: Tx, _ type: RecordType, from loser: SyncRecord, into survivorID: ToriID) throws {
         guard var survivor = try RecordIO.load(tx.db, type, survivorID), !survivor.deleted else { return }
         var changed = false
@@ -217,7 +217,7 @@ enum DuplicateMerge {
     }
 }
 
-/// Card creation for Entries that became reviewable (§4.2 `card`), rank 0, deterministic IDs.
+/// Card creation for Entries that became reviewable, rank 0, deterministic IDs.
 enum Cards {
     static func createMissing(_ tx: Tx) throws {
         let db = tx.db
@@ -244,7 +244,7 @@ enum Cards {
     }
 }
 
-/// Card cache = replay of its canonical logs (§7.6).
+/// Card cache = replay of its canonical logs.
 enum Replay {
     static func parameters(_ db: Database) throws -> (FSRSParameters, String) {
         let row = try Row.fetchOne(db, sql: "SELECT fsrs_w, desired_retention, params_id FROM settings WHERE id = ?", arguments: [ToriID.settings])
@@ -282,7 +282,7 @@ enum Replay {
     }
 }
 
-/// Explicit purge of a deleted Entry's children (§4.3); no cascades.
+/// Explicit purge of a deleted Entry's children; no cascades.
 enum Purge {
     static func deletedEntries(_ db: Database, among ids: Set<ToriID>) throws {
         let deleted = try ToriID.fetchAll(db, sql: """

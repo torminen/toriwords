@@ -1,6 +1,6 @@
 import Foundation
 
-/// App Group container layout (doc 36 §3). The root is injectable for tests.
+/// App Group container layout. The root is injectable for tests.
 public struct AppGroup: Sendable {
     public static let identifier = "group.com.toriwords.app"
 
@@ -58,7 +58,7 @@ enum JSONFiles {
     }
 }
 
-/// Darwin notification the Share Extension posts after writing an inbox file (doc 36 §5.3).
+/// Darwin notification the Share Extension posts after writing an inbox file.
 public enum InboxNotification {
     public static let name = "com.toriwords.inbox.changed"
 
@@ -68,7 +68,7 @@ public enum InboxNotification {
             CFNotificationCenterGetDarwinNotifyCenter(), CFNotificationName(name as CFString), nil, nil, true)
     }
 
-    /// Calls `handler` (on an arbitrary thread) for each post while this object is alive (doc 36 §5.6).
+    /// Calls `handler` (on an arbitrary thread) for each post while this object is alive.
     public final class Observer: Sendable {
         private let handler: @Sendable () -> Void
 

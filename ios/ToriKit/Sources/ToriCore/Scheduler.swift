@@ -5,7 +5,7 @@ import CryptoKit
 import Crypto
 #endif
 
-/// Review days with the 04:00 local boundary, doc 36 §7.2. All maths in 64-bit integers, floor toward −∞.
+/// Review days with the 04:00 local boundary. All maths in 64-bit integers, floor toward −∞.
 public enum DayModel {
     public static func dayNumber(unixMs: Int64, utcOffsetMin: Int) -> Int {
         Int(floorDiv(floorDiv(unixMs, 1000) + Int64(utcOffsetMin) * 60 - 4 * 3600, 86400))
@@ -22,12 +22,12 @@ public enum Rating: Int, Comparable, Codable, Sendable {
     public static func < (a: Self, b: Self) -> Bool { a.rawValue < b.rawValue }
 }
 
-/// Card stage (§7.6); the raw value is the stored name.
+/// Card stage; the raw value is the stored name.
 public enum CardStage: String, Codable, Sendable {
     case new, learning, knownWell = "known_well"
 }
 
-/// FSRS-6 parameter set (§7.4); synced via Settings.
+/// FSRS-6 parameter set; synced via Settings.
 public struct FSRSParameters: Hashable, Codable, Sendable {
     public var w: [Double]
     public var desiredRetention: Double
@@ -101,7 +101,7 @@ public struct ReviewLogInput: Hashable, Sendable {
     public static func replayOrder(_ a: Self, _ b: Self) -> Bool { (a.reviewedAt, a.id) < (b.reviewedAt, b.id) }
 }
 
-/// FSRS-6 (doc 36 §7.3–7.6). Pure and deterministic: binary64, seeded fuzz, no clock reads.
+/// FSRS-6. Pure and deterministic: binary64, seeded fuzz, no clock reads.
 public enum FSRS {
     public static func retrievability(elapsedDays t: Int, stability s: Double, _ p: FSRSParameters = .default) -> Double {
         pow(1 + p.factor * Double(t) / s, p.decay)
@@ -147,7 +147,7 @@ public enum FSRS {
             d = clamp(w[7] * d0(4) + (1 - w[7]) * dPrime, 1, 10)
             if t == 0 {
                 var inc = exp(w[17] * (g - 3 + w[18])) * pow(s0, -w[19])
-                // py-fsrs 6.3.3 (AQ-17) floors Hard too; doc 36 §7.3 said G ≥ 3. The fixtures follow py-fsrs.
+                // Same-day stability floor for G ≥ 2 (Hard too), as in py-fsrs 6.3.3. The fixtures follow py-fsrs.
                 if rating >= .hard { inc = max(inc, 1) }
                 s = s0 * inc
             } else {
@@ -177,7 +177,7 @@ public enum FSRS {
                          lastRating: rating, interval: ivl)
     }
 
-    /// Card state = replay of its logs (§7.6): sorted by (reviewedAt, id), unrated logs skipped. Nil = New.
+    /// Card state = replay of its logs: sorted by (reviewedAt, id), unrated logs skipped. Nil = New.
     public static func replay(cardID: ToriID, logs: [ReviewLogInput], _ p: FSRSParameters = .default) -> CardState? {
         logs.sorted(by: ReviewLogInput.replayOrder).reduce(nil) { state, log in
             guard let rating = log.rating else { return state }
@@ -186,7 +186,7 @@ public enum FSRS {
     }
 }
 
-/// Entry-level stage (AQ-9): New if no live Card has a rated log (or there are no Cards); Known well if every
+/// Entry-level stage: New if no live Card has a rated log (or there are no Cards); Known well if every
 /// live Card is `known_well`; otherwise Learning. Pass the state of each live Card (nil = New Card).
 public func entryStage(cardStates: [CardState?]) -> CardStage {
     let started = cardStates.compactMap { $0 }

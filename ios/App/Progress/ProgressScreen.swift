@@ -5,7 +5,7 @@ import ToriCore
 import ToriStore
 import ToriUI
 
-/// Progress (doc 35 §3.9, wireframe 9-4 P1; Product §5.15; doc 36 §14.1). No XP, levels or streaks.
+/// Progress. No XP, levels or streaks.
 struct ProgressScreen: View {
     @Environment(Router.self) private var router
     @Environment(\.scenePhase) private var scenePhase

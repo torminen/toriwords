@@ -2,7 +2,7 @@ import Foundation
 import ToriCore
 import ToriStore
 
-/// Background fills of pending Entries (doc 36 §6.4): dictionary first, MT fallback, three MT failures → `unavailable`.
+/// Background fills of pending Entries: dictionary first, MT fallback, three MT failures → `unavailable`.
 /// Triggers (the app calls them): app foreground → `runPending`; translation data installed → `retryUnavailable`;
 /// dictionary update → `updateDictionary`; "Try again" → `tryAgain`.
 public actor EnrichmentOrchestrator {
@@ -34,7 +34,7 @@ public actor EnrichmentOrchestrator {
         self.now = now
     }
 
-    /// Variants for the Add / Entry screens: dictionary first, MT appended when ready and new (§6.2).
+    /// Variants for the Add / Entry screens: dictionary first, MT appended when ready and new.
     public func suggestions(for text: String) async -> [Suggestion] {
         let headwords = lookup(text)
         var machine: String?
@@ -42,12 +42,12 @@ public actor EnrichmentOrchestrator {
         return Suggestions.build(headwords: headwords, dictVersion: dictionary?.version, machine: machine)
     }
 
-    /// IPA of the first dictionary headword for the text (Add preview, §6.2 item 7).
+    /// IPA of the first dictionary headword for the text (Add preview).
     public func ipa(for text: String) -> String? {
         lookup(text).lazy.compactMap(\.ipa).first
     }
 
-    /// "In this sentence: …" help on Add (P1, §6.2 item 5): only when on-device translation is ready; never stored.
+    /// "In this sentence: …" help on Add: only when on-device translation is ready; never stored.
     public func contextHelp(for sentence: String) async -> String? {
         guard let translator, await translator.isReady() else { return nil }
         return try? await translator.translate(sentence)
@@ -70,7 +70,7 @@ public actor EnrichmentOrchestrator {
         return total
     }
 
-    /// A new dictionary build was installed: `unavailable` Entries get another chance (§6.4, §8.3).
+    /// A new dictionary build was installed: `unavailable` Entries get another chance.
     @discardableResult
     public func updateDictionary(_ dictionary: (any DictionaryLookup)?) async throws -> RunSummary {
         self.dictionary = dictionary

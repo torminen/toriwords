@@ -98,6 +98,11 @@ enum Canonical {
                 """)
             for id in survivors { try tx.delete(type, id) }
         }
+        // A deleted Entry group: its other Entries become value-less tombstones too (the cloud keeps no values of the group).
+        guard !(tx.touched[RecordType.entry.name] ?? []).isEmpty else { return }
+        for id in try ToriID.fetchAll(tx.db, sql: """
+            SELECT m.id FROM entry m JOIN entry c ON c.id = m.canonical_id WHERE m.deleted = 0 AND m.id != c.id AND c.deleted = 1
+            """) { try tx.delete(.entry, id) }
     }
 }
 
@@ -284,7 +289,11 @@ enum Replay {
 
 /// Explicit purge of a deleted Entry's children; no cascades.
 enum Purge {
-    static func deletedEntries(_ db: Database, among ids: Set<ToriID>) throws {
+    static let children = ["sense", "context", "card", "entry_tag"]
+
+    /// Deletes the children of deleted Entries' groups (tombstones stay). `queueCloudDeletes`: the purged children are also
+    /// queued for deletion from the cloud (sync active), replacing their outbox rows.
+    static func deletedEntries(_ db: Database, among ids: Set<ToriID>, queueCloudDeletes: Bool = false) throws {
         let deleted = try ToriID.fetchAll(db, sql: """
             SELECT id FROM entry WHERE deleted = 1 AND id IN \(Database.placeholders(ids.count))
             AND NOT EXISTS (SELECT 1 FROM pending_changes WHERE record_id = entry.id AND field = '_deleted')
@@ -293,9 +302,30 @@ enum Purge {
         let group = Set(deleted).union(try ToriID.fetchAll(db, sql: "SELECT id FROM entry WHERE canonical_id IN \(Database.placeholders(deleted.count))",
                                                           arguments: idArgs(deleted)))
         let ph = Database.placeholders(group.count)
-        for child in ["sense", "context", "card", "entry_tag"] {
-            try db.execute(sql: "DELETE FROM \(child) WHERE entry_id IN \(ph) OR canonical_entry_id IN \(ph)", arguments: idArgs(group) + idArgs(group))
+        let owned: [(String, String)] = children.map { ($0, "entry_id IN \(ph) OR canonical_entry_id IN \(ph)") }
+            + [("review_log", "owner_entry_id IN \(ph)")]
+        for (table, condition) in owned {
+            let args = table == "review_log" ? idArgs(group) : idArgs(group) + idArgs(group)
+            if queueCloudDeletes {
+                for id in try ToriID.fetchAll(db, sql: "SELECT id FROM \(table) WHERE \(condition)", arguments: args) {
+                    try Outbox.queueCloudDelete(db, id, table)
+                }
+            }
+            try db.execute(sql: "DELETE FROM \(table) WHERE \(condition)", arguments: args)
         }
-        try db.execute(sql: "DELETE FROM review_log WHERE owner_entry_id IN \(ph)", arguments: idArgs(group))
+    }
+
+    /// Records the cloud deleted: only hidden children (owner Entry deleted) are purged here; anything else stays.
+    static func hiddenChildren(_ db: Database, _ ids: [ToriID]) throws {
+        guard !ids.isEmpty else { return }
+        let ph = Database.placeholders(ids.count)
+        for type in RecordType.all {
+            guard let owner = type.ownerColumn else { continue }
+            try db.execute(sql: """
+                DELETE FROM \(type.name) WHERE id IN \(ph) AND EXISTS (SELECT 1 FROM entry e LEFT JOIN entry c ON c.id = e.canonical_id
+                WHERE e.id = \(type.name).\(owner) AND (e.deleted = 1 OR c.deleted = 1))
+                """, arguments: idArgs(ids))
+        }
+        try db.execute(sql: "DELETE FROM cloud_record_meta WHERE record_id IN \(ph)", arguments: idArgs(ids))
     }
 }

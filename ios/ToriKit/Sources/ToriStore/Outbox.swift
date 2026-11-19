@@ -4,22 +4,26 @@ import ToriCore
 
 /// Outbox reads and bookkeeping.
 enum Outbox {
+    /// Field of a row that asks for the cloud deletion of a purged child record.
+    static let cloudDelete = "_cloudDelete"
+
+    /// Full envelopes: the cloud stores whole merged records, so a partial change still sends every field.
     static func batch(_ db: Database, maxRecords: Int, excluding: Set<ToriID>) throws -> PushBatch {
         let ids = try Row.fetchAll(db, sql: """
-            SELECT record_id, MIN(type) AS type FROM pending_changes WHERE record_id NOT IN \(Database.placeholders(excluding.count))
+            SELECT record_id, MIN(type) AS type FROM pending_changes
+            WHERE field != '\(cloudDelete)' AND record_id NOT IN \(Database.placeholders(excluding.count))
             GROUP BY record_id ORDER BY record_id LIMIT ?
             """, arguments: idArgs(excluding) + [maxRecords])
         var records: [SyncRecord] = [], rows: [OutboxRow] = []
         for r in ids {
             let id: ToriID = r["record_id"]
             let typeName: String = r["type"]
-            let pending = try Row.fetchAll(db, sql: "SELECT field, clock FROM pending_changes WHERE record_id = ?", arguments: [id]).map {
+            let pending = try Row.fetchAll(db, sql: "SELECT field, clock FROM pending_changes WHERE record_id = ? AND field != ?",
+                                           arguments: [id, cloudDelete]).map {
                 OutboxRow(recordID: id, type: typeName, field: $0["field"], clock: $0["clock"])
             }
             rows += pending
-            guard let type = RecordType.byName[typeName], var record = try RecordIO.load(db, type, id) else { continue }
-            let fields = Set(pending.map(\.field))
-            if !fields.contains("*") { record.fields = record.fields.filter { fields.contains($0.key) } }
+            guard let type = RecordType.byName[typeName], let record = try RecordIO.load(db, type, id) else { continue }
             records.append(record)
         }
         return PushBatch(records: records, rows: rows)
@@ -32,7 +36,13 @@ enum Outbox {
                            arguments: [row.recordID, row.field, row.clock])
             if row.type == "entry" { tombstones.insert(row.recordID) }
         }
-        if !tombstones.isEmpty { try Purge.deletedEntries(db, among: tombstones) }
+        if !tombstones.isEmpty { try Purge.deletedEntries(db, among: tombstones, queueCloudDeletes: true) }
+    }
+
+    static func queueCloudDelete(_ db: Database, _ id: ToriID, _ type: String) throws {
+        try db.execute(sql: "DELETE FROM pending_changes WHERE record_id = ?", arguments: [id])
+        try db.execute(sql: "INSERT INTO pending_changes (record_id, type, field, clock) VALUES (?, ?, ?, '')",
+                       arguments: [id, type, cloudDelete])
     }
 
     static func markAll(_ tx: Tx) throws {
@@ -46,7 +56,8 @@ enum Outbox {
     static func recoverClockAhead(_ tx: Tx, lastServerTime: Int64) throws -> Bool {
         guard tx.hlc.ms - lastServerTime > HLCState.hourMs else { return false }
         tx.hlc = HLCState(ms: max(lastServerTime, tx.now), counter: 0)
-        let rows = try Row.fetchAll(tx.db, sql: "SELECT record_id, type, field FROM pending_changes ORDER BY record_id, field")
+        let rows = try Row.fetchAll(tx.db, sql: "SELECT record_id, type, field FROM pending_changes WHERE field != ? ORDER BY record_id, field",
+                                    arguments: [cloudDelete])
         for row in rows {
             let id: ToriID = row["record_id"], field: String = row["field"]
             let clock = tx.stamp()
@@ -63,13 +74,14 @@ enum Outbox {
 
 /// Applying a pulled page; also used by restore.
 enum Apply {
-    static func page(_ tx: Tx, _ records: [SyncRecord]) throws -> PulledPageResult {
-        var skipped = Set<String>()
+    /// `dropped`: live children of deleted Entries (id -> type), for the cloud purge on sight.
+    static func page(_ tx: Tx, _ records: [SyncRecord]) throws -> (skipped: Set<String>, dropped: [ToriID: String]) {
+        var skipped = Set<String>(), dropped: [ToriID: String] = [:]
         for remote in records {
             guard let type = RecordType.byName[remote.type] else { skipped.insert(remote.type); continue }
-            try record(tx, type, remote)
+            if try record(tx, type, remote) == .dropped, !remote.deleted { dropped[remote.id] = type.name }
         }
-        return PulledPageResult(skippedUnknownTypes: skipped)
+        return (skipped, dropped)
     }
 
     /// Merges one record; returns the outcome for restore statistics.

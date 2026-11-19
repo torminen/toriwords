@@ -28,12 +28,12 @@ struct TestStore {
         let clock = TestClock(now)
         self.clock = clock
         store = try ToriStore(path: dir.appendingPathComponent("user.sqlite").path, now: { clock.ms })
-        if launch { try store.launch(deviceMarker: marker, displayName: "iPhone", purgeKeychain: {}) }
+        if launch { try store.launch(deviceMarker: marker, displayName: "iPhone") }
     }
 
     var marker: URL { dir.appendingPathComponent("device-marker") }
 
-    func signIn(_ account: String = "acc-1") throws { try store.setSyncState([.accountId: account]) }
+    func activateCloud(_ user: String = "user-1") throws { try store.activateCloud(user: user) }
 
     func scalar<T: DatabaseValueConvertible>(_ sql: String, _ args: StatementArguments = []) throws -> T? {
         try store.db.read { try T.fetchOne($0, sql: sql, arguments: args) }

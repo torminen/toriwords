@@ -27,6 +27,10 @@ public enum WidgetDisplay: Hashable, Sendable {
     /// Timeline instants: each 04:00 day boundary (in the snapshot's offset) after `now`, for the next `count` days.
     public static func dayBoundaries(after now: Int64, utcOffsetMin: Int, count: Int = 7) -> [Int64] {
         let today = DayModel.dayNumber(unixMs: now, utcOffsetMin: utcOffsetMin)
-        return (1...count).map { k in (Int64(today + k) * 86_400 + 4 * 3_600 - Int64(utcOffsetMin) * 60) * 1_000 }
+        let offsetSec = Int64(utcOffsetMin) * 60
+        return (1...count).map { k -> Int64 in
+            let day = Int64(today + k)
+            return (day * 86_400 + 4 * 3_600 - offsetSec) * 1_000
+        }
     }
 }

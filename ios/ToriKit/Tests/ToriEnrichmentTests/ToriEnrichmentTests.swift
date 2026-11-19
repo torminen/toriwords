@@ -54,7 +54,7 @@ struct Harness {
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let clock = self.clock
         store = try ToriStore(path: dir.appendingPathComponent("user.sqlite").path, now: { clock.ms })
-        try store.launch(deviceMarker: dir.appendingPathComponent("marker"), displayName: "iPhone", purgeKeychain: {})
+        try store.launch(deviceMarker: dir.appendingPathComponent("marker"), displayName: "iPhone")
     }
 
     func orchestrator(_ dict: FakeDictionary? = FakeDictionary(), _ mt: FakeTranslator? = nil) -> EnrichmentOrchestrator {

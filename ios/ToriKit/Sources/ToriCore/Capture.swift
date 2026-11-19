@@ -222,7 +222,7 @@ public enum Capture {
         func render(_ a: Int, _ b: Int) -> ([Unicode.Scalar], Int) {
             let prefix: [Unicode.Scalar] = a == 0 ? [] : [ellipsis]
             let suffix: [Unicode.Scalar] = b == words.count - 1 ? [] : [ellipsis]
-            return (prefix + s[words[a].0..<words[b].1] + suffix, prefix.count - words[a].0)
+            return (prefix + Array(s[words[a].0..<words[b].1]) + suffix, prefix.count - words[a].0)
         }
         var a = first, b = last, grew = true
         while grew {

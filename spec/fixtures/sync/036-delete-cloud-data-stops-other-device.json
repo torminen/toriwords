@@ -1,0 +1,132 @@
+{
+  "kind": "sync-scenario",
+  "source": "Delete iCloud data: the zone is deleted; another device sees it gone, keeps its words and stops syncing until \"Back up this device again\"",
+  "cases": [
+    {
+      "id": "036-delete-cloud-data-stops-other-device",
+      "title": "Deleting iCloud data on one device stops the other, which keeps its words and can back up again",
+      "start": 1762776000000,
+      "devices": {
+        "A": {},
+        "B": {}
+      },
+      "steps": [
+        {
+          "t": 0,
+          "device": "A",
+          "op": "capture",
+          "term": "run",
+          "translations": [
+            "бежать"
+          ],
+          "as": "run"
+        },
+        {
+          "t": 10,
+          "device": "A",
+          "op": "enableSync",
+          "account": "alice"
+        },
+        {
+          "t": 15,
+          "device": "B",
+          "op": "capture",
+          "term": "walk",
+          "translations": [
+            "идти"
+          ],
+          "as": "walk"
+        },
+        {
+          "t": 20,
+          "device": "B",
+          "op": "enableSync",
+          "account": "alice"
+        },
+        {
+          "t": 30,
+          "device": "A",
+          "op": "sync"
+        },
+        {
+          "t": 40,
+          "device": "A",
+          "op": "deleteCloudData"
+        },
+        {
+          "t": 50,
+          "device": "B",
+          "op": "capture",
+          "term": "swim",
+          "translations": [
+            "плавать"
+          ],
+          "as": "swim"
+        },
+        {
+          "t": 60,
+          "device": "B",
+          "op": "sync"
+        },
+        {
+          "t": 70,
+          "device": "B",
+          "op": "backUpAgain"
+        },
+        {
+          "t": 80,
+          "device": "A",
+          "op": "sync"
+        }
+      ],
+      "note": "A stays stopped after B's backup: its own \"Back up this device again\" would merge its words into the new zone.",
+      "expected": {
+        "devices": {
+          "A": {
+            "words": [
+              {
+                "text": "run"
+              },
+              {
+                "text": "walk"
+              }
+            ],
+            "sync": {
+              "state": "cloudDeleted",
+              "outbox": 0
+            }
+          },
+          "B": {
+            "words": [
+              {
+                "text": "run"
+              },
+              {
+                "text": "swim",
+                "translations": [
+                  "плавать"
+                ]
+              },
+              {
+                "text": "walk"
+              }
+            ],
+            "sync": {
+              "state": "synced",
+              "outbox": 0
+            }
+          }
+        },
+        "cloud": {
+          "alice": {
+            "entries": {
+              "live": 3,
+              "deleted": 0,
+              "merged": 0
+            }
+          }
+        }
+      }
+    }
+  ]
+}

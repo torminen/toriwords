@@ -59,8 +59,8 @@ struct SettingsView: View {
                     router.push(.translation)
                 }
                 DrillRow(title: Text("Language"), value: Text(verbatim: AppLanguage.currentName)) { router.push(.language) }
-                DrillRow(title: Text("Account"), value: Text(AccountStatusText.rowValue(env.syncCoordinator.model.status))) {
-                    router.push(.account)
+                DrillRow(title: Text("iCloud sync"), value: env.syncCoordinator.model.status.map(CloudSyncText.rowValue)) {
+                    router.push(.cloudSync)
                 }
                 DrillRow(title: Text("Data"), value: nil) { router.push(.data) }
                 DrillRow(title: Text("About"), value: nil) { router.push(.about) }

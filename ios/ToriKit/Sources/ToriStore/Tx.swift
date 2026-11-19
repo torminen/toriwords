@@ -18,6 +18,8 @@ final class Tx {
     /// Canonical Cards already advanced incrementally (answer commit).
     var stepped: Set<ToriID> = []
     var paramsChanged = false
+    /// Applying cloud records: Entry tombstones that arrive purge their group's children (queued as cloud deletes).
+    var pulled = false
 
     init(db: Database, now: Int64) throws {
         self.db = db
@@ -97,7 +99,9 @@ final class Tx {
         try Cards.createMissing(self)
         try Canonical.resolve(self)
         try Replay.run(self)
-        if !outboxActive, let deleted = touched["entry"], !deleted.isEmpty { try Purge.deletedEntries(db, among: deleted) }
+        if let deleted = touched["entry"], !deleted.isEmpty, !outboxActive || pulled {
+            try Purge.deletedEntries(db, among: deleted, queueCloudDeletes: outboxActive)
+        }
         try SyncStateStore.set(db, .hlc, JSONText.encode(hlc))
         touched = [:]
     }

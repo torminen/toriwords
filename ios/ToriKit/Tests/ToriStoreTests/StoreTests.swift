@@ -23,27 +23,28 @@ import ToriTestSupport
 
 @Test func launchFreshThenRestore() throws {
     let s = try TestStore(launch: false)
-    var purged = 0
-    #expect(try s.store.launch(deviceMarker: s.marker, displayName: "iPhone", purgeKeychain: { purged += 1 }) == .freshInstall)
-    #expect(purged == 1)
+    #expect(try s.store.launch(deviceMarker: s.marker, displayName: "iPhone") == .freshInstall)
     let first = try #require(try s.store.thisDeviceID())
     #expect(try Data(contentsOf: s.marker) == Data(first.bytes))
     #expect(try s.scalar("SELECT new_words_per_day FROM settings WHERE id = ?", [ToriID.settings]) == 10)
     #expect(try s.scalar("SELECT native_lang FROM language_pair WHERE id = ?", [ToriID.languagePair(native: "ru", target: "en")]) == "ru")
     #expect((try s.scalar("SELECT field_clocks FROM settings") as String?)?.contains("\"u\":0") == true)
 
-    #expect(try s.store.launch(deviceMarker: s.marker, displayName: "iPhone", purgeKeychain: { purged += 1 }) == .existing)
+    #expect(try s.store.launch(deviceMarker: s.marker, displayName: "iPhone") == .existing)
 
-    // Restored from a backup: the marker (excluded from backup) is missing.
-    try s.store.setSyncState([.accountId: "acc", .lastSyncedAccountId: "acc", .cursor: "42"])
+    // Restored from a backup: the marker (excluded from backup) is missing; token and system fields are stale.
+    try s.activateCloud()
+    let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0))
+    try s.store.applyCloudChanges([], meta: [e: Data([1])], token: "dG9r")
+    try s.store.recordSaved(try s.store.pendingPush().rows, meta: [e: Data([2])])
     try FileManager.default.removeItem(at: s.marker)
-    #expect(try s.store.launch(deviceMarker: s.marker, displayName: "iPhone", purgeKeychain: { purged += 1 }) == .restoredFromBackup)
-    #expect(purged == 1)
+    #expect(try s.store.launch(deviceMarker: s.marker, displayName: "iPhone") == .restoredFromBackup)
     let second = try #require(try s.store.thisDeviceID())
     #expect(second != first)
     #expect(try s.scalar("SELECT is_this_device FROM device WHERE id = ?", [first]) == 0)
-    #expect(try s.store.syncState(.accountId) == nil && s.store.syncState(.cursor) == nil)
-    #expect(try s.store.syncState(.lastSyncedAccountId) == "acc")
+    #expect(try s.store.syncState(.changeToken) == nil && s.store.cloudMeta([e]).isEmpty)
+    #expect(try s.store.syncState(.cloudUser) == "user-1")
+    #expect(try s.store.pendingPush().records.contains { $0.id == e })
 }
 
 // MARK: Text order through the real A–Z query
@@ -62,36 +63,40 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
 
 // MARK: Clocks and outbox
 
-@Test func outboxOnlyWhileSignedInAndNotPaused() throws {
+@Test func outboxOnlyWhileCloudActiveAndNotDeleted() throws {
     let s = try TestStore()
     let a = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
     #expect(try s.store.pendingRecordCount() == 0)
     let clocks = try #require(JSONText.decode([String: FieldClock].self, try s.scalar("SELECT field_clocks FROM entry WHERE id = ?", [a])))
     #expect(clocks["text"]?.u == 1 && clocks["enrichment_status"]?.u == 0 && clocks["needs_check"]?.u == 0)
 
-    try s.signIn()
+    try s.activateCloud()
+    let initial = try s.store.pendingPush()
+    try s.store.recordSaved(initial.rows, meta: Dictionary(uniqueKeysWithValues: initial.records.map { ($0.id, Data([0])) }))
+    #expect(try s.store.pendingRecordCount() == 0)
     s.clock.ms += 1
     try s.store.setEntryNote(a, "note")
     let rows = try s.rows("SELECT type, field FROM pending_changes").map { "\($0["type"] as String).\($0["field"] as String)" }
     #expect(Set(rows) == ["entry.note", "entry.updated_at"])
     let push = try s.store.pendingPush()
-    #expect(push.records.count == 1 && Set(push.records[0].fields.keys) == ["note", "updated_at"])
+    #expect(push.records.count == 1 && push.records[0].fields.keys.contains("text"), "full envelope")
 
-    // Paused (account prompt cancelled): no outbox rows, clocks still stamped.
-    try s.store.setSyncState([.pendingAccountChoice: "{}"])
-    try s.store.setEntryNote(a, "paused edit")
-    #expect(try s.store.pendingRecordCount() == 1)
-    #expect(try s.scalar("SELECT note FROM entry WHERE id = ?", [a]) == "paused edit")
-
-    // Ack removes only rows whose clock is unchanged.
-    try s.store.setSyncState([.pendingAccountChoice: nil])
+    // Ack removes only rows whose clock is unchanged; the system fields are stored.
     s.clock.ms += 1
     try s.store.setEntryNote(a, "newer")
-    try s.store.acknowledge(push.rows, acked: [a])
+    try s.store.recordSaved(push.rows, meta: [a: Data([7])])
+    #expect(try s.store.cloudMeta([a]) == [a: Data([7])])
     #expect(try s.rows("SELECT field FROM pending_changes").map { $0["field"] as String }.sorted() == ["note", "updated_at"])
     let all = try s.store.pendingPush()
-    try s.store.acknowledge(all.rows, acked: [a])
+    try s.store.recordSaved(all.rows, meta: [a: Data([8])])
     #expect(try s.store.pendingRecordCount() == 0)
+
+    // iCloud data deleted: no outbox rows, clocks still stamped.
+    try s.store.markCloudDeleted()
+    try s.store.setEntryNote(a, "local edit")
+    #expect(try s.store.pendingRecordCount() == 0)
+    #expect(try s.scalar("SELECT note FROM entry WHERE id = ?", [a]) == "local edit")
+    #expect(try s.store.cloudMeta([a]).isEmpty)
 }
 
 @Test func automaticWriteNeverOverridesUserValue() throws {
@@ -108,7 +113,7 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
 
 @Test func clockAheadRecoveryRestampsPendingFields() throws {
     let s = try TestStore()
-    try s.signIn()
+    try s.activateCloud()
     s.clock.ms = t0 + 10 * HLCState.hourMs  // device clock ran ahead
     let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0))
     s.clock.ms = t0
@@ -124,7 +129,7 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
 
 @Test func mergeByEditIsAskedThenDeterministic() throws {
     let s = try TestStore()
-    try s.signIn()
+    try s.activateCloud()
     let run = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
     s.clock.ms += 1000
     let walk = try s.store.capture(CaptureInput(term: "walk", capturedAt: t0, senses: [.tr("идти")]))
@@ -155,9 +160,9 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     let card = ToriID.card(entry: mine, direction: .recognition)
     try phone.store.commitAnswer(card: card, rating: .remembered, reviewedAt: t0 + 120_000, utcOffsetMin: 0, answerMs: 1000)
 
-    try phone.store.applyPulledPage(try tablet.records(), cursor: "1")
+    try phone.store.applyCloudChanges(try tablet.records(), token: "1")
     #expect(try phone.scalar("SELECT merged_into FROM entry WHERE id = ?", [mine]) == theirs)
-    #expect(try phone.store.syncState(.cursor) == "1")
+    #expect(try phone.store.syncState(.changeToken) == "1")
     let detail = try #require(try phone.store.read { try $0.entry(mine) })
     #expect(detail.id == theirs)
     #expect(Set(detail.senses.compactMap(\.translation)) == ["взлетать", "снимать"])
@@ -200,11 +205,11 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     let parents: Set = ["entry", "card", "tag", "source", "language_pair", "settings"]
 
     let one = try TestStore(now: t0 + 1)
-    try one.store.applyPulledPage(records, cursor: "1")
+    try one.store.applyCloudChanges(records, token: "1")
     let two = try TestStore(now: t0 + 1)
-    try two.store.applyPulledPage(records.filter { !parents.contains($0.type) }, cursor: "1")
+    try two.store.applyCloudChanges(records.filter { !parents.contains($0.type) }, token: "1")
     #expect(try two.store.read { try $0.words(WordsQuery()) }.isEmpty)  // orphans hidden
-    try two.store.applyPulledPage(records.filter { parents.contains($0.type) }, cursor: "2")
+    try two.store.applyCloudChanges(records.filter { parents.contains($0.type) }, token: "2")
 
     #expect(try one.dump().filter { !$0.hasPrefix("settings") && !$0.hasPrefix("language_pair") }
             == two.dump().filter { !$0.hasPrefix("settings") && !$0.hasPrefix("language_pair") })
@@ -221,7 +226,7 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     let a = try TestStore(now: t0)
     let e = try a.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
     let b = try TestStore(now: t0)
-    try b.store.applyPulledPage(try a.records(), cursor: "1")
+    try b.store.applyCloudChanges(try a.records(), token: "1")
 
     // A adds a Sense offline; B deletes (signed out → children purged at once).
     let lateSense = try a.store.addSense(to: e, .tr("бегать"))
@@ -230,13 +235,13 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     #expect(try b.scalar("SELECT COUNT(*) FROM sense") == 0)
     #expect(try b.scalar("SELECT COUNT(*) FROM card") == 0)
 
-    try b.store.applyPulledPage(try a.store.db.read { db in [try RecordIO.load(db, .sense, lateSense)!] }, cursor: "2")
+    try b.store.applyCloudChanges(try a.store.db.read { db in [try RecordIO.load(db, .sense, lateSense)!] }, token: "2")
     #expect(try b.scalar("SELECT COUNT(*) FROM sense") == 0)
 
     // The tombstone reaches A and wins over its offline edit.
     let tombstone = try b.store.db.read { try RecordIO.load($0, .entry, e)! }
     #expect(tombstone.deleted && tombstone.fields.isEmpty)
-    try a.store.applyPulledPage([tombstone], cursor: "1")
+    try a.store.applyCloudChanges([tombstone], token: "1")
     #expect(try a.store.read { try $0.words(WordsQuery()) }.isEmpty)
     #expect(try a.store.read { try $0.entry(e) } == nil)
 }
@@ -249,9 +254,9 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     record.fields["future_field"] = FieldVersion(value: .string("x"), clock: clock, rank: .user)
     record.schema = 2
     let unknown = SyncRecord(id: .v5("x"), type: "deck", schema: 1, owner: nil, deleted: false, mergedInto: nil, fields: [:])
-    let result = try s.store.applyPulledPage([record, unknown], cursor: "1")
+    let result = try s.store.applyCloudChanges([record, unknown], token: "1")
     #expect(result.skippedUnknownTypes == ["deck"])
-    try s.signIn()
+    try s.activateCloud()
     try s.store.markAllPending()
     let pushed = try #require(try s.store.pendingPush().records.first { $0.id == e })
     #expect(pushed.fields["future_field"] == FieldVersion(value: .string("x"), clock: clock, rank: .user))
@@ -283,7 +288,8 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     var want = try #require(try expected(.default))
     var row = try cached()
     #expect(row["stability"] == want.stability && row["difficulty"] == want.difficulty)
-    #expect(row["due_day"] == want.dueDay && row["reps"] == want.reps && row["lapses"] == want.lapses && row["stage"] == want.stage.rawValue)
+    #expect(row["due_day"] == want.dueDay && row["reps"] == want.reps)
+    #expect(row["lapses"] == want.lapses && row["stage"] == want.stage.rawValue)
 
     var p = FSRSParameters.default
     p.desiredRetention = 0.85
@@ -439,7 +445,7 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     #expect(wrapper.format == "toriwords-backup" && wrapper.version == 1 && wrapper.protocol == 1)
 
     let b = try TestStore(now: t0 + 1)
-    try b.signIn()
+    try b.activateCloud()
     #expect(try b.store.restore(backup) == RestoreSummary(imported: 2, merged: 0, deletedEarlier: 0))
     #expect(try b.store.pendingRecordCount() > 0)
     #expect(try a.store.read { try $0.entry(e) }?.cards == b.store.read { try $0.entry(e) }?.cards)
@@ -464,16 +470,16 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     #expect(csv.csv.contains("take off,взлетать,,It took off.,,travel,learning,2025-11-10\r\n"))
 }
 
-@Test func removeAllDataRecreatesDefaultsAndSignsOut() throws {
+@Test func removeAllDataRecreatesDefaultsAndClearsCloudState() throws {
     let s = try TestStore()
-    try s.signIn()
-    _ = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
-    var signedOut = false
-    try s.store.removeAllDataFromDevice { signedOut = true }
-    #expect(signedOut)
+    try s.activateCloud()
+    let e = try s.store.capture(CaptureInput(term: "run", capturedAt: t0, senses: [.tr("бежать")]))
+    try s.store.applyCloudChanges([], meta: [e: Data([1])], token: "dG9r")
+    try s.store.removeAllDataFromDevice()
+    #expect(try s.store.syncState(.changeToken) == nil && s.store.cloudMeta([e]).isEmpty)
     #expect(try s.scalar("SELECT COUNT(*) FROM entry") == 0 && s.scalar("SELECT COUNT(*) FROM card") == 0)
     #expect(try s.scalar("SELECT COUNT(*) FROM settings") == 1 && s.scalar("SELECT COUNT(*) FROM language_pair") == 1)
-    #expect(try s.store.syncState(.accountId) == nil && s.store.pendingRecordCount() == 0)
+    #expect(try s.store.pendingRecordCount() == 0)
     #expect(try s.store.thisDeviceID() != nil)
 }
 

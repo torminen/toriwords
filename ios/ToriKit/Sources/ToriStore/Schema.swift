@@ -10,6 +10,14 @@ enum Schema {
             for sql in v1 { try db.execute(sql: sql) }
             try db.execute(sql: "INSERT INTO schema_meta (version) VALUES (1)")
         }
+        // No own backend: CloudKit system fields per record; the account and cursor keys of the old sync go.
+        m.registerMigration("v2-cloud") { db in
+            try db.execute(sql: "CREATE TABLE cloud_record_meta (record_id BLOB PRIMARY KEY, system_fields BLOB NOT NULL)")
+            try db.execute(sql: """
+                DELETE FROM sync_state WHERE key IN
+                ('cursor','accountId','lastSyncedAccountId','pendingAccountChoice','adoptedAccountId','lastProvider','signInBaseline')
+                """)
+        }
         return m
     }
 

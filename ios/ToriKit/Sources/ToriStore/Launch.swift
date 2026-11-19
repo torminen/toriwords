@@ -7,10 +7,10 @@ public enum LaunchOutcome: Equatable, Sendable {
 }
 
 extension ToriStore {
-    /// Launch: fresh install or restored-from-backup handling, after the migration in `init`. `deviceMarker` lives in Application Support and is excluded from
-    /// backup; `purgeKeychain` deletes Session tokens left by a previous installation (fresh install only).
+    /// Launch: fresh install or restored-from-backup handling, after the migration in `init`. `deviceMarker` lives in
+    /// Application Support and is excluded from backup.
     @discardableResult
-    public func launch(deviceMarker: URL, displayName: String, purgeKeychain: () -> Void) throws -> LaunchOutcome {
+    public func launch(deviceMarker: URL, displayName: String) throws -> LaunchOutcome {
         let marker = (try? Data(contentsOf: deviceMarker)).flatMap { $0.count == 16 ? ToriID(bytes: $0) : nil }
         let outcome: LaunchOutcome = try write { tx in
             let current = try ToriID.fetchOne(tx.db, sql: "SELECT id FROM device WHERE is_this_device = 1")
@@ -22,15 +22,14 @@ extension ToriStore {
             try tx.set(.device, device, ["platform": .string("ios"), "display_name": .string(displayName),
                                          "first_seen": .int(tx.now)], rank: .automatic)
             guard current == nil else {
-                // Restored: tokens were not restored, so this install is signed out; `lastSyncedAccountId` stays.
-                try Account.signedOutState(tx.db)
+                // Restored from a device backup: token and system fields are an older snapshot than the cloud.
+                try Account.restoreReset(tx)
                 return .restoredFromBackup
             }
             try Defaults.create(tx)
             return .freshInstall
         }
         try writeMarker(deviceMarker)
-        if outcome == .freshInstall { purgeKeychain() }
         return outcome
     }
 
@@ -52,24 +51,10 @@ extension ToriStore {
         try db.read { try ToriID.fetchOne($0, sql: "SELECT id FROM device WHERE is_this_device = 1") }
     }
 
-    /// Account prompt "Remove from this device" (stays signed in): one transaction deleting every synced user record, re-creating
-    /// the LanguagePair and Settings defaults, deleting the outbox, resetting `cursor` and clearing `pendingAccountChoice`.
-    public func removeAllUserRecords() throws {
-        try write { tx in
-            try Account.deleteUserRecords(tx)
-            try SyncStateStore.set(tx.db, .cursor, nil)
-            try SyncStateStore.set(tx.db, .pendingAccountChoice, nil)
-        }
-    }
-
-    /// Settings → Data → "Remove all data from this device": deletes all user records, recreates defaults and
-    /// signs out (auth keys of `sync_state` cleared; `signOut` deletes the Keychain tokens after commit).
-    public func removeAllDataFromDevice(signOut: () -> Void) throws {
-        try write { tx in
-            try Account.deleteUserRecords(tx)
-            try Account.signedOutState(tx.db)
-        }
-        signOut()
+    /// Settings → Data → "Remove all data from this device": deletes all user records and recreates the defaults. Token
+    /// and system fields go too, so the next sync downloads everything the cloud still has.
+    public func removeAllDataFromDevice() throws {
+        try write { tx in try Account.deleteUserRecords(tx) }
     }
 }
 
@@ -95,11 +80,12 @@ enum Account {
         }
         try Defaults.create(tx)
         try tx.db.execute(sql: "DELETE FROM pending_changes")
+        try CloudMeta.reset(tx.db)
     }
 
-    /// Sign-out state: session keys, cursor and outbox gone; data and `lastSyncedAccountId` kept.
-    static func signedOutState(_ db: Database) throws {
-        for key in [SyncStateKey.accountId, .cursor, .adoptedAccountId, .pendingAccountChoice] { try SyncStateStore.set(db, key, nil) }
-        try db.execute(sql: "DELETE FROM pending_changes")
+    /// Restored install: token and system fields cleared, every record pending; `cloudDeleted` untouched.
+    static func restoreReset(_ tx: Tx) throws {
+        try CloudMeta.reset(tx.db)
+        try Outbox.markAll(tx)
     }
 }

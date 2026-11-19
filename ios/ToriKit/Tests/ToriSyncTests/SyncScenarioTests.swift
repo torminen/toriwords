@@ -6,7 +6,7 @@ import ToriTestSupport
 @testable import ToriStore
 @testable import ToriSync
 
-/// `spec/fixtures/sync/`: the real ToriStore + SyncEngine for each simulated device, in-process, against `Hub`.
+/// `spec/fixtures/sync/`: the real ToriStore + SyncEngine for each simulated device, in-process, against `InMemoryCloud`.
 enum SyncScenarios {
     static var all: [FixtureCase] {
         let dir = FixtureLocator.url("sync")
@@ -24,62 +24,28 @@ func syncScenario(_ c: FixtureCase) async throws {
     try await world.check(c["expected"])
 }
 
-final class ScenarioClock: @unchecked Sendable {
-    private let lock = NSLock()
-    private var value: Int64
-    init(_ v: Int64) { value = v }
-    var ms: Int64 {
-        get { lock.withLock { value } }
-        set { lock.withLock { value = newValue } }
-    }
-}
-
-final class Device {
-    let name: String
-    let store: ToriStore
-    let engine: SyncEngine
-    let link: HubLink
-    let offset: ScenarioClock
-
-    init(name: String, hub: Hub, clock: ScenarioClock, offsetMs: Int64,
-         sleep: @escaping @Sendable (Int64) async throws -> Void = { _ in throw CancellationError() }) async throws {
-        self.name = name
-        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        let offset = ScenarioClock(offsetMs)
-        self.offset = offset
-        let now: @Sendable () -> Int64 = { clock.ms + offset.ms }
-        store = try ToriStore(path: dir.appendingPathComponent("user.sqlite").path, now: now)
-        try store.launch(deviceMarker: dir.appendingPathComponent("marker"), displayName: name, purgeKeychain: {})
-        link = HubLink(hub)
-        engine = SyncEngine(.init(store: store, transport: link, sessionStore: InMemorySessionStore(), appVersion: "1.0.0",
-                                  deviceID: try store.thisDeviceID()!, now: now, sleep: sleep,
-                                  jitter: { 0.5 }))
-        try await engine.start()
-    }
-}
-
 final class World {
     let c: FixtureCase
-    let clock: ScenarioClock
+    let clock: TestClock
     let start: Int64
-    let hub: Hub
-    var devices: [String: Device] = [:]
+    let cloud: InMemoryCloud
+    var devices: [String: CloudDevice] = [:]
     /// Alias -> record ID (IDs are global across devices).
     var aliases: [String: ToriID] = [:]
 
     init(_ c: FixtureCase) async throws {
         self.c = c
         start = c["start"].int64!
-        let clock = ScenarioClock(start)
+        let clock = TestClock(start)
         self.clock = clock
-        hub = Hub(now: { clock.ms })
+        cloud = InMemoryCloud { clock.ms }
         for (name, cfg) in c["devices"].object.sorted(by: { $0.key < $1.key }) {
-            devices[name] = try await Device(name: name, hub: hub, clock: clock, offsetMs: Int64(cfg["clockOffsetSec"].int ?? 0) * 1000)
+            devices[name] = try await CloudDevice(name: name, cloud: cloud, user: nil, clock: clock,
+                                                  offsetMs: Int64(cfg["clockOffsetSec"].int ?? 0) * 1000)
         }
     }
 
-    func entry(_ d: Device, _ alias: String) throws -> ToriID {
+    func entry(_ d: CloudDevice, _ alias: String) throws -> ToriID {
         let id = try #require(aliases[alias], "unknown alias \(alias)")
         return try d.store.db.read { try ToriID.fetchOne($0, sql: "SELECT canonical_id FROM entry WHERE id = ?", arguments: [id]) } ?? id
     }
@@ -138,28 +104,35 @@ final class World {
                 p.desiredRetention = r
                 try store.setSchedulerParameters(p, paramsID: "custom-\(Int(r * 100))")
             }
-        case "signIn":
-            let saved = await engine.pageLimit
-            if let limit = s["limit"].int { await engine.setPageLimit(limit) }
-            _ = try await engine.signIn(.google(idToken: "acct:" + s["account"].string!, nonce: nil))
-            await engine.setPageLimit(saved)
-        case "accountChoice":
-            switch s["choice"].string! {
-            case "add": _ = await engine.resolveAccountChoice(.add)
-            case "remove": _ = await engine.resolveAccountChoice(.remove)
-            default: break  // cancel: nothing to call
+        case "enableSync":
+            d.link.user = s["account"].string!
+            await withPageLimit(s) { await engine.sync() }
+        case "sync":
+            if let other = s["racedBy"].string {
+                let racer = try #require(devices[other], "step \(index): racedBy")
+                cloud.beforeNextSave { await racer.engine.sync() }
             }
-        case "signOut": try await engine.signOut()
-        case "deleteAccount": try await engine.deleteAccount(removeLocalData: s["removeLocal"].bool ?? false)
+            await withPageLimit(s) { await engine.sync() }
+        case "cloudOff": d.link.user = nil
+        case "cloudSwitch": d.link.user = s["to"].string!
+        case "deleteCloudData":
+            if s["inSettings"].bool == true {
+                cloud.deleteZoneInSettings(user: try #require(d.link.user, "step \(index): iCloud is off"))
+            } else {
+                try await engine.deleteCloudData()
+            }
+        case "backUpAgain": try await engine.backUpAgain()
         case "network": d.link.online = s["online"].bool!
         case "setClock": d.offset.ms = Int64(s["offsetSec"].int!) * 1000
-        case "sync", "pullOnly", "pushOnly":
-            let saved = await engine.pageLimit
-            if let limit = s["limit"].int { await engine.setPageLimit(limit) }
-            await engine.cycle(push: op != "pullOnly", pull: op != "pushOnly")
-            await engine.setPageLimit(saved)
         default: Issue.record("step \(index): unknown op \(op)")
         }
+    }
+
+    func withPageLimit(_ s: JSON, _ body: () async -> Void) async {
+        let saved = cloud.pageLimit
+        if let limit = s["limit"].int { cloud.pageLimit = limit }
+        await body()
+        cloud.pageLimit = saved
     }
 
     /// A newer client wrote raw records to the account (unknown fields / types, newer schema).
@@ -175,7 +148,7 @@ final class World {
                               owner: r["owner"].string.flatMap { aliases[$0] ?? ToriID($0) }, deleted: false, mergedInto: nil,
                               fields: fields)
         }
-        hub.inject(account: s["account"].string!, records)
+        cloud.inject(user: s["account"].string!, records)
     }
 
     func wire(_ j: JSON) -> WireValue {
@@ -196,18 +169,18 @@ final class World {
             let d = try #require(devices[name])
             try await checkDevice(d, exp)
         }
-        for (name, exp) in e["hub"].object { try checkHub(name, exp) }
+        for (name, exp) in e["cloud"].object { try checkCloud(name, exp) }
         let converged = e["converged"].array.compactMap { $0.string.flatMap { devices[$0] } }
         if let first = converged.first {
             let reference = try dump(first)
             for d in converged.dropFirst() {
                 let other = try dump(d)
-                #expect(other == reference, "\(d.name) differs from \(first.name): \(Set(other).symmetricDifference(reference).sorted())")
+                #expect(other == reference, "\(d.name) differs from \(first.name): only \(d.name) \(Set(other).subtracting(reference).sorted()) only \(first.name) \(Set(reference).subtracting(other).sorted())")
             }
         }
     }
 
-    func checkDevice(_ d: Device, _ exp: JSON) async throws {
+    func checkDevice(_ d: CloudDevice, _ exp: JSON) async throws {
         let store = d.store
         if exp.has("words") {
             let ids = try liveEntries(store)
@@ -225,20 +198,17 @@ final class World {
             if let e = exp["settings"]["newWordsPerDay"].int { #expect(n == e, "\(d.name): newWordsPerDay") }
             if let e = exp["settings"]["desiredRetention"].double { #expect(r == e, "\(d.name): desiredRetention") }
         }
-        if exp.has("account") {
-            let a = exp["account"]
+        if exp.has("sync") {
+            let e = exp["sync"]
             let status = await d.engine.status
-            if let state = a["state"].string { #expect(stateName(status.state) == state, "\(d.name): state \(status.state)") }
-            if a.has("signedIn") { #expect(try accountName(store.syncState(.accountId)) == a["signedIn"].string, "\(d.name): signedIn") }
-            if a.has("lastSynced") {
-                #expect(try accountName(store.syncState(.lastSyncedAccountId)) == a["lastSynced"].string, "\(d.name): lastSynced")
-            }
-            if let p = a["pendingChoice"].bool { #expect(try (store.syncState(.pendingAccountChoice) != nil) == p, "\(d.name): pendingChoice") }
-            if let n = a["outbox"].int { #expect(try store.pendingRecordCount() == n, "\(d.name): outbox") }
+            if let state = e["state"].string { #expect(stateName(status.state) == state, "\(d.name): state \(status.state)") }
+            if e.has("user") { #expect(try store.syncState(.cloudUser) == e["user"].string, "\(d.name): user") }
+            if let n = e["outbox"].int { #expect(try store.pendingRecordCount() == n, "\(d.name): outbox") }
         }
-        if exp.has("notices") {
-            let notices = await d.engine.status.notices.map(noticeName)
-            #expect(notices == exp["notices"].array.map(\.string!), "\(d.name): notices")
+        for alias in exp["tombstones"].array.map(\.string!) {
+            let id = try #require(aliases[alias])
+            let r: SyncRecord? = try await store.db.read { db in try RecordIO.load(db, .entry, id) }
+            #expect(r?.deleted == true && r?.fields.isEmpty == true, "\(d.name): \(alias) is not a value-less tombstone")
         }
     }
 
@@ -253,31 +223,15 @@ final class World {
         }
     }
 
-    /// Hub account IDs are the account names (a re-created account would get a suffix).
-    func accountName(_ id: String?) -> String? { id }
-
     func stateName(_ s: SyncState) -> String {
         switch s {
-        case .localOnly: "localOnly"
-        case .firstSync: "firstSync"
+        case .idle: "idle"
         case .syncing: "syncing"
         case .synced: "synced"
         case .waitingForNetwork: "waitingForNetwork"
-        case .unreachable: "unreachable"
-        case .clockSkew: "clockSkew"
-        case .updateRequired: "updateRequired"
-        case .paused: "paused"
-        }
-    }
-
-    func noticeName(_ n: SyncNotice) -> String {
-        switch n {
-        case .accountPrompt(let w): "accountPrompt:\(w)"
-        case .removeNeedsNetwork: "removeNeedsNetwork"
-        case .signedOut: "signedOut"
-        case .accountDeletedElsewhere: "accountDeletedElsewhere"
-        case let .mergeSummary(a, b, c): "mergeSummary:\(a)/\(b)/\(c)"
-        case .backedUp: "backedUp"
+        case .iCloudOff: "iCloudOff"
+        case .quotaFull: "quotaFull"
+        case .cloudDeleted: "cloudDeleted"
         }
     }
 
@@ -306,29 +260,30 @@ final class World {
         ]
     }
 
-    func checkHub(_ name: String, _ exp: JSON) throws {
-        let acc = try #require(hub.account(named: name), "hub account \(name)")
-        let records = acc.records.values.map(\.record)
+    func checkCloud(_ user: String, _ exp: JSON) throws {
+        #expect(cloud.zone(user) != nil, "cloud \(user): no zone")
+        let records = Array(cloud.records(user).values)
         if exp.has("entries") {
             let entries = records.filter { $0.type == "entry" }
-            #expect(entries.filter { !$0.deleted && $0.mergedInto == nil }.count == exp["entries"]["live"].int, "hub \(name): live")
-            #expect(entries.filter(\.deleted).count == exp["entries"]["deleted"].int, "hub \(name): deleted")
-            #expect(entries.filter { !$0.deleted && $0.mergedInto != nil }.count == exp["entries"]["merged"].int, "hub \(name): merged")
+            #expect(entries.filter { !$0.deleted && $0.mergedInto == nil }.count == exp["entries"]["live"].int, "cloud \(user): live")
+            #expect(entries.filter(\.deleted).count == exp["entries"]["deleted"].int, "cloud \(user): deleted")
+            #expect(entries.filter { !$0.deleted && $0.mergedInto != nil }.count == exp["entries"]["merged"].int, "cloud \(user): merged")
         }
         for alias in exp["purged"].array.map(\.string!) {
             let id = try #require(aliases[alias])
-            for r in records where r.id == id || r.owner == id {
-                #expect(r.fields.isEmpty, "hub \(name): \(r.type) of \(alias) not purged")
+            #expect(!records.contains { $0.owner == id }, "cloud \(user): children of \(alias) left")
+            if let entry = records.first(where: { $0.id == id }) {
+                #expect(entry.deleted && entry.fields.isEmpty, "cloud \(user): \(alias) is not a value-less tombstone")
             }
         }
         for (type, n) in exp["types"].object {
-            #expect(records.filter { $0.type == type }.count == n.int, "hub \(name): \(type) count")
+            #expect(records.filter { $0.type == type }.count == n.int, "cloud \(user): \(type) count")
         }
     }
 
     /// Synced and derived state of visible records (no device-local columns), for convergence checks. Children of a
     /// deleted Entry are hidden and purged "later", so when that happens may differ per device.
-    func dump(_ d: Device) throws -> [String] {
+    func dump(_ d: CloudDevice) throws -> [String] {
         let local: Set<String> = ["is_this_device", "enrich_attempts"]
         var out: [String] = []
         for type in RecordType.all {
@@ -337,13 +292,15 @@ final class World {
             } ?? ""
             for row in try d.store.db.read({ try Row.fetchAll($0, sql: "SELECT * FROM \(type.name) t WHERE deleted = 0\(owner) ORDER BY id") }) {
                 let cols = row.columnNames.sorted().filter { !local.contains($0) }
-                out.append(type.name + " " + cols.map { "\($0)=\(row[$0] as DatabaseValue)" }.joined(separator: " "))
+                out.append(type.name + " " + cols.map { "\($0)=\(Self.text(row[$0]))" }.joined(separator: " "))
             }
         }
         return out
     }
-}
 
-extension SyncEngine {
-    func setPageLimit(_ n: Int) { pageLimit = n }
+    /// Blobs (IDs) as the last 6 hex digits, so a convergence diff shows which records differ.
+    static func text(_ v: DatabaseValue) -> String {
+        guard case .blob(let b) = v.storage else { return "\(v)" }
+        return String(b.map { String(format: "%02x", $0) }.joined().suffix(6))
+    }
 }

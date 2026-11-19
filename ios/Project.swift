@@ -15,11 +15,11 @@ let settings = Settings.settings(
 /// App Group shared by the app, the Share Extension and the widget.
 let appGroup: Plist.Value = .array([.string("$(TORI_APP_GROUP_ID)")])
 let extensionEntitlements: Entitlements = .dictionary(["com.apple.security.application-groups": appGroup])
-/// The app also signs in with Apple. Keychain: the session item uses the app's default access group, so no
-/// `keychain-access-groups` entry (extensions never see tokens).
+/// The app also syncs through the iCloud private database (CloudKit container below).
 let appEntitlements: Entitlements = .dictionary([
     "com.apple.security.application-groups": appGroup,
-    "com.apple.developer.applesignin": .array([.string("Default")]),
+    "com.apple.developer.icloud-services": .array([.string("CloudKit")]),
+    "com.apple.developer.icloud-container-identifiers": .array([.string("iCloud.com.toriwords.app")]),
 ])
 
 /// UI in English and Russian, on every target.
@@ -46,16 +46,12 @@ let project = Project(
                     "UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight",
                 ],
                 "ITSAppUsesNonExemptEncryption": false,
-                // toriwords:// deep links and the Google OAuth redirect (reversed client ID).
+                // toriwords:// deep links.
                 "CFBundleURLTypes": [
                     ["CFBundleURLName": "com.toriwords.app", "CFBundleURLSchemes": ["$(TORI_URL_SCHEME)"]],
-                    ["CFBundleURLName": "google-oauth", "CFBundleURLSchemes": ["$(TORI_GOOGLE_REVERSED_CLIENT_ID)"]],
                 ],
                 "BGTaskSchedulerPermittedIdentifiers": ["$(TORI_BG_REFRESH_TASK_ID)"],
                 "UIBackgroundModes": ["fetch"],
-                "ToriAPIBaseURL": "$(TORI_API_BASE_URL)",
-                "ToriGoogleClientID": "$(TORI_GOOGLE_CLIENT_ID)",
-                "ToriGoogleReversedClientID": "$(TORI_GOOGLE_REVERSED_CLIENT_ID)",
             ]),
             sources: ["App/**"],
             // The full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app

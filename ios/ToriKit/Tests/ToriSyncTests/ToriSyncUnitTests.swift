@@ -4,157 +4,55 @@ import ToriCore
 @testable import ToriStore
 @testable import ToriSync
 
-/// Records requests and answers from a queue (or one fixed response).
-final class FakeTransport: HTTPTransport, @unchecked Sendable {
+/// 2025-11-10 12:00 UTC.
+let t0: Int64 = 1_762_776_000_000
+
+/// Captures the sleeps the engine schedules; never sleeps.
+final class SleepLog: @unchecked Sendable {
     private let lock = NSLock()
-    private var queue: [Result<HTTPResponse, TransportError>]
-    private(set) var sent: [HTTPRequest] = []
-    let delayMs: Int
+    private var values: [Int64] = []
+    func record(_ ms: Int64) { lock.withLock { values.append(ms) } }
+    var all: [Int64] { lock.withLock { values } }
+}
 
-    init(_ responses: [Result<HTTPResponse, TransportError>], delayMs: Int = 0) {
-        queue = responses
-        self.delayMs = delayMs
+/// One cloud, devices on the same iCloud user by default.
+struct Rig {
+    let clock = TestClock(t0)
+    let cloud: InMemoryCloud
+    let sleeps = SleepLog()
+
+    init() {
+        let clock = clock
+        cloud = InMemoryCloud { clock.ms }
     }
 
-    func send(_ request: HTTPRequest) async throws -> HTTPResponse {
-        let next: Result<HTTPResponse, TransportError> = lock.withLock {
-            sent.append(request)
-            return queue.count > 1 ? queue.removeFirst() : queue[0]
-        }
-        if delayMs > 0 { try await Task.sleep(for: .milliseconds(delayMs)) }
-        return try next.get()
-    }
-
-    var requests: [HTTPRequest] { lock.withLock { sent } }
-}
-
-func response(_ status: Int, _ body: [String: Any] = [:], headers: [String: String] = [:]) -> Result<HTTPResponse, TransportError> {
-    .success(HTTPResponse(status: status, headers: headers, body: try! JSONSerialization.data(withJSONObject: body)))
-}
-
-nonisolated(unsafe) let sessionBody: [String: Any] = ["accountId": "acc", "sessionId": "s1", "provider": "google", "accessToken": "a2",
-                                  "accessTokenExpiresAt": "2030-01-01T00:00:00.000Z", "refreshToken": "r2"]
-
-// MARK: API client
-
-@Test func clientSendsProtocolHeadersAndBearer() async throws {
-    let t = FakeTransport([response(200, ["records": [], "cursor": "7", "hasMore": false])])
-    let api = APIClient(transport: t, appVersion: "1.2.3", deviceID: ToriID.settings)
-    let page = try await api.pull(since: "5", limit: 10, types: ["entry", "sense"], accessToken: "tok").value
-    #expect(page.cursor == "7")
-    let r = try #require(t.requests.first)
-    #expect(r.method == "GET" && r.path == "/sync/pull")
-    #expect(r.headers["Toriwords-Client"] == "ios/1.2.3")
-    #expect(r.headers["Toriwords-Protocol"] == "1")
-    #expect(r.headers["Authorization"] == "Bearer tok")
-    #expect(r.headers["Accept-Encoding"] == "gzip")
-    #expect(r.query.map { "\($0.name)=\($0.value ?? "")" } == ["since=5", "limit=10", "types=entry,sense"])
-}
-
-struct ErrorCase: Sendable, CustomTestStringConvertible {
-    var status: Int
-    var body: [String: String]
-    var headers: [String: String] = [:]
-    var expected: APIError
-    var testDescription: String { "\(status) \(body["error"] ?? "-")" }
-}
-
-@Test(arguments: [
-    ErrorCase(status: 400, body: ["error": "invalid_record"], expected: .invalidRecord(recordIDs: [])),
-    ErrorCase(status: 400, body: ["error": "too_large"], expected: .tooLarge(recordIDs: [])),
-    ErrorCase(status: 400, body: ["error": "invalid_token"], expected: .invalidToken),
-    ErrorCase(status: 400, body: ["error": "invalid_code"], expected: .invalidCode),
-    ErrorCase(status: 401, body: ["error": "token_expired"], expected: .tokenExpired),
-    ErrorCase(status: 401, body: ["error": "session_revoked"], expected: .sessionRevoked),
-    ErrorCase(status: 401, body: [:], expected: .sessionRevoked),
-    ErrorCase(status: 410, body: ["error": "account_deleted"], expected: .accountDeleted),
-    ErrorCase(status: 426, body: ["error": "upgrade_required"], expected: .upgradeRequired),
-    ErrorCase(status: 429, body: ["error": "rate_limited"], headers: ["retry-after": "17"], expected: .rateLimited(retryAfter: 17)),
-    ErrorCase(status: 429, body: [:], expected: .rateLimited(retryAfter: 60)),
-    ErrorCase(status: 503, body: [:], expected: .unreachable),
-    ErrorCase(status: 418, body: ["error": "teapot"], expected: .unexpected(status: 418, code: "teapot")),
-])
-func clientMapsErrors(_ c: ErrorCase) async {
-    let t = FakeTransport([response(c.status, c.body, headers: c.headers)])
-    let api = APIClient(transport: t, appVersion: "1", deviceID: ToriID.settings)
-    await #expect(throws: c.expected) { try await api.logout(accessToken: "x") }
-}
-
-@Test func clientMapsRecordIDsAndClockSkew() async {
-    let id = ToriID.settings
-    let t = FakeTransport([response(400, ["error": "clock_skew", "recordIds": [id.description],
-                                          "serverTime": "2025-11-10T12:00:00.250Z"])])
-    let api = APIClient(transport: t, appVersion: "1", deviceID: id)
-    await #expect(throws: APIError.clockSkew(serverTime: 1_762_776_000_250, recordIDs: [id])) {
-        _ = try await api.push([], accessToken: "x")
+    func device(_ name: String = "A", user: String? = "alice", offsetMs: Int64 = 0) async throws -> CloudDevice {
+        try await CloudDevice(name: name, cloud: cloud, user: user, clock: clock, offsetMs: offsetMs, sleep: { [sleeps] in
+            sleeps.record($0)
+            throw CancellationError()
+        })
     }
 }
 
-@Test func clientMapsTransportFailures() async {
-    for (failure, expected) in [(TransportError.offline, APIError.offline), (.unreachable, .unreachable)] {
-        let api = APIClient(transport: FakeTransport([.failure(failure)]), appVersion: "1", deviceID: ToriID.settings)
-        await #expect(throws: expected) { try await api.logout(accessToken: "x") }
+extension CloudDevice {
+    @discardableResult
+    func capture(_ term: String, translation: String? = nil) throws -> ToriID {
+        let senses = translation.map { [NewSense(translation: $0, source: .wiktionary, dictVersion: "2026.11.1")] } ?? []
+        return try store.capture(CaptureInput(term: term, capturedAt: t0, senses: senses, sentence: nil, source: nil, tags: []))
     }
-}
 
-@Test func clientReportsServerTimeFromDateHeader() async throws {
-    let seen = ScenarioClock(0)
-    let t = FakeTransport([response(401, ["error": "session_revoked"], headers: ["date": "Mon, 10 Nov 2025 12:00:00 GMT"])])
-    let api = APIClient(transport: t, appVersion: "1", deviceID: ToriID.settings) { seen.ms = $0 }
-    _ = try? await api.logout(accessToken: "x")
-    #expect(seen.ms == 1_762_776_000_000)
-    #expect(HTTPDate.format(unixMs: 1_762_776_000_000) == "Mon, 10 Nov 2025 12:00:00 GMT")
-}
+    func sync() async { await engine.sync() }
+    var state: SyncState { get async { await engine.status.state } }
 
-// MARK: Sessions
-
-func session(expiresAt: Int64 = 0) -> Session {
-    Session(accountId: "acc", sessionId: "s1", accessToken: "a1", accessTokenExpiresAt: expiresAt, refreshToken: "r1")
-}
-
-@Test func concurrentRefreshesShareOneRequest() async throws {
-    let t = FakeTransport([response(200, sessionBody)], delayMs: 50)
-    let store = InMemorySessionStore(session())
-    let manager = SessionManager(api: APIClient(transport: t, appVersion: "1", deviceID: ToriID.settings), store: store,
-                                 now: { 0 })
-    let tokens = try await withThrowingTaskGroup(of: String.self) { group in
-        for _ in 0..<5 { group.addTask { try await manager.refresh().accessToken } }
-        return try await group.reduce(into: []) { $0.append($1) }
+    func entry(_ id: ToriID) throws -> SyncRecord? { try store.db.read { try RecordIO.load($0, .entry, id) } }
+    func note(_ id: ToriID) throws -> String? {
+        guard case .string(let s)? = try entry(id)?.fields["note"]?.value else { return nil }
+        return s
     }
-    #expect(tokens == Array(repeating: "a2", count: 5))
-    #expect(t.requests.filter { $0.path == "/auth/refresh" }.count == 1)
-    #expect(try store.load()?.refreshToken == "r2")
+    func count(_ table: String) throws -> Int { try store.db.read { try Int.fetchOne($0, sql: "SELECT COUNT(*) FROM \(table)") ?? 0 } }
 }
 
-@Test func expiredTokenIsRefreshedAndTheCallRetriedOnce() async throws {
-    let t = FakeTransport([response(401, ["error": "token_expired"]), response(200, sessionBody), response(200, [:])])
-    let manager = SessionManager(api: APIClient(transport: t, appVersion: "1", deviceID: ToriID.settings),
-                                 store: InMemorySessionStore(session(expiresAt: .max)), now: { 0 })
-    let api = APIClient(transport: t, appVersion: "1", deviceID: ToriID.settings)
-    try await manager.authorized { token in try await api.logout(accessToken: token) }
-    #expect(t.requests.map(\.path) == ["/auth/logout", "/auth/refresh", "/auth/logout"])
-    #expect(t.requests.last?.headers["Authorization"] == "Bearer a2")
-}
-
-@Test func revokedRefreshLosesTheSession() async throws {
-    let lost = ScenarioClock(0)
-    let store = InMemorySessionStore(session())
-    let manager = SessionManager(api: APIClient(transport: FakeTransport([response(401, ["error": "session_revoked"])]),
-                                                appVersion: "1", deviceID: ToriID.settings), store: store, now: { 0 })
-    await manager.setLossHandler { _ in lost.ms += 1 }
-    await #expect(throws: APIError.sessionRevoked) { try await manager.refresh() }
-    #expect(lost.ms == 1)
-    #expect(try store.load() == nil)
-    #expect(await manager.current == nil)
-}
-
-@Test func networkErrorKeepsTheSession() async throws {
-    let store = InMemorySessionStore(session())
-    let manager = SessionManager(api: APIClient(transport: FakeTransport([.failure(.offline)]), appVersion: "1",
-                                                deviceID: ToriID.settings), store: store, now: { 0 })
-    await #expect(throws: APIError.offline) { try await manager.refresh() }
-    #expect(try store.load() != nil)
-}
+func isSynced(_ s: SyncState) -> Bool { if case .synced = s { true } else { false } }
 
 // MARK: Backoff
 
@@ -166,202 +64,383 @@ func session(expiresAt: Int64 = 0) -> Session {
     #expect(Backoff.delayMs(attempt: 99, jitter: 1) == 1_080_000)
 }
 
-// MARK: Engine status machine and error paths (against the hub)
+// MARK: Zone and generation
 
-/// Captures the sleeps the engine schedules; never sleeps.
-final class SleepLog: @unchecked Sendable {
-    private let lock = NSLock()
-    private var values: [Int64] = []
-    func record(_ ms: Int64) { lock.withLock { values.append(ms) } }
-    var all: [Int64] { lock.withLock { values } }
+@Test func firstSyncUploadsAndSecondDeviceAdoptsTheGeneration() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A")
+    let run = try a.capture("run")
+    #expect(await a.state == .idle)
+    await a.sync()
+    #expect(isSynced(await a.state))
+    let generation = try #require(rig.cloud.generation("alice"))
+    #expect(try a.store.syncState(.zoneGeneration) == generation)
+    #expect(rig.cloud.records("alice")[run] != nil)
+    #expect(try a.store.pendingRecordCount() == 0)
+
+    let b = try await rig.device("B")
+    await b.sync()
+    #expect(isSynced(await b.state))
+    #expect(try b.store.syncState(.zoneGeneration) == generation)
+    #expect(try b.entry(run) != nil)
+    await a.sync()
+    #expect(isSynced(await a.state))
+    #expect(rig.cloud.generation("alice") == generation)
 }
 
-struct Rig {
-    let hub: Hub
-    let device: Device
-    let sleeps = SleepLog()
-    var engine: SyncEngine { device.engine }
-    var store: ToriStore { device.store }
-
-    init() async throws {
-        let clock = ScenarioClock(1_762_776_000_000)
-        hub = Hub { clock.ms }
-        device = try await Device(name: "A", hub: hub, clock: clock, offsetMs: 0, sleep: { [sleeps] in
-            sleeps.record($0)
-            throw CancellationError()
-        })
-    }
-
-    func capture(_ term: String) throws -> ToriID {
-        try store.capture(CaptureInput(term: term, capturedAt: 1_762_776_000_000, senses: [], sentence: nil, source: nil, tags: []))
-    }
-
-    func signIn(_ account: String = "alice") async throws -> SignInResult {
-        try await engine.signIn(.google(idToken: "acct:\(account)", nonce: nil))
-    }
-
-    func script(_ path: String, _ status: Int, _ body: [String: Any] = [:], headers: [String: String] = [:]) {
-        hub.scripted[path, default: []].append(
-            HTTPResponse(status: status, headers: headers, body: try! JSONSerialization.data(withJSONObject: body)))
-    }
+@Test func concurrentFirstSyncsShareOneGeneration() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A"), b = try await rig.device("B")
+    let run = try a.capture("run"), walk = try b.capture("walk")
+    async let x: Void = a.sync()
+    async let y: Void = b.sync()
+    _ = await (x, y)
+    await a.sync()
+    await b.sync()
+    let (sa, sb) = (await a.state, await b.state)
+    #expect(isSynced(sa) && isSynced(sb))
+    #expect(try a.store.syncState(.zoneGeneration) == b.store.syncState(.zoneGeneration))
+    #expect(try a.entry(walk) != nil && b.entry(run) != nil)
 }
 
-@Test func signInMovesFromLocalOnlyThroughFirstSyncToSynced() async throws {
-    let rig = try await Rig()
-    _ = try rig.capture("run")
-    var states: [SyncState] = []
-    let updates = await rig.engine.statusUpdates()
-    let collector = Task {
-        var seen: [SyncState] = []
-        for await s in updates where seen.last != s.state {
-            seen.append(s.state)
-            if s.state == .synced { break }
-        }
-        return seen
-    }
-    #expect(try await rig.signIn() == .syncing)
-    states = await collector.value
-    #expect(states == [.localOnly, .firstSync, .synced])
-    #expect(await rig.engine.status.notices == [.backedUp])
-    #expect(await rig.engine.status.syncNowEnabled)
+@Test func zoneDeletedInSettingsStopsSyncAndKeepsWords() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    try a.capture("run")
+    await a.sync()
+    rig.cloud.deleteZoneInSettings(user: "alice")
+    await a.sync()
+    #expect(await a.state == .cloudDeleted)
+    #expect(try a.store.liveEntryCount() == 1)
+    try a.capture("walk")
+    #expect(try a.store.pendingRecordCount() == 0, "no outbox while cloud data is deleted")
+    let fetches = rig.cloud.count(.fetchChanges)
+    await a.sync()
+    #expect(rig.cloud.count(.fetchChanges) == fetches)
+    #expect(await a.state == .cloudDeleted)
 }
 
-@Test func upgradeRequiredStopsSyncing() async throws {
-    let rig = try await Rig()
-    _ = try await rig.signIn()
-    rig.script("/sync/push", 426, ["error": "upgrade_required"])
-    _ = try rig.capture("run")
-    await rig.engine.sync()
-    #expect(await rig.engine.status.state == .updateRequired)
-    let before = rig.hub.requests("/sync/pull").count
-    await rig.engine.sync()
-    #expect(rig.hub.requests("/sync/pull").count == before)
+@Test func deleteCloudDataStopsTheOtherDeviceAndBackUpAgainRecreatesTheZone() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A"), b = try await rig.device("B")
+    let run = try a.capture("run")
+    await a.sync()
+    await b.sync()
+    let old = try #require(rig.cloud.generation("alice"))
+
+    try await a.engine.deleteCloudData()
+    #expect(await a.state == .cloudDeleted)
+    #expect(rig.cloud.zone("alice") == nil)
+    await b.sync()
+    #expect(await b.state == .cloudDeleted)
+    #expect(try b.entry(run) != nil)
+
+    try await a.engine.backUpAgain()
+    #expect(isSynced(await a.state))
+    let new = try #require(rig.cloud.generation("alice"))
+    #expect(new != old && rig.cloud.records("alice")[run] != nil)
+    await b.sync()
+    #expect(await b.state == .cloudDeleted, "B stays stopped until its own Back up again")
 }
 
-@Test func rateLimitKeepsSyncedAndRetriesAfterTheServerDelay() async throws {
-    let rig = try await Rig()
-    _ = try await rig.signIn()
-    rig.script("/sync/pull", 429, ["error": "rate_limited"], headers: ["retry-after": "30"])
-    await rig.engine.sync()
-    #expect(await rig.engine.status.state == .synced)
+@Test func zoneRecreatedByAnotherDeviceMeansCloudDeleted() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A"), b = try await rig.device("B")
+    try a.capture("run")
+    await a.sync()
+    await b.sync()
+    // A deletes and re-creates the zone before B notices the deletion.
+    try await a.engine.deleteCloudData()
+    try await a.engine.backUpAgain()
+    await b.sync()
+    #expect(await b.state == .cloudDeleted)
+    #expect(try b.store.liveEntryCount() == 1)
+    #expect(try b.store.syncState(.zoneGeneration) == nil || b.store.syncState(.zoneGeneration) != rig.cloud.generation("alice"))
+}
+
+// MARK: Account
+
+@Test func iCloudOffKeepsQueueingAndPushesWhenBack() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    try a.capture("run")
+    await a.sync()
+    a.link.user = nil
+    let walk = try a.capture("walk")
+    await a.sync()
+    #expect(await a.state == .iCloudOff)
+    #expect(try a.store.pendingRecordCount() > 0)
+    a.link.user = "alice"
+    await a.sync()
+    #expect(isSynced(await a.state))
+    #expect(rig.cloud.records("alice")[walk] != nil)
+}
+
+@Test func switchToAnAccountWithoutTheZoneMergesSilently() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    let run = try a.capture("run")
+    await a.sync()
+    a.link.user = "bob"
+    await a.sync()
+    #expect(isSynced(await a.state))
+    #expect(try a.store.syncState(.cloudUser) == "bob")
+    #expect(rig.cloud.zone("bob") != nil && rig.cloud.records("bob")[run] != nil)
+    #expect(rig.cloud.generation("bob") != rig.cloud.generation("alice"))
+    // System fields of alice's zone were cleared, not sent to bob's (no conflicts or unknown items).
+    let meta = try #require(try a.store.cloudMeta([run])[run])
+    #expect(String(decoding: meta, as: UTF8.self).hasPrefix("\(rig.cloud.zone("bob")!.epoch):"))
+}
+
+@Test func activateCloudClearsMetaAndMarksAllPending() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    let run = try a.capture("run")
+    await a.sync()
+    #expect(try a.store.pendingRecordCount() == 0 && !a.store.cloudMeta([run]).isEmpty)
+    try a.store.activateCloud(user: "bob")
+    #expect(try a.store.cloudMeta([run]).isEmpty)
+    #expect(try a.store.syncState(.changeToken) == nil && a.store.syncState(.zoneGeneration) == nil)
+    #expect(try a.store.pendingPush().records.contains { $0.id == run })
+}
+
+// MARK: Saves
+
+@Test func staleTagConflictMergesTheServerCopyAndResends() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A"), b = try await rig.device("B")
+    let run = try a.capture("run")
+    await a.sync()
+    await b.sync()
+    rig.clock.ms += 1_000
+    try a.store.setEntryNote(run, "from A")
+    let fromA = try #require(try a.entry(run))
+    rig.clock.ms += 1_000
+    _ = try b.store.setEntryText(run, "running")
+    // A's save lands between B's pull and B's push.
+    rig.cloud.beforeNextSave { [cloud = rig.cloud] in cloud.inject(user: "alice", [fromA]) }
+    await b.sync()
+    #expect(isSynced(await b.state))
+    let stored = try #require(rig.cloud.records("alice")[run])
+    #expect(stored.fields["note"]?.value == .string("from A") && stored.fields["text"]?.value == .string("running"))
+    #expect(try b.note(run) == "from A")
+    #expect(try b.store.pendingRecordCount() == 0)
+}
+
+@Test func existingRecordWithoutLocalMetaIsAConflictThenSaved() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    let run = try a.capture("run")
+    await a.sync()
+    try a.store.dropCloudMeta([run])
+    rig.clock.ms += 1_000
+    try a.store.setEntryNote(run, "note")
+    await a.sync()
+    #expect(isSynced(await a.state))
+    #expect(rig.cloud.records("alice")[run]?.fields["note"]?.value == .string("note"))
+    #expect(try !a.store.cloudMeta([run]).isEmpty && a.store.pendingRecordCount() == 0)
+}
+
+@Test func retriedAndUnknownItemRecordsAreSentAgain() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    let run = try a.capture("run"), walk = try a.capture("walk")
+    await a.sync()
+    rig.clock.ms += 1_000
+    try a.store.setEntryNote(run, "r")
+    try a.store.setEntryNote(walk, "w")
+    rig.cloud.script(run, .retry)
+    rig.cloud.script(walk, .unknownItem)
+    await a.sync()
+    #expect(isSynced(await a.state))
+    #expect(try a.store.pendingRecordCount() == 0)
+    #expect(rig.cloud.records("alice")[run]?.fields["note"]?.value == .string("r"))
+    #expect(rig.cloud.records("alice")[walk]?.fields["note"]?.value == .string("w"))
+}
+
+@Test func failedRecordIsExcludedAndTheRestIsSaved() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    let bad = try a.capture("run"), good = try a.capture("walk")
+    rig.cloud.script(bad, .failed(.other("invalid")))
+    await a.sync()
+    #expect(isSynced(await a.state))
+    #expect(rig.cloud.records("alice")[bad] == nil && rig.cloud.records("alice")[good] != nil)
+    let saves = rig.cloud.count(.save)
+    await a.sync()
+    #expect(rig.cloud.count(.save) == saves, "the excluded record is not retried in this app version")
+}
+
+@Test func limitExceededHalvesTheBatch() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    try a.capture("run")
+    try a.capture("walk")
+    rig.cloud.fail(.save, with: .limitExceeded)
+    await a.sync()
+    #expect(isSynced(await a.state))
+    let sizes = rig.cloud.batchSizes
+    #expect(sizes.count >= 2 && sizes[1] < sizes[0])
+    #expect(try a.store.pendingRecordCount() == 0)
+}
+
+// MARK: Pull
+
+@Test func changeTokenExpiredRefetchesEverything() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A"), b = try await rig.device("B")
+    let run = try a.capture("run")
+    await a.sync()
+    await b.sync()
+    let walk = try a.capture("walk")
+    await a.sync()
+    rig.cloud.fail(.fetchChanges, with: .changeTokenExpired)
+    let fetches = rig.cloud.count(.fetchChanges)
+    await b.sync()
+    #expect(isSynced(await b.state))
+    #expect(rig.cloud.count(.fetchChanges) >= fetches + 2)
+    #expect(try b.entry(run) != nil && b.entry(walk) != nil)
+}
+
+@Test func pagesFollowThePageLimit() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A"), b = try await rig.device("B")
+    for w in ["run", "walk", "swim"] { try a.capture(w, translation: w) }
+    await a.sync()
+    rig.cloud.pageLimit = 2
+    let fetches = rig.cloud.count(.fetchChanges)
+    await b.sync()
+    #expect(try b.store.liveEntryCount() == 3)
+    #expect(rig.cloud.count(.fetchChanges) - fetches > 3)
+}
+
+// MARK: Cloud purge
+
+@Test func savedEntryTombstoneDeletesTheGroupChildrenFromTheCloud() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A"), b = try await rig.device("B")
+    let run = try a.capture("run", translation: "бежать")
+    await a.sync()
+    await b.sync()
+    #expect(try b.count("sense") == 1)
+    let children = rig.cloud.records("alice").values.filter { $0.owner == run }.map(\.id)
+    #expect(!children.isEmpty)
+
+    try a.store.deleteEntries([run])
+    #expect(try a.count("sense") == 1, "children stay until the tombstone is saved")
+    await a.sync()
+    let cloud = rig.cloud.records("alice")
+    #expect(cloud[run]?.deleted == true)
+    #expect(children.allSatisfy { cloud[$0] == nil })
+    #expect(try a.count("sense") == 0 && a.store.pendingRecordCount() == 0)
+
+    await b.sync()
+    #expect(try b.count("sense") == 0 && b.count("card") == 0)
+    #expect(try b.entry(run)?.deleted == true)
+}
+
+@Test func liveChildrenOfADeletedEntryArePurgedOnSight() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A")
+    let run = try a.capture("run", translation: "бежать")
+    let records = try JSONDecoder().decode(Backup.self, from: a.store.exportBackup(attribution: "")).records
+    var tombstone = try #require(records.first { $0.id == run })
+    tombstone.deleted = true
+    tombstone.fields = [:]
+    let children = records.filter { $0.owner == run }
+    rig.cloud.inject(user: "alice", [tombstone] + children)
+
+    let b = try await rig.device("B")
+    await b.sync()
+    #expect(isSynced(await b.state))
+    #expect(try b.count("sense") == 0)
+    #expect(children.allSatisfy { rig.cloud.records("alice")[$0.id] == nil })
+    #expect(rig.cloud.records("alice")[run]?.deleted == true)
+}
+
+// MARK: Errors
+
+@Test func offlineWaitsForNetworkWithBackoff() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    await a.sync()
+    a.link.online = false
+    await a.sync()
+    #expect(await a.state == .waitingForNetwork)
+    await a.sync()
+    try await Task.sleep(for: .milliseconds(20))
+    #expect(rig.sleeps.all.suffix(2) == [5_000, 10_000])
+    a.link.online = true
+    await a.engine.networkPathChanged(satisfied: true)
+    #expect(isSynced(await a.state))
+}
+
+@Test func rateLimitKeepsTheLastStateAndRetriesAfterTheCloudDelay() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    await a.sync()
+    rig.cloud.fail(.fetchChanges, with: .rateLimited(retryAfter: 30))
+    await a.sync()
+    #expect(isSynced(await a.state))
     try await Task.sleep(for: .milliseconds(20))
     #expect(rig.sleeps.all.last == 30_000)
 }
 
-@Test func offlineWaitsForNetworkWithBackoff() async throws {
-    let rig = try await Rig()
-    _ = try await rig.signIn()
-    rig.device.link.online = false
-    await rig.engine.sync()
-    #expect(await rig.engine.status.state == .waitingForNetwork)
-    await rig.engine.sync()
-    try await Task.sleep(for: .milliseconds(20))
-    #expect(rig.sleeps.all.suffix(2) == [5_000, 10_000])
+@Test func quotaAndAuthenticationErrorsMapToTheirStates() async throws {
+    let rig = Rig()
+    let a = try await rig.device()
+    try a.capture("run")
+    rig.cloud.fail(.save, with: .quotaExceeded)
+    await a.sync()
+    #expect(await a.state == .quotaFull)
+    #expect(await a.engine.status.syncNowEnabled)
+    rig.cloud.fail(.fetchChanges, with: .notAuthenticated)
+    await a.sync()
+    #expect(await a.state == .iCloudOff)
+    await a.sync()
+    #expect(isSynced(await a.state))
 }
 
-@Test func serverErrorIsUnreachable() async throws {
-    let rig = try await Rig()
-    _ = try await rig.signIn()
-    rig.script("/sync/pull", 503)
-    await rig.engine.sync()
-    #expect(await rig.engine.status.state == .unreachable)
+@Test func deviceClockFarFromTheCloudWarnsWithoutBlocking() async throws {
+    let rig = Rig()
+    let a = try await rig.device(offsetMs: 2 * HLCState.hourMs)
+    try a.capture("run")
+    await a.sync()
+    #expect(isSynced(await a.state))
+    #expect(await a.engine.status.clockWarning)
 }
 
-@Test func revokedSessionSignsOutAndKeepsWords() async throws {
-    let rig = try await Rig()
-    _ = try rig.capture("run")
-    _ = try await rig.signIn()
-    rig.script("/sync/pull", 401, ["error": "session_revoked"])
-    await rig.engine.sync()
-    #expect(await rig.engine.status.state == .localOnly)
-    #expect(await rig.engine.status.notices.last == .signedOut)
-    #expect(try rig.store.liveEntryCount() == 1)
-    #expect(try rig.store.syncState(.accountId) == nil)
+// MARK: Store resets during a cycle (validation 48/2)
+
+@Test func removeAllDataDuringACycleLeavesNoStaleTokenOrMeta() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A"), b = try await rig.device("B")
+    let walk = try b.capture("walk")
+    await b.sync()
+    let run = try a.capture("run")
+    await a.sync()
+    let jump = try a.capture("jump")
+    rig.cloud.beforeNextSave { try? await a.engine.removeAllDataFromDevice() }
+    await a.sync()
+
+    #expect(try a.count("cloud_record_meta") == 0)
+    #expect(try a.store.syncState(.changeToken) == nil)
+    #expect(try a.entry(run) == nil)
+    #expect(!isSynced(await a.state), "the superseded cycle must not report Synced")
+
+    await a.sync()
+    #expect(isSynced(await a.state))
+    #expect(try a.entry(walk) != nil && a.entry(run) != nil && a.entry(jump) != nil, "everything comes back from iCloud")
 }
 
-@Test func accountDeletedOnAnotherDeviceEndsTheSession() async throws {
-    let rig = try await Rig()
-    _ = try rig.capture("run")
-    _ = try await rig.signIn()
-    rig.script("/sync/pull", 410, ["error": "account_deleted"])
-    await rig.engine.sync()
-    #expect(await rig.engine.status.state == .localOnly)
-    #expect(await rig.engine.status.notices.last == .accountDeletedElsewhere)
-    #expect(try rig.store.liveEntryCount() == 1)
-}
-
-@Test(arguments: [false, true])
-func deleteAccountGoesLocalOnly(removeLocalData: Bool) async throws {
-    let rig = try await Rig()
-    _ = try rig.capture("run")
-    _ = try await rig.signIn()
-    try await rig.engine.deleteAccount(removeLocalData: removeLocalData)
-    #expect(await rig.engine.status.state == .localOnly)
-    #expect(rig.hub.account(named: "alice") == nil)
-    #expect(try rig.store.liveEntryCount() == (removeLocalData ? 0 : 1))
-    #expect(await rig.engine.sessions.current == nil)
-}
-
-@Test func invalidRecordIsExcludedAndTheRestIsPushed() async throws {
-    let rig = try await Rig()
-    _ = try await rig.signIn()
-    let bad = try rig.capture("run")
-    _ = try rig.capture("walk")
-    rig.script("/sync/push", 400, ["error": "invalid_record", "recordIds": [bad.description]])
-    await rig.engine.sync()
-    #expect(await rig.engine.status.state == .synced)
-    let acc = try #require(rig.hub.account(named: "alice"))
-    #expect(acc.records[bad] == nil)
-    #expect(acc.records.values.contains { $0.record.type == "entry" })
-    let pushedAfter = rig.hub.requests("/sync/push").count
-    await rig.engine.sync()
-    #expect(rig.hub.requests("/sync/push").count == pushedAfter, "the excluded record is not retried in this version")
-}
-
-@Test func tooLargeWithoutIDsHalvesTheBatch() async throws {
-    let rig = try await Rig()
-    _ = try await rig.signIn()
-    _ = try rig.capture("run")
-    rig.script("/sync/push", 400, ["error": "too_large"])
-    await rig.engine.sync()
-    let pushes = rig.hub.requests("/sync/push")
-    struct Body: Decodable { var records: [SyncRecord] }
-    let sizes = try pushes.suffix(2).map { try JSONDecoder().decode(Body.self, from: $0.body!).records.count }
-    #expect(sizes[1] < sizes[0])
-    #expect(await rig.engine.status.state == .synced)
-}
-
-@Test func signOutKeepsWordsAndLastSyncedAccount() async throws {
-    let rig = try await Rig()
-    _ = try rig.capture("run")
-    _ = try await rig.signIn()
-    try await rig.engine.signOut()
-    #expect(await rig.engine.status.state == .localOnly)
-    #expect(rig.hub.requests("/auth/logout").count == 1)
-    #expect(try rig.store.syncState(.lastSyncedAccountId) == "alice")
-    #expect(try rig.store.liveEntryCount() == 1)
-}
-
-// MARK: Sign-in helpers
-
-@Test func pkceAndNonceHashes() {
-    // Expected values from Python hashlib + base64.urlsafe_b64encode.
-    #expect(AuthCrypto.pkceChallenge("dBjftJeZ4CVP-mJ92K9qFTiXcLGr8U1LSSn6t7-yIgM") == "ssIeg1EFqiPtAGsEjweW8zgfJRd0PvTiZvQKBDh9uwA")
-    #expect(AuthCrypto.appleNonceHash("nonce-1") == "9e3f156324d42f0ea4b6f4fce81d56fbd64a2143a3fdd60a130d9c90e5b4d688")
-    let token = AuthCrypto.randomToken()
-    #expect(token.count == 43 && !token.contains(where: { "+/=".contains($0) }))
-}
-
-@Test func googleRedirectChecksState() throws {
-    let config = GoogleOAuthConfig(clientID: "123.apps", redirectScheme: "com.googleusercontent.apps.123")
-    let url = config.authorizationURL(state: "st", nonce: "n", codeChallenge: "ch")
-    let items = Dictionary(uniqueKeysWithValues: (URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? [])
-        .map { ($0.name, $0.value ?? "") })
-    #expect(items["client_id"] == "123.apps" && items["code_challenge_method"] == "S256" && items["nonce"] == "n")
-    #expect(items["redirect_uri"] == "com.googleusercontent.apps.123:/oauth2redirect")
-    let ok = try #require(URL(string: "com.googleusercontent.apps.123:/oauth2redirect?state=st&code=abc"))
-    #expect(config.code(fromRedirect: ok, expectedState: "st") == "abc")
-    #expect(config.code(fromRedirect: ok, expectedState: "other") == nil)
-    let denied = try #require(URL(string: "com.googleusercontent.apps.123:/oauth2redirect?state=st&error=access_denied"))
-    #expect(config.code(fromRedirect: denied, expectedState: "st") == nil)
+@Test func deleteCloudDataDuringASaveKeepsCloudDeleted() async throws {
+    let rig = Rig()
+    let a = try await rig.device("A")
+    try a.capture("run")
+    await a.sync()
+    try a.capture("jump")
+    rig.cloud.beforeNextSave { try? await a.engine.deleteCloudData() }
+    await a.sync()
+    #expect(await a.state == .cloudDeleted)
+    #expect(try a.store.syncState(.cloudDeleted) != nil)
 }

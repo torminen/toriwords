@@ -9,11 +9,11 @@ Language-neutral JSON cases that pin every behaviour iOS, Android and the backen
 |---|---|---|
 | `normalization/` | `match-key`, `translation-key`, `sentence-key`, `tag-key`, `search-fold`, `url-key`, `source-key`, `text-order` | Text keys, BINARY text order and prefix ranges |
 | `ids/` | `uuid-v5`, `uuid-v7`, `byte-order` | Deterministic IDs and their names, UUIDv7 layout, unsigned byte order |
-| `hlc/` | `local-write`, `receive`, `clock-ahead` | HLC local write, receive (> 24 h not adopted), server 1 h skew, clock-ahead recovery |
+| `hlc/` | `local-write`, `receive`, `clock-ahead` | HLC local write, receive (> 24 h not adopted), clock-ahead recovery against cloud time from record modification dates |
 | `merge/` | `field-comparator`, `envelope` | Comparator and envelope merge incl. partial push |
 | `capture/` | `clean`, `extract`, `typed-highlight` | Capture text rules |
 | `scheduler/` | `fsrs-step`, `fsrs-replay`, `day-boundary`, `queue-*`, `snapshot` | FSRS-6, replay, 04:00 day, daily queue, widget snapshot. **Generated**, see below |
-| `sync/` | `001–034` | Multi-device scenarios: merge, purge, accounts, clock skew. See [Sync scenarios](#sync-scenarios) |
+| `sync/` | `001–038` | Multi-device scenarios: merge, cloud purge, iCloud accounts, cloud deletion, clock-ahead. See [Sync scenarios](#sync-scenarios) |
 | `schema/` | `<kind>.schema.json` | JSON Schema 2020-12, one per fixture kind |
 | `known-deviations.json` | | Must be `[]` before release; no per-platform skips |
 
@@ -54,28 +54,42 @@ Runners run one test argument per case id and print it in the test name.
 
 Kind `sync-scenario`, one case per file. A case starts at `start` (Unix ms). It names its `devices`, each with a fresh
 store, and runs `steps` in order. Each step has `t` (seconds after start, strictly increasing), which is also the clock
-of the device that runs it. Devices talk to one in-memory hub that implements the server envelope merge, the `seq` cursor and the
-merge-group purge. Words and records are named by **aliases** (`as` on `capture`, `entry` on other ops), never by IDs.
+of the device that runs it. Devices talk to one in-memory cloud: a private zone per iCloud user with a change log and
+change tokens, per-record change tags (a save with a stale tag is a conflict), the `zone-info` generation marker and
+modification dates from the cloud clock (`start` + `t`). Like CloudKit it never merges or purges; every device merges
+(HLC per field) and deletes a deleted group's child records itself. Words and records are named by **aliases** (`as` on
+`capture`, `entry` on other ops), never by IDs.
 
 Ops: `capture`, `editField` (`text|note|ipa|translation`), `enrich` (an automatic `translation`/`ipa`), `review`,
-`exclude`, `resume`, `delete`, `tag`, `untag`, `mergeByEdit`, `setSettings`, `signIn` (optional page `limit`),
-`accountChoice` (`add|remove|cancel`), `signOut`, `deleteAccount`, `sync`, `pullOnly`, `pushOnly`, `network`
-(`online`), `setClock` (`offsetSec`) and `upgradeSchema`. `upgradeSchema` has no device: it writes records of a newer app
-version (`schema`, unknown fields or types) straight into the hub.
+`exclude`, `resume`, `delete`, `tag`, `untag`, `mergeByEdit`, `setSettings`, `network` (`online`), `setClock`
+(`offsetSec`), and the sync ops:
+
+- `enableSync` (`account`): the device's iCloud user becomes `account`, then one sync cycle.
+- `sync`: one cycle. `racedBy: <device>` runs that device's whole cycle between this device's fetch and its first save.
+- `enableSync` and `sync` take an optional page `limit` (changes per fetched page) for that step.
+- `cloudOff`: iCloud becomes unavailable on the device. `cloudSwitch` (`to`): another iCloud user. Neither runs a cycle.
+- `deleteCloudData`: "Delete iCloud data" in the app; `inSettings: true` deletes the zone in iOS Settings instead.
+- `backUpAgain`: "Back up this device again" after the cloud data was deleted.
+- `upgradeSchema` (`account`, `records`, no device): records of a newer app version (`schema`, unknown fields or types)
+  written straight into the cloud.
 
 `expected` describes the final logical state:
 
 - `devices.<name>.words`: the exact set of live words. Only the listed keys of each word are compared.
-- `devices.<name>.settings`, `account` (`state`, `signedIn`, `lastSynced`, `pendingChoice`, `outbox` rows) and
-  `notices` (in order).
-- `hub.<account>`: Entry counts (`live`, `deleted`, `merged`), `purged` aliases and per-type record counts.
+- `devices.<name>.settings`, `sync` (`state`, `user`, `outbox` rows) and `tombstones` (aliases whose Entry is a
+  value-less tombstone).
+- `cloud.<account>`: Entry counts (`live`, `deleted`, `merged`), `purged` aliases (no child records left in the cloud,
+  the Entry is a value-less tombstone) and per-type record counts.
 - `converged`: these devices hold identical synced and derived rows. Device-local columns and hidden children of
   deleted words are left out.
 
+Ids are never reused. Retired with the own backend: `018`, `022`, `026`, `030`, `031`, `032`, `033`, `034` (account
+prompts, merge summary, server clock-skew rejection, server-side purge; `031` is replaced by `038`).
+
 | Id | Scenario |
 |---|---|
-| `001` | First sign-in uploads local words to an empty account |
-| `002` | A new device signs in and gets everything by a full pull |
+| `001` | First sync uploads local words to an empty iCloud zone |
+| `002` | A new device enables sync and gets everything by a full fetch |
 | `003` | The same field edited offline on two devices: the later edit wins |
 | `004` | A user value beats a later automatic value of the same field (rank first) |
 | `005` | Edits of different fields on two devices are both kept |
@@ -91,23 +105,19 @@ version (`schema`, unknown fields or types) straight into the hub.
 | `015` | Untag of one EntryTag does not remove a concurrent tag merged into the same pair |
 | `016` | Answers to the same Card on two devices are replayed in time order |
 | `017` | New scheduler settings from another device rebuild the Cards |
-| `018` | Signing in to another account with no live words removes silently |
 | `019` | Automatic fills on two devices write one Sense; the later wins |
 | `020` | A user-edited translation survives a later automatic fill |
 | `021` | Answering on another device clears 'Check translation' everywhere |
-| `022` | Signing back in to the last-synced account asks nothing |
 | `023` | Exclude, resume and a note on different devices all arrive |
 | `024` | A confirmed merge by edit reaches the other device |
 | `025` | An edit of a merged loser made elsewhere reaches the survivor |
-| `026` | A push with clocks > 1 h ahead is rejected; the rows stay pending |
 | `027` | After the device clock is fixed, the clock-ahead check re-stamps and pushes |
 | `028` | Fields from a newer app version survive an old client's edits |
-| `029` | A record type from a newer app is skipped on pull and kept on the server |
-| `030` | Another account's words: Cancel pauses sync, nothing is uploaded |
-| `031` | A merges X into Y while B deletes X: the whole group is purged on the server |
-| `032` | Another account's words: 'Add' uploads them and merges with the account |
-| `033` | Another account's words: 'Remove' needs the network, then replaces local data |
-| `034` | First sign-in with local words into an account with words shows the merge summary |
+| `029` | A record type from a newer app is skipped on pull and kept in the cloud |
+| `035` | Switching iCloud accounts keeps the words and uploads them to the new account |
+| `036` | Deleting iCloud data on one device stops the other, which keeps its words and can back up again |
+| `037` | A save that loses the race to another device merges and re-sends |
+| `038` | A merges X into Y while B deletes X: the group's children leave the cloud |
 
 ## Unicode ≤ 13
 

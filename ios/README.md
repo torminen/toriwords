@@ -86,29 +86,19 @@ All build settings live in `Config/Shared.xcconfig`. It holds no secrets.
 | `TORI_APP_GROUP_ID` | `group.com.toriwords.app`. Shared by the app, Share Extension and widget. |
 | `TORI_BG_REFRESH_TASK_ID` | `com.toriwords.app.refresh` (`BGAppRefreshTask`). |
 | `TORI_URL_SCHEME` | `toriwords`, for `toriwords://review` and `toriwords://add?text=…`. |
-| `TORI_API_BASE_URL` | Backend base URL, **https only**. Empty means sync is off and the app is local-only. |
-| `TORI_GOOGLE_CLIENT_ID` / `TORI_GOOGLE_REVERSED_CLIENT_ID` | iOS OAuth client ID and its reversed form. While it contains `REPLACE_ME`, Google sign-in is hidden. |
 
-`//` starts a comment in an xcconfig file, so write URLs with an empty variable between the slashes:
-
-```
-TORI_API_BASE_URL = https:/$()/api.toriwords.app
-```
-
-The app reads these values from Info.plist keys (`ToriAPIBaseURL`, `ToriGoogleClientID`,
-`ToriGoogleReversedClientID`) that `Project.swift` maps to the xcconfig values.
+There is no backend: sync uses the iCloud private database (CloudKit container `iCloud.com.toriwords.app`).
 
 ### Bundle IDs and capabilities
 
 | Target | Bundle ID | Notes |
 |---|---|---|
-| `Toriwords` (app) | `com.toriwords.app` | Entitlements: App Group, Sign in with Apple (`Default`). Background fetch (`BGTaskSchedulerPermittedIdentifiers`). URL schemes `toriwords` and the Google reversed client ID (OAuth redirect). |
+| `Toriwords` (app) | `com.toriwords.app` | Entitlements: App Group, iCloud (CloudKit, container `iCloud.com.toriwords.app`). Background fetch (`BGTaskSchedulerPermittedIdentifiers`). URL scheme `toriwords`. |
 | `ToriwordsShare` | `com.toriwords.app.share` | Share Extension (text, one web URL, Safari web page with `ExtensionPreprocessing.js`). Entitlement: App Group. |
 | `ToriwordsWidget` | `com.toriwords.app.widget` | WidgetKit (small, medium, lock-screen circular and rectangular). Entitlement: App Group. |
 
 All three targets: iOS 18.0, Swift 6 language mode, `CFBundleLocalizations` en + ru. The app sets
-`ITSAppUsesNonExemptEncryption = NO` and is portrait-only on iPhone (all orientations on iPad). The Keychain session
-item uses the app's default access group, so no Keychain Sharing entitlement is needed.
+`ITSAppUsesNonExemptEncryption = NO` and is portrait-only on iPhone (all orientations on iPad).
 
 ### Signing
 
@@ -116,7 +106,7 @@ CI builds unsigned (`CODE_SIGNING_ALLOWED=NO`). For a device:
 
 - Set `DEVELOPMENT_TEAM`.
 - Let Xcode manage signing.
-- Register the App Group `group.com.toriwords.app` and Sign in with Apple for the app ID.
+- Register the App Group `group.com.toriwords.app` and the iCloud container `iCloud.com.toriwords.app` (CloudKit) for the app ID.
 
 Without the App Group entitlement, `AppGroup.shared` is nil. Sharing, the widget snapshot and the vocab index are then
 off, and the app still runs.
@@ -133,7 +123,7 @@ ToriKit/
   ToriShared         App Group layout, inbox files, vocab index, deep links, Darwin notification
   ToriDictionary     read-only dictionary.sqlite + installer
   ToriStore          user.sqlite (GRDB): records, outbox, sync apply, queries, backup
-  ToriSync           HTTP client, sessions (Keychain), SyncEngine, Apple/Google sign-in
+  ToriSync           SyncEngine, CloudDatabase protocol, CloudKit adapter (iCloud private database)
   ToriEnrichment     on-device translation, dictionary lookup, enrichment orchestrator, speech
   ToriUI             design tokens and shared SwiftUI components
 ```

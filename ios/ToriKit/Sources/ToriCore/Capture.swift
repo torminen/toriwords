@@ -1,4 +1,4 @@
-/// Capture text rules, doc 36 §5.2. Lengths and cuts count Unicode code points; highlight offsets
+/// Capture text rules. Lengths and cuts count Unicode code points; highlight offsets
 /// and lengths are UTF-16 code units of the stored sentence (what `NSRange` and Kotlin use).
 public enum Capture {
     public static let maxCharacters = 5000

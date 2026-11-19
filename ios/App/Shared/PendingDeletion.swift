@@ -5,7 +5,7 @@ import ToriCore
 import ToriStore
 import ToriUI
 
-/// Delete with Undo (§5.7): the words are hidden at once, and the tombstones are written only when the toast goes away,
+/// Delete with Undo: the words are hidden at once, and the tombstones are written only when the toast goes away,
 /// when another delete starts, or when the app goes to the background. A crash inside the window keeps the words.
 @MainActor @Observable
 final class PendingDeletion {

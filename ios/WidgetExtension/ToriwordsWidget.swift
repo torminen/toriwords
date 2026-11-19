@@ -4,7 +4,7 @@ import ToriShared
 import ToriUI
 import WidgetKit
 
-/// Due-count widget (doc 36 §10.2, UI doc §3.12): reads `widget-snapshot.json` only; tap opens Review.
+/// Due-count widget: reads `widget-snapshot.json` only; tap opens Review.
 @main
 struct ToriwordsWidget: Widget {
     var body: some WidgetConfiguration {
@@ -23,7 +23,7 @@ struct DueEntry: TimelineEntry {
     let date: Date
     let snapshot: WidgetSnapshot?
 
-    /// "Today" is recomputed from the device offset at the entry's instant (§10.2).
+    /// "Today" is recomputed from the device offset at the entry's instant.
     var display: WidgetDisplay {
         WidgetDisplay(snapshot: snapshot, now: Int64(date.timeIntervalSince1970 * 1000),
                       utcOffsetMin: TimeZone.current.secondsFromGMT(for: date) / 60)
@@ -92,7 +92,7 @@ struct WidgetView: View {
             Spacer(minLength: 0)
             switch d {
             case .due(let r, let n):
-                // The small widget splits the count onto two lines (UI doc §3.12).
+                // The small widget splits the count onto two lines.
                 if r > 0 { Text("\(r) to review").font(.headline) }
                 if n > 0 { Text("\(n) new").font(.subheadline).foregroundStyle(Palette.textSecondary) }
             default:
@@ -124,7 +124,7 @@ struct WidgetView: View {
         }
     }
 
-    /// A §7.2 day number is the local calendar date it starts on: format it as that date, never a time.
+    /// A review-day number is the local calendar date it starts on: format it as that date, never a time.
     static func date(_ day: Int) -> String {
         var style = Date.FormatStyle.dateTime.weekday(.abbreviated).day().month(.abbreviated)
         style.timeZone = TimeZone(identifier: "UTC")!

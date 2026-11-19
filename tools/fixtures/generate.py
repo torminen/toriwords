@@ -1,4 +1,4 @@
-"""Generates spec/fixtures/scheduler/*.json from torifix.scheduler (doc 36 §7, §10.1).
+"""Generates spec/fixtures/scheduler/*.json from torifix.scheduler (scheduler, day model, daily queue, widget snapshot).
 
 Deterministic: fixed inputs, no clock reads, stable JSON formatting. Run: `uv run python generate.py`.
 """
@@ -70,7 +70,7 @@ def day_boundary() -> None:
             c["note"] = note
         out.append(c)
     write("day-boundary.json", {"kind": "day-boundary",
-        "source": "doc 36 §7.2: dayNumber(t_ms, offsetMin) = floorDiv(floorDiv(t_ms, 1000) + offsetMin*60 − 4*3600, 86400), 64-bit, floor toward −∞",
+        "source": "Day model: dayNumber(t_ms, offsetMin) = floorDiv(floorDiv(t_ms, 1000) + offsetMin*60 − 4*3600, 86400), 64-bit, floor toward −∞",
         "cases": out})
 
 
@@ -119,7 +119,7 @@ def fsrs_step() -> None:
         n += 1
         add(f"st-{n:03d}", prev, CARD_B, day, g, note)
     write("fsrs-step.json", {"kind": "fsrs-step",
-        "source": "doc 36 §7.3–7.5 (FSRS-6 step, intervals, fuzz), §7.6 stage. state = previous state or null for a new card. expected.interval = rounded interval before fuzz (null when dueDay = reviewDay). S and D within 1e-9 relative; everything else exact",
+        "source": "FSRS-6 step, intervals, fuzz and stage. state = previous state or null for a new card. expected.interval = rounded interval before fuzz (null when dueDay = reviewDay). S and D within 1e-9 relative; everything else exact",
         "params": PARAMS, "cases": cases})
 
 
@@ -167,7 +167,7 @@ def fsrs_replay() -> None:
     add("rp-007", CARD_A, [log(T - 3, None)], "only null ratings → still new (final null)")
     add("rp-008", CARD_B, [log(T - 1, 2), log(T - 1, 3, 15)], "imported first answer Hard (G=2) stays due that day, then Good")
     write("fsrs-replay.json", {"kind": "fsrs-replay",
-        "source": "doc 36 §7.6 replay: sort by (reviewedAt, id as unsigned bytes), skip rating null, review day = dayNumber(reviewedAt, utcOffsetMin), fold §7.3 from new. expected.steps = state after each rated log in replay order",
+        "source": "Card state replay: sort by (reviewedAt, id as unsigned bytes), skip rating null, review day = dayNumber(reviewedAt, utcOffsetMin), fold the FSRS-6 step from new. expected.steps = state after each rated log in replay order",
         "params": PARAMS, "cases": cases})
 
 
@@ -211,8 +211,8 @@ def queue_case(cid: str, w: World, note: str, limit: int = 10, now: int = NOW) -
         "waiting": q.waiting, "catchUp": q.catch_up, "normalLoad": q.normal_load, "homeState": q.home_state}}
 
 
-QUEUE_SOURCE = ("doc 36 §7.7 daily queue and catch-up, Home states; day = dayNumber(now, utcOffsetMin). Card state comes "
-                "from replaying the input logs (§7.6). Input entries are live; cards are live Cards. reshow is ordered by "
+QUEUE_SOURCE = ("Daily queue and catch-up, Home states; day = dayNumber(now, utcOffsetMin). Card state comes "
+                "from replaying the input logs. Input entries are live; cards are live Cards. reshow is ordered by "
                 "card id (unsigned bytes). dueToday.toReview = steps 1 + 3, dueToday.new = step 2")
 
 
@@ -288,7 +288,7 @@ def queue_new_answered_today() -> None:
     w.review(es[0].cards[0], T, 3, 12)
     after = queue_case("qa-002", w, "the first New Card answered Remembered today: not in step 2 again, its recall is skipped "
                                      "(sibling), Due today drops by one")
-    write("queue-new-answered-today.json", {"kind": "queue", "source": QUEUE_SOURCE + "; doc 36 §15.2", "params": PARAMS,
+    write("queue-new-answered-today.json", {"kind": "queue", "source": QUEUE_SOURCE, "params": PARAMS,
                                             "cases": [before, after]})
 
 
@@ -343,7 +343,7 @@ def snapshots() -> None:
     add("sn-005", w, "a Forgot today counts in today's dueReviews; future days assume no further answers")
     add("sn-006", World(), "generatedAt and utcOffsetMin are echoed from the input", now=at(T, 4, 0))
     write("snapshot.json", {"kind": "snapshot",
-        "source": "doc 36 §10.1 widget snapshot: 7 days from today; day T+k (k ≥ 1) applies §7.7 assuming no further answers; dueReviews = steps 1 + 3, newAvailable = step 2; nextDueDay = first of the 7 days with dueReviews + newAvailable > 0, else null; homeState = today's Home state",
+        "source": "Widget snapshot: 7 days from today; day T+k (k ≥ 1) applies the daily queue rules assuming no further answers; dueReviews = steps 1 + 3, newAvailable = step 2; nextDueDay = first of the 7 days with dueReviews + newAvailable > 0, else null; homeState = today's Home state",
         "params": PARAMS, "cases": cases})
 
 

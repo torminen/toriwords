@@ -47,7 +47,7 @@ final class Tx {
         var record = try RecordIO.load(db, type, id)
             ?? SyncRecord(id: id, type: type.name, schema: 1, owner: nil, deleted: false, mergedInto: nil, fields: [:])
         guard !record.deleted else { return false }
-        // An automatic write never overrides a user value (enrichment never overwrites user edits, §11.3).
+        // An automatic write never overrides a user value (enrichment never overwrites user edits).
         let changed = fields.filter { name, value in
             guard let old = record.fields[name] else { return true }
             return rank >= old.rank && (old.value != value || old.rank < rank)
@@ -63,7 +63,7 @@ final class Tx {
         return true
     }
 
-    /// Tombstone (delete wins, §11.7): field values dropped, `_deleted` pushed.
+    /// Tombstone (delete wins): field values dropped, `_deleted` pushed.
     func delete(_ type: RecordType, _ id: ToriID) throws {
         guard var record = try RecordIO.load(db, type, id), !record.deleted else { return }
         record.deleted = true
@@ -86,7 +86,7 @@ final class Tx {
 
     // MARK: Finish
 
-    /// Post-write maintenance (§4.3, §11.6 steps 6–9, §11.7), then persist the HLC.
+    /// Post-write maintenance (canonical IDs, duplicate merge, cards, replay), then persist the HLC.
     func finish() throws {
         var rounds = 0
         repeat {

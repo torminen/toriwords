@@ -4,12 +4,12 @@ import ToriCore
 import ToriEnrichment
 import ToriStore
 
-/// Add (doc 35 §3.2, Product §5.1): typing with autocomplete, then the preview, then Save and clear for the next word.
+/// Add: typing with autocomplete, then the preview, then Save and clear for the next word.
 @MainActor @Observable
 final class AddModel {
     enum Step: Equatable { case typing, preview }
 
-    /// What the saved Entry with the same key looks like (8-6 A2; known / paused per §5.3).
+    /// What the saved Entry with the same key looks like (it may be known or paused).
     struct Existing: Equatable {
         var id: ToriID
         var status: EntryStatus
@@ -19,7 +19,7 @@ final class AddModel {
     var text: String { didSet { if text != oldValue { refreshCompletions() } } }
     private(set) var completions: [Completion] = []
     private(set) var russianWithoutCandidates = false
-    /// Word chips of a typed sentence and the dictionary phrases found in it (§5.1 "looks like a sentence").
+    /// Word chips of a typed sentence and the dictionary phrases found in it (more than 6 words or sentence punctuation).
     private(set) var sentenceChips: [String] = []
     private(set) var containedPhrases: [String] = []
 
@@ -27,7 +27,7 @@ final class AddModel {
     private(set) var existing: Existing?
     var resumeLearning = false
     private(set) var ipa: String?
-    /// "Did you mean …?": the base form is preselected, the typed form stays available (P1, PD-14).
+    /// "Did you mean …?": the base form is preselected, the typed form stays available.
     private(set) var baseForm: (base: String, typed: String)?
     private(set) var isLoading = false
     private(set) var contextHelp: String?

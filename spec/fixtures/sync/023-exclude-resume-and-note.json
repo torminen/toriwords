@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.3",
+  "source": "Per-field merge by rank and clock: exclude, resume and note fields",
   "cases": [
     {
       "id": "023-exclude-resume-and-note",

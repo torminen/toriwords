@@ -1,4 +1,4 @@
-/// A field value on the wire (doc 36 §11.1): string, number, boolean, null, or an array (`fsrs_w`).
+/// A field value on the wire: string, number, boolean, null, or an array (`fsrs_w`).
 public enum WireValue: Hashable, Sendable, Codable {
     case null
     case bool(Bool)
@@ -63,7 +63,7 @@ extension FieldVersion: Codable where Value: Codable {
     }
 }
 
-/// Wire envelope (doc 36 §11.1).
+/// Wire envelope.
 extension Envelope: Codable where Value: Codable {
     enum CodingKeys: String, CodingKey { case id, type, schema, owner, deleted, mergedInto, fields }
 

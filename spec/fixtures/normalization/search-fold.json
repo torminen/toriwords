@@ -1,7 +1,7 @@
 {
   "kind": "text-key",
   "function": "searchFold",
-  "source": "doc 36 §15.1 Search fold (CH-35): match-key steps 1–4, ё→е, whitespace collapsed/trimmed; punctuation and symbols kept; empty allowed",
+  "source": "Search fold: match-key steps 1–4, ё→е, whitespace collapsed/trimmed; punctuation and symbols kept; empty allowed",
   "cases": [
     { "id": "sf-001", "input": "Don’t Stop!", "expected": "don't stop!" },
     { "id": "sf-002", "input": "Ёж", "expected": "еж" },

@@ -3,7 +3,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-/// One API request relative to the base URL `https://<api-host>/v1` (doc 36 §19.1).
+/// One API request relative to the base URL `https://<api-host>/v1`.
 public struct HTTPRequest: Sendable, Equatable {
     public var method: String
     /// Path below the base URL, e.g. `/sync/push`.

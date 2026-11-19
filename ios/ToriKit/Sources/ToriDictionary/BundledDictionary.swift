@@ -2,16 +2,16 @@ import Foundation
 import GRDB
 import ToriCore
 
-/// Read-only access to `dictionary.sqlite` (doc 36 §8.2 schema and queries, §6.2 steps 1–4 and 8).
-/// All text orders are SQL `BINARY` on UTF-8 (§4.1 Text order); row IDs are runtime-only, never stored in user data.
+/// Read-only access to `dictionary.sqlite`: autocomplete, lookup, forms, reverse RU → EN lookup, related words, `meta`.
+/// All text orders are SQL `BINARY` on UTF-8; row IDs are runtime-only, never stored in user data.
 public final class BundledDictionary: Sendable {
     /// `meta.dictionary_version`, e.g. `2026.11.1` (`…-sample` for the Debug sample).
     public let version: String
-    /// `meta.licence_text`: attribution shown in Settings → About (§8.4).
+    /// `meta.licence_text`: attribution shown in Settings → About.
     public let licenceText: String
     private let db: DatabaseQueue
 
-    /// Opens the file read-only and immutable (`file:…?immutable=1`), as both the app and the extension do (§8.3).
+    /// Opens the file read-only and immutable (`file:…?immutable=1`), as both the app and the extension do.
     public init(path: String) throws {
         var config = Configuration()
         config.readonly = true
@@ -29,7 +29,7 @@ public final class BundledDictionary: Sendable {
         Dictionary(uniqueKeysWithValues: try Row.fetchAll(db, sql: "SELECT key, value FROM meta").map { ($0["key"], $0["value"]) })
     }
 
-    // MARK: Autocomplete (§6.2 step 1b)
+    // MARK: Autocomplete
 
     /// Prefix range scan on `headword.key` (`key` = `TextKey.matchKey` of the input), phrases included, in dictionary
     /// order (`freq_rank` NULL last, `key`, `id`). `excluding` skips keys already shown from the user's vocabulary.
@@ -50,7 +50,7 @@ public final class BundledDictionary: Sendable {
         (SELECT t.text FROM translation_ru t WHERE t.headword_id = h.id ORDER BY t.rank LIMIT 1) AS primary_ru
         """
 
-    // MARK: Lookup (§6.2 step 3)
+    // MARK: Lookup
 
     /// Exact `headword.key = key` hits (several POS possible) with senses and RU variants, in dictionary order.
     public func headwords(key: String) throws -> [Headword] {
@@ -97,7 +97,7 @@ public final class BundledDictionary: Sendable {
         }
     }
 
-    /// §6.2 step 3 for a typed or captured text: exact hit; else the base-form offer (P1, never for phrases);
+    /// Lookup for a typed or captured text: exact hit; else the base-form offer (P1, never for phrases);
     /// and dictionary phrases contained in a longer text (`took off` in a sentence → `take off`).
     public func resolve(_ text: String) throws -> Resolution {
         let key = TextKey.matchKey(text)
@@ -162,7 +162,7 @@ public final class BundledDictionary: Sendable {
         return out.map { $0.joined(separator: " ") }
     }
 
-    // MARK: Reverse RU → EN (P1, §6.2 step 2)
+    // MARK: Reverse RU → EN
 
     /// For input with Cyrillic and no Latin letters: prefix match of the folded input on `ru_fts`; one row per headword,
     /// ordered by its best matching `translation_ru.rank`, then `freq_rank` (NULL last), `key`, `id`.
@@ -190,7 +190,7 @@ public final class BundledDictionary: Sendable {
         return cyrillic
     }
 
-    // MARK: Related words (P1, §6.2 step 8)
+    // MARK: Related words
 
     /// Up to `limit` related headwords: kind (`synonym`, `related`, `derived`, `phrase`), then `freq_rank` NULL last,
     /// then `related_headword_id`. Empty when the build pruned `related`.

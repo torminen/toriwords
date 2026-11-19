@@ -4,7 +4,7 @@ import ToriStore
 import ToriSync
 import ToriUI
 
-/// Settings → Account (doc 35 §3.10, wireframes 4-6 S2–S5b; Product §5.8; doc 36 §11.10, §12.5–12.7).
+/// Settings → Account.
 /// Prompts and summaries are alerts; the engine's one-time `notices` are shown here in order.
 struct AccountView: View {
     @Environment(AppEnvironment.self) private var env
@@ -191,7 +191,7 @@ private struct NoticeAlerts: ViewModifier {
                 Button("Remove all \(n) words from this device", role: .destructive) { resolve(.remove) }
                 Button("Cancel", role: .cancel) {}
             case .removeNeedsNetwork:
-                // OK reopens the prompt (Product §5.8).
+                // OK reopens the prompt.
                 Button("OK") {
                     // After the binding's close() for this notice.
                     Task { @MainActor in

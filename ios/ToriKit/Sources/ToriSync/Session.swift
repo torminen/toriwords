@@ -3,7 +3,7 @@ import Foundation
 import Security
 #endif
 
-/// The tokens kept for the signed-in account (doc 36 §12.3). `provider` goes to `sync_state.lastProvider` instead.
+/// The tokens kept for the signed-in account. `provider` goes to `sync_state.lastProvider` instead.
 public struct Session: Codable, Sendable, Equatable {
     public var accountId: String
     public var sessionId: String
@@ -45,7 +45,7 @@ public final class InMemorySessionStore: SessionStore, @unchecked Sendable {
 }
 
 #if canImport(Security)
-/// One generic-password item, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, not shared with extensions (§12.3).
+/// One generic-password item, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, not shared with extensions.
 public struct KeychainSessionStore: SessionStore {
     public enum KeychainError: Error { case status(OSStatus) }
 
@@ -96,7 +96,7 @@ public enum SessionLoss: Sendable, Equatable {
     case accountDeleted
 }
 
-/// Owns the tokens: sign-in calls, single-flight refresh, authorized calls with one retry on `token_expired` (§12.3).
+/// Owns the tokens: sign-in calls, single-flight refresh, authorized calls with one retry on `token_expired`.
 /// Session loss clears the tokens and reports to `onLoss`; local state is the caller's job.
 public actor SessionManager {
     let api: APIClient
@@ -104,7 +104,7 @@ public actor SessionManager {
     let now: @Sendable () -> Int64
     private var session: Session?
     private var refreshing: Task<Session, any Error>?
-    /// Set by a successful refresh; `foregroundEnded()` resets it (pre-resolution check reuse, §12.3).
+    /// Set by a successful refresh; `foregroundEnded()` resets it (the account-prompt pre-resolution check reuses it).
     private(set) var refreshedThisForeground = false
     private var onLoss: (@Sendable (SessionLoss) async -> Void)?
 
@@ -119,7 +119,7 @@ public actor SessionManager {
 
     public var current: Session? { session }
 
-    /// E1 / E5. The session is **not** persisted here: the post-sign-in flow decides the order (§12.4).
+    /// E1 / E5. The session is **not** persisted here: the post-sign-in flow decides the order.
     public func signIn(_ credential: SignInCredential) async throws -> SessionResponse {
         try await api.signIn(credential).value
     }
@@ -159,13 +159,13 @@ public actor SessionManager {
         }
     }
 
-    /// Foreground check (§12.3): refresh if the access token expires within 5 minutes. Network errors are ignored.
+    /// Foreground check: refresh if the access token expires within 5 minutes. Network errors are ignored.
     public func foregroundCheck() async {
         guard let s = session, s.accessTokenExpiresAt - now() < 5 * 60_000 else { return }
         _ = try? await refresh()
     }
 
-    /// Pre-resolution check (§12.5): a valid session, reusing a refresh from this foreground.
+    /// Pre-resolution check before an account-prompt choice: a valid session, reusing a refresh from this foreground.
     /// Throws `APIError.offline`/`.unreachable` on network errors, `.sessionRevoked`/`.accountDeleted` after loss.
     public func validate() async throws {
         if refreshedThisForeground, session != nil { return }

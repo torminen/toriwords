@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §6.4, §11.3",
+  "source": "A review clears the \"Check translation\" flag; per-field merge by rank and clock",
   "cases": [
     {
       "id": "021-review-clears-needs-check",

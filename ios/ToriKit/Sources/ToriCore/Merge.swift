@@ -1,4 +1,4 @@
-/// Author rank of a field write: 1 for a direct user action, 0 for anything automatic (doc 36 §11.3).
+/// Author rank of a field write: 1 for a direct user action, 0 for anything automatic.
 public enum AuthorRank: Int, Comparable, Codable, Sendable {
     case automatic = 0, user = 1
     public static func < (a: Self, b: Self) -> Bool { a.rawValue < b.rawValue }
@@ -23,7 +23,7 @@ public struct FieldVersion<Value: Sendable & Equatable>: Equatable, Sendable {
     public static func merge(local: Self, remote: Self) -> Self { remote.wins(over: local) ? remote : local }
 }
 
-/// A synced record (doc 36 §11.1). `fields` holds only the fields present (a partial push carries a subset).
+/// A synced record. `fields` holds only the fields present (a partial push carries a subset).
 public struct Envelope<Value: Sendable & Equatable>: Equatable, Sendable {
     public var id: ToriID
     public var type: String

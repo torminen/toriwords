@@ -23,12 +23,12 @@ public struct QueueCard: Hashable, Sendable {
     }
 }
 
-/// Home "Due today" state (§7.7).
+/// Home "Due today" state.
 public enum HomeState: String, Codable, Sendable {
     case due, allDone, nothingDue, noneReviewable, empty
 }
 
-/// Device-local, session-only extensions of today's list (§7.7). Nothing is stored or synced.
+/// Device-local, session-only extensions of today's list. Nothing is stored or synced.
 public struct QueueExtensions: Hashable, Sendable {
     /// "Review all now": every waiting Card, ignoring the catch-up quota.
     public var reviewAll: Bool
@@ -41,7 +41,7 @@ public struct QueueExtensions: Hashable, Sendable {
     }
 }
 
-/// Today's queue, doc 36 §7.7. Nothing about it is stored; build it from synced data and `today`.
+/// Today's queue. Nothing about it is stored; build it from synced data and `today`.
 public struct DailyQueue: Hashable, Sendable {
     /// Step 1: waiting Cards taken, in session order.
     public var reviews: [ToriID]
@@ -66,7 +66,7 @@ public struct DailyQueue: Hashable, Sendable {
     public var newCount: Int { new.count }
 
     /// Session order when Review opens: reviews, then re-shows, then new Cards (the UI also inserts a re-show
-    /// a few cards after each Forgot, §7.8).
+    /// a few cards after each Forgot).
     public var sessionOrder: [ToriID] { reviews + reshow + new }
 
     public static func build(entries: [QueueEntry], logs: [ReviewLogInput], today: Int, newWordsPerDay: Int,

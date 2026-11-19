@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.8",
+  "source": "Schema evolution: unknown fields are kept in extra and sent back unchanged",
   "cases": [
     {
       "id": "028-unknown-fields-round-trip",

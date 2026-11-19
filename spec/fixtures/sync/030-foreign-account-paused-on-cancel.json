@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §12.4, §12.5",
+  "source": "Foreign account prompt, Cancel: stays signed in with sync paused (no push or pull)",
   "cases": [
     {
       "id": "030-foreign-account-paused-on-cancel",

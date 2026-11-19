@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/queue.schema.json",
-  "title": "Daily queue, catch-up and Home state (doc 36 §7.7)",
+  "title": "Daily queue, catch-up and Home state",
   "type": "object",
   "properties": {
     "kind": {

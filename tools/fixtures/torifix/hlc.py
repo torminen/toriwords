@@ -1,4 +1,4 @@
-"""Hybrid logical clock, doc 36 §11.3 and §11.5 step 2."""
+"""Hybrid logical clock: local write, receive and clock-ahead recovery."""
 
 MAX_COUNTER = 0xFFFF
 DAY_MS = 86_400_000

@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.3, §11.9",
+  "source": "Clock skew that persists after one recovery: outbox rows are kept, status \"Check your device time\"",
   "cases": [
     {
       "id": "026-clock-skew-persists",

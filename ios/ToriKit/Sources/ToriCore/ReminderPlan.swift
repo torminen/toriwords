@@ -1,4 +1,4 @@
-/// Daily reminder requests from the widget snapshot (doc 36 §10.3).
+/// Daily reminder requests from the widget snapshot.
 public enum ReminderPlan {
     /// One `UNCalendarNotificationTrigger` request (`repeats: false`) at a local calendar date and time.
     public struct Request: Hashable, Sendable {
@@ -17,10 +17,10 @@ public enum ReminderPlan {
     /// Up to 7 requests, one per snapshot day with something to review, at `hour:minute` local time.
     /// A time before 04:00 belongs to the previous review day, so it fires on the next calendar date.
     /// Requests whose fire instant is not after `now` are skipped; so are snapshot days before today.
-    /// A day with only new words fires (Product OQ-18 / AQ-20 proposal); the other answer is `d.dueReviews > 0` below.
+    /// A day with only new words fires: the trigger is reviews + new words > 0.
     public static func requests(snapshot: WidgetSnapshot, hour: Int, minute: Int, now: Int64, utcOffsetMin: Int) -> [Request] {
         let today = DayModel.dayNumber(unixMs: now, utcOffsetMin: utcOffsetMin)
-        let shift = hour < 4 ? 1 : 0  // the review day starts at 04:00 (§7.2)
+        let shift = hour < 4 ? 1 : 0  // the review day starts at 04:00
         return snapshot.days.compactMap { d in
             let count = d.dueReviews + d.newAvailable
             guard d.day >= today, count > 0 else { return nil }

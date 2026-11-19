@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/text-order.schema.json",
-  "title": "BINARY (UTF-8 byte) order and prefix ranges (doc 36 §4.1, §8.2)",
+  "title": "BINARY (UTF-8 byte) order and prefix ranges",
   "type": "object",
   "properties": {
     "kind": {

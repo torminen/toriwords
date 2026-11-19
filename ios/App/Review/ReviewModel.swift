@@ -4,7 +4,7 @@ import ToriCore
 import ToriEnrichment
 import ToriStore
 
-/// What one card shows; read fresh from the store each time a card appears (an edit shows immediately, §5.6).
+/// What one card shows; read fresh from the store each time a card appears (an edit shows immediately).
 struct CardContent: Equatable {
     struct Sentence: Equatable {
         var text: String
@@ -23,7 +23,7 @@ struct CardContent: Equatable {
     var ipa: String?
     var partOfSpeech: String?
     var meanings: [Meaning]
-    /// Sentence on the front: any sentence for recognition; only highlighted ones for recall and cloze (§7.8).
+    /// Sentence on the front: any sentence for recognition; only highlighted ones for recall and cloze.
     var frontSentence: Sentence?
     /// The back repeats the front's sentence, or shows the rotated one when the front had none.
     var backSentence: Sentence?
@@ -46,7 +46,7 @@ final class ReviewModel {
     private(set) var position = 0
     private(set) var total = 0
     private(set) var canUndo = false
-    /// Set once when the session reaches the summary for the first time ever (reminder offer, §5.6).
+    /// Set once when the session reaches the summary for the first time ever (reminder offer).
     var showReminderOffer = false
     var errorMessage: String?
 
@@ -92,7 +92,7 @@ final class ReviewModel {
         if env.activeReview === self { env.activeReview = nil }
     }
 
-    /// Session end or app background (§7.8).
+    /// Session end or app background.
     func commitPending() {
         if let answer = session.flush() { commit(answer) }
         canUndo = false
@@ -134,7 +134,7 @@ final class ReviewModel {
         showCurrent()
     }
 
-    /// Delete with the shared Undo toast (§5.7). Undo keeps the word, but its cards stay out of this session.
+    /// Delete with the shared Undo toast. Undo keeps the word, but its cards stay out of this session.
     func delete() {
         guard case .card(let c) = screen else { return }
         env.deletion.schedule([c.card.entry], word: c.word)
@@ -142,7 +142,7 @@ final class ReviewModel {
         showCurrent()
     }
 
-    /// "Learn more new words": one more batch for this session only (§7.7).
+    /// "Learn more new words": one more batch for this session only.
     func learnMore() {
         commitPending()
         extraNewBatches += 1
@@ -230,7 +230,7 @@ final class ReviewModel {
         try store.read { try $0.widgetSnapshot(now: Now.ms, utcOffsetMin: Now.utcOffsetMin) }.nextDueDay.map { $0 - Now.today }
     }
 
-    /// Entries with no rated log yet: answering one of their cards introduces a new word (summary, §7.8).
+    /// Entries with no rated log yet: answering one of their cards introduces a new word (summary).
     private nonisolated static func newEntries(_ r: StoreReader) throws -> Set<ToriID> {
         let (entries, logs) = try r.queueInput()
         let answered = Set(logs.filter { $0.rating != nil }.map(\.cardID))

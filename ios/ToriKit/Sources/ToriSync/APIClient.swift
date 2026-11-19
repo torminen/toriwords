@@ -1,7 +1,7 @@
 import Foundation
 import ToriCore
 
-/// Session response of E1, E5, E6 (doc 36 §19.2).
+/// Session response of E1, E5, E6.
 public struct SessionResponse: Codable, Sendable, Equatable {
     public var accountId: String
     public var sessionId: String
@@ -21,7 +21,7 @@ public struct SessionResponse: Codable, Sendable, Equatable {
     }
 }
 
-/// E9 response (§19.4).
+/// E9 response.
 public struct AccountInfo: Codable, Sendable, Equatable {
     public struct Identity: Codable, Sendable, Equatable {
         public var provider: String
@@ -62,7 +62,7 @@ public enum SignInCredential: Sendable, Equatable {
     case google(idToken: String, nonce: String?)
 }
 
-/// §19.6 error contract mapped for the client (§11.9).
+/// The API error contract mapped for the client.
 public enum APIError: Error, Equatable, Sendable {
     case offline
     case unreachable
@@ -82,13 +82,13 @@ public enum APIError: Error, Equatable, Sendable {
     case unexpected(status: Int, code: String?)
 }
 
-/// A decoded response plus the server time from its `Date` header (Unix ms), for §11.3 / §11.5 step 7.
+/// A decoded response plus the server time from its `Date` header (Unix ms), for the device-time check and `lastServerTime`.
 public struct APIResponse<T: Sendable>: Sendable {
     public var value: T
     public var serverTime: Int64?
 }
 
-/// Typed calls of E1, E5–E7, E9, E10, E12, E13 with the `Toriwords-*` headers (§19.1).
+/// Typed calls of E1, E5–E7, E9, E10, E12, E13 with the `Toriwords-*` headers.
 public struct APIClient: Sendable {
     public static let protocolVersion = "1"
 
@@ -96,7 +96,7 @@ public struct APIClient: Sendable {
     /// `CFBundleShortVersionString`.
     public let appVersion: String
     public let deviceID: ToriID
-    /// Observes the `Date` of every response that arrived (also error responses): device-time check (§11.3).
+    /// Observes the `Date` of every response that arrived (also error responses): device-time check.
     let onServerTime: @Sendable (Int64) async -> Void
 
     public init(transport: any HTTPTransport, appVersion: String, deviceID: ToriID,
@@ -107,7 +107,7 @@ public struct APIClient: Sendable {
         self.onServerTime = onServerTime
     }
 
-    // MARK: Auth (§19.3)
+    // MARK: Auth
 
     public func signIn(_ credential: SignInCredential) async throws -> APIResponse<SessionResponse> {
         switch credential {
@@ -131,7 +131,7 @@ public struct APIClient: Sendable {
         let _: APIResponse<Empty> = try await call("POST", "/auth/logout", token: accessToken)
     }
 
-    // MARK: Account (§19.4)
+    // MARK: Account
 
     public func account(accessToken: String) async throws -> APIResponse<AccountInfo> {
         try await call("GET", "/account", token: accessToken)
@@ -141,7 +141,7 @@ public struct APIClient: Sendable {
         let _: APIResponse<Empty> = try await call("DELETE", "/account", token: accessToken)
     }
 
-    // MARK: Sync (§19.5)
+    // MARK: Sync
 
     struct PushBody: Encodable {
         var deviceId: String

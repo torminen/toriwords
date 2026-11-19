@@ -4,7 +4,7 @@ import ToriCore
 import AuthenticationServices
 #endif
 
-/// Nonce and PKCE helpers for the sign-in adapters (doc 36 §12.1, §12.2; RFC 7636).
+/// Nonce and PKCE helpers for the sign-in adapters (RFC 7636).
 public enum AuthCrypto {
     /// 32 random bytes, base64url without padding.
     public static func randomToken() -> String {
@@ -24,7 +24,7 @@ public enum AuthCrypto {
     }
 }
 
-/// Google OAuth without the SDK (§12.2 alternative): authorization code + PKCE + nonce, code exchanged for the ID token.
+/// Google OAuth without the SDK: authorization code + PKCE + nonce, code exchanged for the ID token.
 public struct GoogleOAuthConfig: Sendable, Equatable {
     /// iOS OAuth client ID (public identifier, build configuration).
     public var clientID: String
@@ -75,7 +75,7 @@ public enum SignInError: Error, Equatable, Sendable {
 }
 
 #if canImport(AuthenticationServices) && !os(watchOS)
-/// Sign in with Apple (§12.1): no scopes, hashed nonce; yields the E1 credential.
+/// Sign in with Apple: no scopes, hashed nonce; yields the E1 credential.
 @MainActor
 public final class AppleSignIn: NSObject, ASAuthorizationControllerDelegate {
     private var continuation: CheckedContinuation<SignInCredential, any Error>?
@@ -165,7 +165,7 @@ public final class GoogleSignIn: NSObject, ASWebAuthenticationPresentationContex
         let (data, _) = try await URLSession.shared.data(for: request)
         struct Token: Decodable { var id_token: String }
         guard let token = try? JSONDecoder().decode(Token.self, from: data) else { throw SignInError.failed }
-        // Google's access token is dropped (§12.2).
+        // Google's access token is dropped.
         return .google(idToken: token.id_token, nonce: nonce)
     }
 

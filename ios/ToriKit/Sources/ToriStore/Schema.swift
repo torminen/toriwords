@@ -1,6 +1,6 @@
 import GRDB
 
-/// `user.sqlite` schema (doc 36 §4.2). Synced columns are nullable so a tombstone can drop field values (§11.3).
+/// `user.sqlite` schema. Synced columns are nullable so a tombstone can drop field values.
 enum Schema {
     static let version = 1
 

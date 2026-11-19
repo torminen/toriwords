@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.7 (S4), §11.6 step 3",
+  "source": "Delete wins: an offline review of a deleted Entry is dropped; children of a known deleted Entry are dropped on pull",
   "cases": [
     {
       "id": "010-delete-wins-over-offline-review",

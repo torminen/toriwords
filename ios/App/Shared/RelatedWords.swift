@@ -4,7 +4,7 @@ import ToriEnrichment
 import ToriStore
 import ToriUI
 
-/// Related words (P1, doc 35 §3.7, 10-3 RW1/RW2): up to 8 rows with + Add and ✕; saved ones show "✓ In vocabulary".
+/// Related words: up to 8 rows with + Add and ✕; saved ones show "✓ In vocabulary".
 /// Hidden when the dictionary knows none. ✕ hides a row for this screen only (not stored).
 struct RelatedWords: View {
     let word: String
@@ -75,7 +75,7 @@ struct RelatedWords: View {
         })
     }
 
-    /// One-tap add with the primary translation and no sentence; source "Suggested from '<word>'" (proposal, AQ-19).
+    /// One-tap add with the primary translation and no sentence; source "Suggested from '<word>'".
     private func add(_ item: Completion) {
         guard let store = env.store else { return }
         // Rank-1 dictionary variant with its provenance (version, headword key, sense); none → enrichment fills it.

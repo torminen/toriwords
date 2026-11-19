@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §12.5",
+  "source": "Foreign account prompt, \"Remove from this device\": delete local synced data, re-create defaults, full pull",
   "cases": [
     {
       "id": "033-foreign-account-remove",

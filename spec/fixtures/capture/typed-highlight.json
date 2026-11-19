@@ -1,6 +1,6 @@
 {
   "kind": "capture-typed-highlight",
-  "source": "doc 36 §5.2 step 6: highlight = first occurrence (smallest start, then smallest end) of a slice [s, e) of the sentence that starts and ends at word boundaries (letter/number L*/N* on the inside, non-letter/number or text edge on the outside) with matchKey(slice) == matchKey(entryText); none → null. UTF-16 code units",
+  "source": "Highlight for typed sentences: highlight = first occurrence (smallest start, then smallest end) of a slice [s, e) of the sentence that starts and ends at word boundaries (letter/number L*/N* on the inside, non-letter/number or text edge on the outside) with matchKey(slice) == matchKey(entryText); none → null. UTF-16 code units",
   "cases": [
     {
       "id": "th-001",

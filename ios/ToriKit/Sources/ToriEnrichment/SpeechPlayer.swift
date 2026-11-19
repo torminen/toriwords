@@ -1,7 +1,7 @@
 #if canImport(AVFoundation)
 import AVFoundation
 
-/// Pronunciation via `AVSpeechSynthesizer` (doc 36 §9). One instance owned by the app.
+/// Pronunciation via `AVSpeechSynthesizer`. One instance owned by the app.
 @MainActor
 public final class SpeechPlayer: NSObject {
     public enum Trigger: Sendable {

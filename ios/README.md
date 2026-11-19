@@ -1,7 +1,6 @@
 # ToriWords for iOS
 
-The native iOS app (SwiftUI, iOS 18+) and its Swift package **ToriKit**. The architecture spec is doc 36. The product
-spec is doc 34 and the UI spec is doc 35.
+The native iOS app (SwiftUI, iOS 18+) and its Swift package **ToriKit**.
 
 ## Prerequisites
 
@@ -85,7 +84,7 @@ All build settings live in `Config/Shared.xcconfig`. It holds no secrets.
 |---|---|
 | `DEVELOPMENT_TEAM` | Your Apple team ID, needed for device builds. |
 | `TORI_APP_GROUP_ID` | `group.com.toriwords.app`. Shared by the app, Share Extension and widget. |
-| `TORI_BG_REFRESH_TASK_ID` | `com.toriwords.app.refresh` (`BGAppRefreshTask`, doc 36 §10.4). |
+| `TORI_BG_REFRESH_TASK_ID` | `com.toriwords.app.refresh` (`BGAppRefreshTask`). |
 | `TORI_URL_SCHEME` | `toriwords`, for `toriwords://review` and `toriwords://add?text=…`. |
 | `TORI_API_BASE_URL` | Backend base URL, **https only**. Empty means sync is off and the app is local-only. |
 | `TORI_GOOGLE_CLIENT_ID` / `TORI_GOOGLE_REVERSED_CLIENT_ID` | iOS OAuth client ID and its reversed form. While it contains `REPLACE_ME`, Google sign-in is hidden. |
@@ -139,7 +138,7 @@ ToriKit/
   ToriUI             design tokens and shared SwiftUI components
 ```
 
-Allowed dependencies are declared in `ToriKit/Package.swift` (doc 36 §2.3). The extensions link only ToriCore,
+Allowed dependencies are declared in `ToriKit/Package.swift`. The extensions link only ToriCore,
 ToriShared, ToriDictionary and ToriUI.
 
 ## Specs and fixtures

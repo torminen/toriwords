@@ -16,13 +16,13 @@ struct ToriwordsApp: App {
                 .tint(Palette.accent)
                 .onOpenURL { env.open($0) }
         }
-        // Registered at launch by SwiftUI; expiration cancels the task (§10.4).
+        // Registered at launch by SwiftUI; expiration cancels the task.
         .backgroundTask(.appRefresh(AppConfig.backgroundRefreshTaskID)) { await env.backgroundRefresh() }
     }
 }
 
 /// Runs the launch sequence before any data is shown, hosts the Home stack and the Review cover, the hidden
-/// `.translationTask` for background fills (§6.3), and the scene-phase handling (§3, §7.8).
+/// `.translationTask` for background fills, and the scene-phase handling.
 struct RootView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.scenePhase) private var scenePhase

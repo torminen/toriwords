@@ -2,7 +2,7 @@ import ToriCore
 import ToriDictionary
 import ToriStore
 
-/// The dictionary searches Add and the Entry screen make (§6.2 items 1–3, 8), as app-shaped `Completion` rows. With no
+/// The dictionary searches Add and the Entry screen make, as app-shaped `Completion` rows. With no
 /// dictionary installed every search answers nothing, which the screens show as "not in the dictionary".
 public struct DictionarySearch: Sendable {
     public let dictionary: BundledDictionary?
@@ -12,13 +12,13 @@ public struct DictionarySearch: Sendable {
     /// Reverse RU → EN starts at 2 Cyrillic letters: a 1-letter FTS prefix scan costs ~30 ms per keystroke.
     public static let reverseMinLetters = 2
 
-    /// Headwords whose key starts with the typed key, phrases included, in dictionary order (§6.2 item 1b).
+    /// Headwords whose key starts with the typed key, phrases included, in dictionary order.
     public func complete(_ prefix: String, limit: Int) -> [Completion] {
         let key = TextKey.matchKey(prefix)
         return ((try? dictionary?.autocomplete(prefix: key, limit: limit)) ?? []).map(Self.row)
     }
 
-    /// English candidates for Russian input (P1, §6.2 item 2), each with the Russian variant that matched.
+    /// English candidates for Russian input, each with the Russian variant that matched.
     public func reverse(_ russian: String, limit: Int) -> [Completion] {
         guard russian.unicodeScalars.filter({ $0.properties.isAlphabetic }).count >= Self.reverseMinLetters else { return [] }
         return ((try? dictionary?.reverse(russian, limit: limit)) ?? []).map {
@@ -28,7 +28,7 @@ public struct DictionarySearch: Sendable {
         }
     }
 
-    /// "Did you mean …?": the base form of a single inflected word with no own headword (P1, PD-14); nil for phrases.
+    /// "Did you mean …?": the base form of a single inflected word with no own headword; nil for phrases.
     public func baseForm(of text: String) -> String? {
         guard !TextKey.isPhrase(text) else { return nil }
         return (try? dictionary?.resolve(text))?.baseForms.first?.headword.text
@@ -39,7 +39,7 @@ public struct DictionarySearch: Sendable {
         ((try? dictionary?.containedPhrases(in: text)) ?? []).map(\.text)
     }
 
-    /// Related headwords of the word's headword (or of its base form), at most `limit` (P1, §6.2 item 8).
+    /// Related headwords of the word's headword (or of its base form), at most `limit`.
     public func related(to word: String, limit: Int) -> [Completion] {
         guard let dictionary else { return [] }
         let key = TextKey.matchKey(word)

@@ -2,7 +2,7 @@
 import SwiftUI
 import ToriCore
 
-/// Review card container: front and back on one surface, flipped around the vertical axis (doc 35 §3.4).
+/// Review card container: front and back on one surface, flipped around the vertical axis.
 /// Taps and swipes stay with the caller; only the visible side is exposed to VoiceOver.
 public struct FlipCard<Front: View, Back: View>: View {
     public var isFlipped: Bool

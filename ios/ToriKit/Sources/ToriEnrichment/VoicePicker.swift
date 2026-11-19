@@ -1,10 +1,10 @@
-/// Pronunciation accent, per device (doc 36 §9).
+/// Pronunciation accent, per device.
 public enum Accent: String, Sendable, CaseIterable {
     case us, uk
     public var language: String { self == .us ? "en-US" : "en-GB" }
 }
 
-/// Voice choice (doc 36 §9), kept free of AVFoundation so it is tested on Linux.
+/// Voice choice, kept free of AVFoundation so it is tested on Linux.
 public enum VoicePicker {
     public enum Quality: Int, Comparable, Sendable {
         case `default` = 0, enhanced, premium

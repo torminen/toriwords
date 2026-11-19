@@ -15,7 +15,7 @@ enum TranslationStatusText {
     }
 }
 
-/// Settings → Translation (doc 35 §3.10, wireframe 4-6 S6 TRANSLATION group; doc 36 §6.3): Apple Translation status
+/// Settings → Translation: Apple Translation status
 /// with **Download**, and the bundled dictionary. When EN→RU becomes installed, words whose enrichment found nothing
 /// get another try (`retryUnavailable`).
 struct TranslationView: View {

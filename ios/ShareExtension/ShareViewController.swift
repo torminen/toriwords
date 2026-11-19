@@ -3,7 +3,7 @@ import ToriShared
 import UIKit
 import UniformTypeIdentifiers
 
-/// Principal class: reads the shared items, then hosts the SwiftUI capture sheet (doc 36 §5.3).
+/// Principal class: reads the shared items, then hosts the SwiftUI capture sheet.
 final class ShareViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()

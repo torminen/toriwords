@@ -3,7 +3,7 @@ import ToriDictionary
 import ToriEnrichment
 import ToriShared
 
-/// §8.3: installs the bundled `dictionary.sqlite` into the App Group (copy + verify + rename off the main actor)
+/// Installs the bundled `dictionary.sqlite` into the App Group (copy + verify + rename off the main actor)
 /// and opens it read-only. A version change is reported so enrichment re-runs `unavailable` Entries.
 @MainActor final class AppDictionaryInstaller: DictionaryInstalling {
     private(set) var dictionary: BundledDictionary?

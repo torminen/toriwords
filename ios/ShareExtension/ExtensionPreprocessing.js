@@ -1,5 +1,5 @@
-// Safari share preprocessing (doc 36 §5.1, AQ-13): returns the selection, page title, URL and the sentence around
-// the selection. The extension treats the presence of this result as "shared from Safari" (CH-23).
+// Safari share preprocessing: returns the selection, page title, URL and the sentence around
+// the selection. The extension treats the presence of this result as "shared from Safari".
 var ExtensionPreprocessingJS = {
     run: function (args) {
         var selection = "", sentence = "";

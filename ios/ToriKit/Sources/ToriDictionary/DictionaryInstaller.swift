@@ -3,14 +3,14 @@ import GRDB
 import ToriCore
 
 /// Copies the bundled `dictionary.sqlite` into the App Group when its `meta.dictionary_version` differs from the
-/// installed one (doc 36 §8.3): copy to `<installed>.tmp`, verify size and SHA-256, exclude from backup, atomic rename.
+/// installed one: copy to `<installed>.tmp`, verify size and SHA-256, exclude from backup, atomic rename.
 /// On any failure the old file stays in place.
 public struct DictionaryInstaller: Sendable {
     public enum Outcome: Equatable, Sendable {
         case unchanged(version: String)
         case installed(version: String, previous: String?)
 
-        /// The app then calls `EnrichmentOrchestrator.updateDictionary` (§8.3: re-run enrichment on `unavailable`).
+        /// The app then calls `EnrichmentOrchestrator.updateDictionary` (re-runs enrichment on `unavailable` Entries).
         public var versionChanged: Bool { if case .installed = self { true } else { false } }
     }
 

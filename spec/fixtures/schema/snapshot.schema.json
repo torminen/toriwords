@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/snapshot.schema.json",
-  "title": "Widget snapshot (doc 36 §10.1)",
+  "title": "Widget snapshot",
   "type": "object",
   "properties": {
     "kind": {

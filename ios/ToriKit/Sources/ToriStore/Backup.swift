@@ -2,7 +2,7 @@ import Foundation
 import GRDB
 import ToriCore
 
-/// JSON backup wrapper (§14.2).
+/// JSON backup wrapper.
 public struct Backup: Codable, Sendable {
     public static let formatName = "toriwords-backup"
     public static let supportedVersion = 1
@@ -44,7 +44,7 @@ extension ToriStore {
         return try JSONText.encoder.encode(backup)
     }
 
-    /// Restore (§14.2): validates the wrapper, then applies the records as if pulled, in pages; idempotent.
+    /// Restore: validates the wrapper, then applies the records as if pulled, in pages; idempotent.
     /// Locally changed records are added to the outbox while signed in. (The pre-restore sync cycle is ToriSync's.)
     public func restore(_ data: Data, pageSize: Int = 1000) throws -> RestoreSummary {
         struct Header: Decodable { var format: String?; var version: Int?; var `protocol`: Int? }
@@ -85,7 +85,7 @@ extension ToriStore {
         return summary
     }
 
-    /// CSV export (§14.2): one row per live Entry. `containsWiktionary` tells the caller to add the attribution.
+    /// CSV export: one row per live Entry. `containsWiktionary` tells the caller to add the attribution.
     public func exportCSV(utcOffsetMin: Int) throws -> (csv: String, containsWiktionary: Bool) {
         try read { r in
             let db = r.db

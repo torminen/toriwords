@@ -1,7 +1,7 @@
 import Foundation
 import ToriCore
 
-/// Entry edit mode (Product §5.7, doc 35 §3.5): the editable copy of an Entry and the writes Done makes.
+/// Entry edit mode: the editable copy of an Entry and the writes Done makes.
 public struct EntryDraft: Equatable, Sendable {
     public struct Meaning: Equatable, Sendable, Identifiable {
         /// Row identity in the editor (new rows have no Sense yet).
@@ -71,7 +71,7 @@ public struct EntryDraft: Equatable, Sendable {
         return trimmed != EntryDraft(e)
     }
 
-    /// Done needs some text that can be a word (Latin letters, §5.2).
+    /// Done needs some text that can be a word (Latin letters).
     public var canSave: Bool { Capture.clean(text).isSaveable }
 }
 
@@ -82,7 +82,7 @@ private func nonEmpty(_ s: String) -> String? {
 
 extension ToriStore {
     /// Applies an edit. A text that equals another Entry returns `.duplicate` before anything is written; call again with
-    /// `mergeIfDuplicate` after the user confirms Merge (§5.3). The Entry ID stays valid: reads resolve a merged ID.
+    /// `mergeIfDuplicate` after the user confirms Merge. The Entry ID stays valid: reads resolve a merged ID.
     public func save(_ d: EntryDraft, original e: EntryDetail, mergeIfDuplicate: Bool = false) throws -> KeyEditResult {
         let text = Capture.clean(d.text).text
         if text != e.text {

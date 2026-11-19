@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §7.6, §21.6",
+  "source": "Card state = replay of its logs: a synced scheduling-settings change rebuilds Cards",
   "cases": [
     {
       "id": "017-settings-change-rebuilds-cards",

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/source-key.schema.json",
-  "title": "Source natural key without URL (doc 36 §11.7, §15.1)",
+  "title": "Source natural key without URL",
   "type": "object",
   "properties": {
     "kind": {

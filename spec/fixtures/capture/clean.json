@@ -1,6 +1,6 @@
 {
   "kind": "capture-clean",
-  "source": "doc 36 §5.2 steps 1–3: clean (tags, letter-only [..]/(..) annotations, leading speaker label of ≤ 3 words per line, line breaks → spaces, collapse, first 5,000 code points), classify (> 6 words or ends with . ! ? … plus optional closers \" ' ” ’ » ) ]), reject text without a Latin letter (A–Z, a–z, U+00C0–U+024F except × ÷, U+1E00–U+1EFF)",
+  "source": "Capture text rules: clean (tags, letter-only [..]/(..) annotations, leading speaker label of ≤ 3 words per line, line breaks → spaces, collapse, first 5,000 code points), classify (> 6 words or ends with . ! ? … plus optional closers \" ' ” ’ » ) ]), reject text without a Latin letter (A–Z, a–z, U+00C0–U+024F except × ÷, U+1E00–U+1EFF)",
   "cases": [
     {
       "id": "cl-001",

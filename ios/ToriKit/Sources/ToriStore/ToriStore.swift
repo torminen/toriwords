@@ -2,7 +2,7 @@ import Foundation
 import GRDB
 import ToriCore
 
-/// Owner of `user.sqlite` (doc 36 §4). All writes go through `write`, which stamps clocks, fills the outbox and runs
+/// Owner of `user.sqlite`. All writes go through `write`, which stamps clocks, fills the outbox and runs
 /// the post-write maintenance (canonical IDs, duplicate merge, Card creation, replay) in the same transaction.
 public final class ToriStore: Sendable {
     let db: DatabasePool
@@ -42,7 +42,7 @@ public final class ToriStore: Sendable {
         ValueObservation.tracking { try query(StoreReader(db: $0)) }.removeDuplicates().values(in: db)
     }
 
-    /// `PRAGMA wal_checkpoint(TRUNCATE)` on background (§3).
+    /// `PRAGMA wal_checkpoint(TRUNCATE)` on background.
     public func checkpoint() throws {
         try db.writeWithoutTransaction { try $0.execute(sql: "PRAGMA wal_checkpoint(TRUNCATE)") }
     }

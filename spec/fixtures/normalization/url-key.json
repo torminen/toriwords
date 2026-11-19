@@ -1,7 +1,7 @@
 {
   "kind": "text-key",
   "function": "urlKey",
-  "source": "doc 36 §15.1 URL key. Parsed by an explicit split (scheme ':' '//' authority path ['?' query] ['#' fragment]), never a platform URL parser; NFC and whitespace trim first",
+  "source": "URL key. Parsed by an explicit split (scheme ':' '//' authority path ['?' query] ['#' fragment]), never a platform URL parser; NFC and whitespace trim first",
   "cases": [
     { "id": "url-001", "input": "HTTPS://Example.COM/Path?a=1#frag", "expected": "https://example.com/Path?a=1", "note": "scheme and host lowercased, path case kept, fragment dropped" },
     { "id": "url-002", "input": "https://example.com:443/a", "expected": "https://example.com/a", "note": "default https port dropped" },

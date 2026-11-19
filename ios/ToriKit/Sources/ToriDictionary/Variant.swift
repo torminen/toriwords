@@ -1,6 +1,6 @@
 import ToriCore
 
-/// One RU variant to pick in the capture sheet (UI doc §3.3, checkboxes, first preselected).
+/// One RU variant to pick in the capture sheet (checkboxes, first preselected).
 public struct Variant: Hashable, Sendable {
     public var translation: String
     /// The gloss of the sense the variant belongs to; nil for variants not tied to a sense.

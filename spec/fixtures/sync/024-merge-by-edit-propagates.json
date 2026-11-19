@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.7",
+  "source": "User-initiated merge: an edit that makes match keys collide runs the duplicate merge, which propagates",
   "cases": [
     {
       "id": "024-merge-by-edit-propagates",

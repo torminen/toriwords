@@ -2,16 +2,16 @@ import Foundation
 import GRDB
 import ToriCore
 
-/// `sync_state` keys (doc 36 §4.2).
+/// `sync_state` keys.
 public enum SyncStateKey: String, CaseIterable, Sendable {
     case cursor, hlc, accountId, lastSyncedAccountId, pendingAccountChoice, adoptedAccountId, lastServerTime, lastSyncAt,
          signInBaseline, lastProvider,
          /// JSON `{appVersion, ids}`: records the server rejected (`invalid_record` / `too_large`), excluded from pushes
-         /// until the app version changes (§11.9).
+         /// until the app version changes.
          excludedRecords
 }
 
-/// One outbox row (doc 36 §11.4). `field == "*"` = the whole record; `_deleted` / `_mergedInto` = envelope changes.
+/// One outbox row. `field == "*"` = the whole record; `_deleted` / `_mergedInto` = envelope changes.
 public struct OutboxRow: Hashable, Sendable {
     public var recordID: ToriID
     public var type: String
@@ -31,7 +31,7 @@ public struct PushBatch: Sendable {
 }
 
 public struct PulledPageResult: Sendable, Equatable {
-    /// Records of a type this version does not know (§11.8 backfill).
+    /// Records of a type this version does not know (for a later backfill).
     public var skippedUnknownTypes: Set<String>
 }
 
@@ -62,24 +62,24 @@ extension ToriStore {
         try db.write { try Outbox.acknowledge($0, rows: rows, acked: acked) }
     }
 
-    /// Distinct record IDs in the outbox (sign-out note, §12.7).
+    /// Distinct record IDs in the outbox (sign-out note).
     public func pendingRecordCount() throws -> Int {
         try db.read { try Int.fetchOne($0, sql: "SELECT COUNT(DISTINCT record_id) FROM pending_changes") ?? 0 }
     }
 
-    /// Sign-in / "Add to this account": every synced record pending as `*` (§12.5).
+    /// Sign-in / "Add to this account": every synced record pending as `*`.
     public func markAllPending() throws { try write(Outbox.markAll) }
 
     public func clearOutbox() throws { try db.write { try $0.execute(sql: "DELETE FROM pending_changes") } }
 
-    /// §11.5 step 2: if the HLC is more than 1 h ahead of `lastServerTime`, reset it and re-stamp every pending field
+    /// Clock-ahead check: if the HLC is more than 1 h ahead of `lastServerTime`, reset it and re-stamp every pending field
     /// (same value and rank, new clock, also in `field_clocks`). Returns whether a reset happened.
     @discardableResult
     public func recoverClockAhead(lastServerTime: Int64) throws -> Bool {
         try write { tx in try Outbox.recoverClockAhead(tx, lastServerTime: lastServerTime) }
     }
 
-    /// §11.6: apply one pulled page and store `cursor`, in one transaction.
+    /// Apply one pulled page and store `cursor`, in one transaction.
     @discardableResult
     public func applyPulledPage(_ records: [SyncRecord], cursor: String) throws -> PulledPageResult {
         try write { tx in
@@ -89,7 +89,7 @@ extension ToriStore {
         }
     }
 
-    /// §12.4 step 2 / §12.5 "Add": persist the account and mark every record pending, one transaction.
+    /// Sign-in without a foreign account / account prompt "Add": persist the account and mark every record pending, one transaction.
     /// `adopted` = the account the local data was adopted into ("Add"); clears `pendingAccountChoice`.
     public func beginSyncing(account: String, adopted: Bool) throws {
         try write { tx in
@@ -100,11 +100,11 @@ extension ToriStore {
         }
     }
 
-    /// Sign-out, session loss, account deletion (§12.3, §12.7): `accountId`, cursor, `adoptedAccountId`,
+    /// Sign-out, session loss, account deletion: `accountId`, cursor, `adoptedAccountId`,
     /// `pendingAccountChoice` and the outbox gone; data and `lastSyncedAccountId` kept.
     public func enterLocalOnly() throws { try db.write(Account.signedOutState) }
 
-    /// The device holds synced user records beyond the deterministic defaults (LanguagePair, Settings, Device) — §12.4.
+    /// The device holds synced user records beyond the deterministic defaults (LanguagePair, Settings, Device).
     public func hasUserRecordsBeyondDefaults() throws -> Bool {
         try db.read { db in
             for type in RecordType.all where ![RecordType.languagePair, .settings, .device].contains(type) {
@@ -114,7 +114,7 @@ extension ToriStore {
         }
     }
 
-    /// Live canonical Entries with every Entry ID of their merge group (merge summary, §12.6).
+    /// Live canonical Entries with every Entry ID of their merge group (merge summary).
     public func liveEntryGroups() throws -> [ToriID: Set<ToriID>] {
         try db.read { db in
             var groups: [ToriID: Set<ToriID>] = [:]
@@ -128,7 +128,7 @@ extension ToriStore {
         }
     }
 
-    /// Live (not deleted, not merged) synced user records beyond the defaults — the guard's "N" basis (§12.5).
+    /// Live (not deleted, not merged) synced user records beyond the defaults — the account prompt's "N".
     public func liveEntryCount() throws -> Int {
         try db.read { try Int.fetchOne($0, sql: "SELECT COUNT(*) FROM entry WHERE deleted = 0 AND merged_into IS NULL") ?? 0 }
     }

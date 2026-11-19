@@ -5,7 +5,7 @@ import CryptoKit
 import Crypto
 #endif
 
-/// A record ID: 16 bytes, ordered as unsigned bytes (doc 36 §4.1, §11.2). Text form is lowercase hyphenated.
+/// A record ID: 16 bytes, ordered as unsigned bytes. Text form is lowercase hyphenated.
 public struct ToriID: Hashable, Comparable, Sendable, CustomStringConvertible {
     /// Bytes 0–7 and 8–15, big-endian, so integer order equals unsigned byte order.
     public let high: UInt64
@@ -77,7 +77,7 @@ public struct ToriID: Hashable, Comparable, Sendable, CustomStringConvertible {
         return ToriID(bytes: b)
     }
 
-    // MARK: Deterministic IDs (doc 36 §11.2)
+    // MARK: Deterministic IDs
 
     public static func languagePair(native: String, target: String) -> ToriID { v5("pair:\(native):\(target)") }
     public static let settings = v5("settings")
@@ -87,7 +87,7 @@ public struct ToriID: Hashable, Comparable, Sendable, CustomStringConvertible {
     public static func autoSense(entry: ToriID, ordinal: Int) -> ToriID { v5("autosense:\(entry):\(ordinal)") }
 }
 
-/// Card direction; the raw value is the synced name. Declaration order is the queue order (§7.7).
+/// Card direction; the raw value is the synced name. Declaration order is the queue order.
 public enum CardDirection: String, CaseIterable, Comparable, Sendable {
     case recognition, recall, cloze
 

@@ -3,7 +3,7 @@ import ToriCore
 import ToriStore
 import ToriUI
 
-/// Words list (doc 35 §3.5, Product §5.7; wireframes 3-5 W1–W3, 8-6 A3, 10-3 B1, B2, T2).
+/// Words list.
 /// Select mode (UQ-9: "Select" in the ••• menu or long-press a row): checkboxes, Cancel · N selected · Select all,
 /// bottom bar Tag · Known · Pause · Delete (Resume learning when every selected word is Known or Paused).
 struct WordsView: View {
@@ -204,7 +204,7 @@ struct WordsView: View {
         selection = []
     }
 
-    /// Bulk actions are one store transaction each (§14.3); the mode ends after every action.
+    /// Bulk actions are one store transaction each; the mode ends after every action.
     private func setSelectedStatus(_ status: EntryStatus) {
         try? store.setStatus(selectedRows.map(\.id), status)
         env.didChangeWords()

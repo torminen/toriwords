@@ -4,7 +4,7 @@ import ToriEnrichment
 import ToriStore
 import ToriUI
 
-/// Entry read and edit mode (doc 35 §3.5, Product §5.4, §5.7; wireframes 3-5 W4–W7, 8-6 M1, A4, A5, 10-3 T1, RW1, PR1).
+/// Entry read and edit mode.
 /// `.entryEdit` (Review ••• Edit) opens straight in edit mode, and Done / Cancel return to the caller.
 struct EntryView: View {
     let store: ToriStore
@@ -254,7 +254,7 @@ struct EntryView: View {
             for try await value in observation {
                 if !loaded, let value {
                     loaded = true
-                    // Opening the entry clears "Check translation"; the banner stays for this visit (§5.4 item 6).
+                    // Opening the entry clears "Check translation"; the banner stays for this visit.
                     showCheckBanner = value.needsCheck
                     if value.needsCheck { try? store.markChecked(value.id) }
                     if editOnly { beginEditing(value) }
@@ -340,7 +340,7 @@ struct EntryView: View {
     }
 }
 
-/// ••• on the entry: I already know this / Pause / Delete, or Resume learning (§5.7).
+/// ••• on the entry: I already know this / Pause / Delete, or Resume learning.
 struct StatusMenu: View {
     let status: EntryStatus
     let set: (EntryStatus) -> Void

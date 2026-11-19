@@ -3,7 +3,7 @@ import GRDB
 import ToriCore
 import ToriShared
 
-/// Translation state shown in the UI (§6.4), first match wins.
+/// Translation state shown in the UI, first match wins.
 public enum TranslationState: Hashable, Sendable {
     case has(String)
     case notFound, pending, none
@@ -112,7 +112,7 @@ public struct ProgressSummary: Hashable, Sendable {
 extension StoreReader {
     static let liveEntry = "e.deleted = 0 AND e.merged_into IS NULL"
     static let liveSense = "s.deleted = 0 AND s.merged_into IS NULL"
-    /// First translation in display order: own Senses first, then `position`, then ID (§11.7).
+    /// First translation in display order: own Senses first, then `position`, then ID.
     static let senseOrder = "(s.entry_id <> s.canonical_entry_id), s.position, s.id"
 
     // MARK: Queue, Home, widget
@@ -150,7 +150,7 @@ extension StoreReader {
         try Int.fetchOne(db, sql: "SELECT new_words_per_day FROM settings WHERE id = ?", arguments: [ToriID.settings]) ?? 10
     }
 
-    /// Today's queue (§7.7): Home counts and the session list.
+    /// Today's queue: Home counts and the session list.
     public func dailyQueue(now: Int64, utcOffsetMin: Int, extensions: QueueExtensions = QueueExtensions()) throws -> DailyQueue {
         let (entries, logs) = try queueInput()
         return DailyQueue.build(entries: entries, logs: logs, today: DayModel.dayNumber(unixMs: now, utcOffsetMin: utcOffsetMin),
@@ -163,7 +163,7 @@ extension StoreReader {
                                       newWordsPerDay: try newWordsPerDay(), parameters: try Replay.parameters(db).0)
     }
 
-    // MARK: Words list and search (§14.3)
+    // MARK: Words list and search
 
     public func words(_ q: WordsQuery) throws -> [WordRow] {
         var conditions = [Self.liveEntry]
@@ -225,7 +225,7 @@ extension StoreReader {
               FROM entry e
         """
 
-    /// Add autocomplete (a): live Entries whose match key starts with the typed key, by key then ID (§6.2 item 1).
+    /// Add autocomplete (a): live Entries whose match key starts with the typed key, by key then ID.
     public func vocabularyMatches(prefix text: String, limit: Int = 3) throws -> [WordRow] {
         let key = TextKey.matchKey(text)
         guard !key.isEmpty else { return [] }
@@ -235,7 +235,7 @@ extension StoreReader {
             """, arguments: [key, key, limit]).map(Self.wordRow)
     }
 
-    /// The live Entry with exactly this match key ("Already in your vocabulary", §5.3).
+    /// The live Entry with exactly this match key ("Already in your vocabulary").
     public func entryID(matching text: String) throws -> ToriID? {
         try ToriID.fetchOne(db, sql: "SELECT id FROM entry e WHERE \(Self.liveEntry) AND e.match_key = ? ORDER BY e.id LIMIT 1",
                             arguments: [TextKey.matchKey(text)])
@@ -324,7 +324,7 @@ extension StoreReader {
                            createdAt: row["created_at"] ?? 0, senses: senses, contexts: contexts, tags: try tags(of: canonical), cards: cards)
     }
 
-    /// The live canonical Entry a canonical Card belongs to; nil when the Card or its Entry is gone (Review, §7.8).
+    /// The live canonical Entry a canonical Card belongs to; nil when the Card or its Entry is gone (Review).
     public func cardEntry(_ card: ToriID) throws -> ToriID? {
         try ToriID.fetchOne(db, sql: """
             SELECT e.id FROM card c JOIN entry e ON e.id = c.canonical_entry_id WHERE c.id = ? AND \(Self.liveEntry)
@@ -346,17 +346,17 @@ extension StoreReader {
             .map { TagRow(id: $0["id"], name: $0["name"] ?? "") }
     }
 
-    /// Entries waiting for enrichment (§6.4).
+    /// Entries waiting for enrichment.
     public func pendingEnrichment() throws -> [ToriID] {
         try ToriID.fetchAll(db, sql: "SELECT id FROM entry e WHERE \(Self.liveEntry) AND e.enrichment_status = 'pending' ORDER BY e.created_at, e.id")
     }
 
-    /// Entries enrichment gave up on; re-run when a new source appears (§6.4).
+    /// Entries enrichment gave up on; re-run when a new source appears.
     public func unavailableEnrichment() throws -> [ToriID] {
         try ToriID.fetchAll(db, sql: "SELECT id FROM entry e WHERE \(Self.liveEntry) AND e.enrichment_status = 'unavailable' ORDER BY e.created_at, e.id")
     }
 
-    // MARK: Progress (§14.1)
+    // MARK: Progress
 
     public func progress(now: Int64, utcOffsetMin: Int) throws -> ProgressSummary {
         let today = DayModel.dayNumber(unixMs: now, utcOffsetMin: utcOffsetMin)
@@ -392,7 +392,7 @@ extension StoreReader {
                                topSources: ProgressStats.topSources(sources))
     }
 
-    // MARK: Share Extension index (§5.4)
+    // MARK: Share Extension index
 
     public func vocabIndex(generatedAt: Int64) throws -> VocabIndex {
         let rows = try Row.fetchAll(db, sql: """

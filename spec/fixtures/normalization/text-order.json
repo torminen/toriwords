@@ -1,6 +1,6 @@
 {
   "kind": "text-order",
-  "source": "doc 36 \u00a74.1 Text order (CH-36), \u00a78.2 autocomplete prefix range, \u00a715.2: BINARY collation on UTF-8. Order cases: sort by the A\u2013Z query. Prefix cases: rows with key >= :p AND key < :p || x'FFFF', in that order",
+  "source": "Text order and dictionary autocomplete prefix range: BINARY collation on UTF-8. Order cases: sort by the A\u2013Z query. Prefix cases: rows with key >= :p AND key < :p || x'FFFF', in that order",
   "cases": [
     {
       "id": "to-001",

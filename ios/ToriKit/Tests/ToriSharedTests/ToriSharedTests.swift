@@ -20,7 +20,7 @@ private func roundTrips<T: Codable & Equatable>(_ type: T.Type, _ json: String) 
     return value
 }
 
-/// Doc 36 §5.3.1 example (placeholders filled in).
+/// The spec's inbox file example (placeholders filled in).
 @Test func inboxFileDocExample() throws {
     let json = """
     { "format": 1, "captureId": "0192f3c1-7a4e-7cc3-9b1e-3f5a2d6c8e01", "capturedAt": 1762790400000, "utcOffsetMin": 180,

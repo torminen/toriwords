@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.7 step 5, §7.6",
+  "source": "Duplicate merge does not rewrite children: ReviewLogs from both sides are kept and replayed on the canonical Card",
   "cases": [
     {
       "id": "008-duplicate-reviews-from-both-kept",

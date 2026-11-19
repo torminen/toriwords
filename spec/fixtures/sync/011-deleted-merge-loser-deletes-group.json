@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.6 step 4, §11.7",
+  "source": "A tombstone on any member of a merge group deletes the group; the client writes it on the canonical survivor",
   "cases": [
     {
       "id": "011-deleted-merge-loser-deletes-group",

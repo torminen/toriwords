@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §11.3, §6.4",
+  "source": "Field comparator: a user translation (rank 1) beats a later enrichment value (rank 0)",
   "cases": [
     {
       "id": "020-user-translation-beats-later-enrichment",

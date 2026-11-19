@@ -1,6 +1,6 @@
 {
   "kind": "snapshot",
-  "source": "doc 36 §10.1 widget snapshot: 7 days from today; day T+k (k ≥ 1) applies §7.7 assuming no further answers; dueReviews = steps 1 + 3, newAvailable = step 2; nextDueDay = first of the 7 days with dueReviews + newAvailable > 0, else null; homeState = today's Home state",
+  "source": "Widget snapshot: 7 days from today; day T+k (k ≥ 1) applies the daily queue rules assuming no further answers; dueReviews = steps 1 + 3, newAvailable = step 2; nextDueDay = first of the 7 days with dueReviews + newAvailable > 0, else null; homeState = today's Home state",
   "params": {
     "w": [
       0.212,

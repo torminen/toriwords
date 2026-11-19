@@ -2,7 +2,7 @@ import Foundation
 import GRDB
 import ToriCore
 
-/// Where a Sense value came from (`*_src` columns, §4.2).
+/// Where a Sense value came from (`*_src` columns).
 public enum SenseSource: String, Sendable { case user, wiktionary, mtApple = "mt_apple", mtMLKit = "mt_mlkit" }
 
 public struct NewSense: Hashable, Sendable {
@@ -56,7 +56,7 @@ extension ToriID {
 extension ToriStore {
     // MARK: Entry
 
-    /// Edits the text. A match-key collision is a user-initiated merge (§11.7): returns `.duplicate` unless confirmed.
+    /// Edits the text. A match-key collision is a user-initiated merge: returns `.duplicate` unless confirmed.
     public func setEntryText(_ id: ToriID, _ text: String, mergeIfDuplicate: Bool = false) throws -> KeyEditResult {
         try write { tx in
             let pair = try ToriID.fetchOne(tx.db, sql: "SELECT language_pair_id FROM entry WHERE id = ?", arguments: [id])
@@ -93,7 +93,7 @@ extension ToriStore {
         try write { tx in for id in ids { try tx.delete(.entry, id) } }
     }
 
-    /// Opening the Entry screen: `needs_check = 0`, rank 0, only if it is 1 (§6.4).
+    /// Opening the Entry screen: `needs_check = 0`, rank 0, only if it is 1.
     public func markChecked(_ id: ToriID) throws {
         try write(Self.clearNeedsCheck(id))
     }
@@ -185,7 +185,7 @@ extension ToriStore {
 
     // MARK: Source
 
-    /// Reuses a live Source by URL (deterministic ID) or by kind + title key + app (§11.7), else creates one.
+    /// Reuses a live Source by URL (deterministic ID) or by kind + title key + app, else creates one.
     static func source(_ tx: Tx, _ input: SourceInput) throws -> ToriID {
         if let url = input.url, !url.isEmpty {
             let id = ToriID.source(urlKey: TextKey.urlKey(url))
@@ -208,12 +208,12 @@ extension ToriStore {
 
     // MARK: Tags
 
-    /// Tag Entries by name (reuse by tag key, else create): `present = 1` on the canonical pair's EntryTag (§11.7).
+    /// Tag Entries by name (reuse by tag key, else create): `present = 1` on the canonical pair's EntryTag.
     public func tag(_ entries: [ToriID], name: String) throws {
         try tag(entries, names: [name])
     }
 
-    /// Bulk Tag (§14.3, UQ-10): only adds; every name on every Entry in one transaction.
+    /// Bulk Tag: only adds; every name on every Entry in one transaction.
     public func tag(_ entries: [ToriID], names: [String]) throws {
         try write { tx in
             for name in names {
@@ -267,7 +267,7 @@ extension ToriStore {
         }
     }
 
-    // MARK: Enrichment (§6.4)
+    // MARK: Enrichment
 
     /// Automatic fill of a pending Entry: Sense `v5(autosense:entry:0)`, `needs_check = 1`, `done`; all rank 0.
     public func fillAutomaticSense(_ entry: ToriID, _ sense: NewSense) throws {
@@ -301,7 +301,7 @@ extension ToriStore {
         try write { tx in try tx.set(.settings, .settings, ["new_words_per_day": .int(Int64(min(max(n, Self.newWordsPerDayRange.lowerBound), Self.newWordsPerDayRange.upperBound)))], rank: .user) }
     }
 
-    /// A new parameter set triggers a full replay rebuild (§7.6).
+    /// A new parameter set triggers a full replay rebuild.
     public func setSchedulerParameters(_ p: FSRSParameters, paramsID: String) throws {
         try write { tx in
             try tx.set(.settings, .settings, ["fsrs_w": .array(p.w.map(WireValue.double)), "desired_retention": .double(p.desiredRetention),
@@ -311,7 +311,7 @@ extension ToriStore {
 
     // MARK: Review
 
-    /// Commits one answer (§7.8): ReviewLog + scheduler step + `needs_check` clear + outbox, one transaction.
+    /// Commits one answer: ReviewLog + scheduler step + `needs_check` clear + outbox, one transaction.
     /// `card` is a canonical Card ID from the queue. The step is incremental when the log is the Card's newest.
     @discardableResult
     public func commitAnswer(card: ToriID, rating: Rating, reviewedAt: Int64, utcOffsetMin: Int, answerMs: Int?) throws -> ToriID {

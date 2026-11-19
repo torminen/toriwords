@@ -1,7 +1,7 @@
 import Foundation
 import ToriCore
 
-/// `vocab-index.json` (doc 36 §5.4): duplicate hints for the Share Extension.
+/// `vocab-index.json`: duplicate hints for the Share Extension.
 public struct VocabIndex: Codable, Hashable, Sendable {
     public enum Status: String, Codable, Sendable { case active, known, paused }
 
@@ -78,7 +78,7 @@ public struct VocabIndex: Codable, Hashable, Sendable {
     }
 }
 
-/// `capture-sticky.json` (doc 36 §5.5): written and read by the Share Extension only.
+/// `capture-sticky.json`: written and read by the Share Extension only.
 public struct CaptureSticky: Codable, Hashable, Sendable {
     public static let offerWindowMs: Int64 = 30 * 60 * 1000
 

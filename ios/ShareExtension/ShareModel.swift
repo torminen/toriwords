@@ -4,7 +4,7 @@ import ToriCore
 import ToriDictionary
 import ToriShared
 
-/// Capture sheet state (doc 36 §5.3): text and chips (`CaptureDraft`), dictionary variants, duplicate hint,
+/// Capture sheet state: text and chips (`CaptureDraft`), dictionary variants, duplicate hint,
 /// source, tags; Save writes one inbox file. No `user.sqlite`, no network, no Keychain.
 @MainActor @Observable
 final class ShareModel {
@@ -27,7 +27,7 @@ final class ShareModel {
     @ObservationIgnored private let group: AppGroup?
     @ObservationIgnored private let sticky: CaptureSticky?
     @ObservationIgnored private let finish: (Bool) -> Void
-    /// Opened per capture, read-only `immutable=1` (§5.3); nil before the app's first launch.
+    /// Opened per capture, read-only `immutable=1`; nil before the app's first launch.
     @ObservationIgnored private lazy var dictionary: BundledDictionary? = group.flatMap { g in
         FileManager.default.fileExists(atPath: g.dictionary.path) ? try? BundledDictionary(path: g.dictionary.path) : nil
     }
@@ -65,7 +65,7 @@ final class ShareModel {
         if picked.contains(v) { picked.remove(v) } else { picked.insert(v) }
     }
 
-    /// New term (the draft dropped its offers): base form / contained phrases (doc 36 §6.2), then the lookup.
+    /// New term (the draft dropped its offers): base form / contained phrases, then the lookup.
     private func refresh() {
         let r = draft.term.flatMap { try? dictionary?.resolve($0) }
         draft.setOffers(baseForm: r?.baseForms.first?.headword.text, phrases: r?.containedPhrases.map(\.text) ?? [])
@@ -94,7 +94,7 @@ final class ShareModel {
         tagsText = TagInput.names(tagsText + "," + name).joined(separator: ", ")
     }
 
-    /// §5.3 Save: inbox file (atomic) → sticky → Darwin notification → dismiss after a short "Saved".
+    /// Save: inbox file (atomic) → sticky → Darwin notification → dismiss after a short "Saved".
     func save() {
         guard let group else { saveFailed = true; return }
         let now = Self.nowMs

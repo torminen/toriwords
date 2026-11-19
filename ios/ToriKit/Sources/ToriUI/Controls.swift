@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: Buttons
 
-/// Full-width filled button, radius 12, height ≥ 50 (doc 35 §4). `tint` gives Forgot (danger) / Remembered (success).
+/// Full-width filled button, radius 12, height ≥ 50. `tint` gives Forgot (danger) / Remembered (success).
 public struct PrimaryButtonStyle: ButtonStyle {
     public var tint: Color
     @Environment(\.isEnabled) private var isEnabled
@@ -173,7 +173,7 @@ public struct Badge: View {
     }
 }
 
-/// Stage marker on Words rows and the entry (doc 35 §3.5, colours §4). The app maps its stage model to `Kind`.
+/// Stage marker on Words rows and the entry. The app maps its stage model to `Kind`.
 public struct StageMarker: View {
     public enum Kind: Sendable, CaseIterable {
         case new, learning, knownWell, known, paused, needsTranslation
@@ -195,7 +195,7 @@ public struct StageMarker: View {
     }
 }
 
-/// "Wiktionary" mark next to Sense values with provenance `wiktionary` (doc 36 §8.4).
+/// "Wiktionary" mark next to Sense values with provenance `wiktionary`.
 public struct WiktionaryMark: View {
     public init() {}
     public var body: some View { Badge(Strings.wiktionary, fill: Palette.neutralFill, ink: Palette.textSecondary) }

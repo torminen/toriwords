@@ -1,6 +1,6 @@
 {
   "kind": "fsrs-replay",
-  "source": "doc 36 §7.6 replay: sort by (reviewedAt, id as unsigned bytes), skip rating null, review day = dayNumber(reviewedAt, utcOffsetMin), fold §7.3 from new. expected.steps = state after each rated log in replay order",
+  "source": "Card state replay: sort by (reviewedAt, id as unsigned bytes), skip rating null, review day = dayNumber(reviewedAt, utcOffsetMin), fold the FSRS-6 step from new. expected.steps = state after each rated log in replay order",
   "params": {
     "w": [
       0.212,

@@ -1,4 +1,4 @@
-/// Progress / stats, doc 36 §14.1. Pure functions over live data (deleted Entries and their logs excluded by the caller).
+/// Progress / stats. Pure functions over live data (deleted Entries and their logs excluded by the caller).
 public enum ProgressStats {
     /// Progress → Today.
     public struct Today: Hashable, Sendable {
@@ -112,7 +112,7 @@ public enum ProgressStats {
 }
 
 extension String {
-    /// UTF-8 byte order (BINARY collation, doc 36 §4.1), independent of Swift's String comparison.
+    /// UTF-8 byte order (BINARY collation), independent of Swift's String comparison.
     var utf8Ordered: UTF8Key { UTF8Key(bytes: Array(utf8)) }
 }
 

@@ -1,6 +1,6 @@
 {
   "kind": "sync-scenario",
-  "source": "doc 36 §12.4",
+  "source": "Sign-in back to the same account merges silently (no prompt)",
   "cases": [
     {
       "id": "022-same-account-sign-in-merges-silently",

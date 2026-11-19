@@ -1,7 +1,7 @@
 import Foundation
 import ToriCore
 
-/// `toriwords://` links (doc 36 §10.2, §10.3): the widget and the reminder open Review; `add` opens Add with text.
+/// `toriwords://` links: the widget and the reminder open Review; `add` opens Add with text.
 public enum DeepLink: Hashable, Sendable {
     case review
     /// Text is untrusted (any app can open the link): trimmed, cut to `Capture.maxCharacters` code points, empty → nil.

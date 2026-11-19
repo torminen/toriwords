@@ -3,7 +3,7 @@ import ToriDictionary
 import ToriShared
 import ToriUI
 
-/// The capture sheet (UI doc §3.3, wireframes 1-10 iOS 8, 8-6 C1–C4): Cancel · ToriWords · Save.
+/// The capture sheet: Cancel · ToriWords · Save.
 struct ShareSheetView: View {
     @Bindable var model: ShareModel
     @State private var text = ""

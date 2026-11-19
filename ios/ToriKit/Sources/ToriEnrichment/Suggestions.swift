@@ -2,7 +2,7 @@ import Foundation
 import ToriCore
 import ToriStore
 
-/// One translation variant offered on Add / Entry ("Suggested meanings") or used by the automatic fill (§6.2 item 4–6).
+/// One translation variant offered on Add / Entry ("Suggested meanings") or used by the automatic fill.
 public struct Suggestion: Hashable, Sendable {
     public var sense: NewSense
     public var isMachine: Bool { sense.source == .mtApple }
@@ -12,7 +12,7 @@ public struct Suggestion: Hashable, Sendable {
 
 public enum Suggestions {
     /// Dictionary variants (headword order, sense ordinal, variant rank), deduplicated by translation key, then the MT
-    /// variant only if its key differs from all dictionary variants (§6.2 items 4–5).
+    /// variant only if its key differs from all dictionary variants.
     public static func build(headwords: [DictionaryHeadword], dictVersion: String?, machine: String?) -> [Suggestion] {
         var seen = Set<String>()
         var out: [Suggestion] = []

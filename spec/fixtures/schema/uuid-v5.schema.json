@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://toriwords.app/fixtures/schema/uuid-v5.schema.json",
-  "title": "Deterministic UUIDv5 names (doc 36 §11.2)",
+  "title": "Deterministic UUIDv5 names",
   "type": "object",
   "properties": {
     "kind": {

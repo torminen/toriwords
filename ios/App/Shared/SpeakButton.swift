@@ -1,7 +1,7 @@
 import SwiftUI
 import ToriUI
 
-/// ▶: tap speaks `text`; long-press speaks `sentence` (§9). Without an English voice it looks disabled and a tap
+/// ▶: tap speaks `text`; long-press speaks `sentence`. Without an English voice it looks disabled and a tap
 /// explains how to add one (PR2).
 struct SpeakButton: View {
     let text: String

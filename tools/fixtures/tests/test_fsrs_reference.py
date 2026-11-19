@@ -1,4 +1,4 @@
-"""AQ-17: our FSRS-6 parameters and formulas agree with the pinned py-fsrs release."""
+"""Our FSRS-6 parameters and formulas agree with the pinned py-fsrs release."""
 
 import math
 

@@ -1,6 +1,6 @@
 {
   "kind": "hlc-local-write",
-  "source": "doc 36 §11.3 Format and Local write: pt = now(); if pt > ms {ms = pt; counter = 0} else counter += 1; counter > 0xFFFF → ms += 1, counter = 0. Clock = ms (12 hex) ‖ counter (4 hex) ‖ node (16 hex), lowercase",
+  "source": "HLC format and local write: pt = now(); if pt > ms {ms = pt; counter = 0} else counter += 1; counter > 0xFFFF → ms += 1, counter = 0. Clock = ms (12 hex) ‖ counter (4 hex) ‖ node (16 hex), lowercase",
   "node": "0123456789abcdef",
   "cases": [
     {

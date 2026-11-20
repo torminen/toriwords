@@ -55,7 +55,9 @@ struct SettingsView: View {
             } header: { Text("Pronunciation") }
 
             Section {
-                DrillRow(title: Text("Translation"), value: translation.map { Text(TranslationStatusText.short($0)) }) {
+                // The bundled dictionary always works; Apple Translation is an opt-in extra set up inside.
+                DrillRow(title: Text("Translation"),
+                         value: translation == .installed ? Text("Ready") : Text("Built-in dictionary")) {
                     router.push(.translation)
                 }
                 DrillRow(title: Text("Language"), value: Text(verbatim: AppLanguage.currentName)) { router.push(.language) }

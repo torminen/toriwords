@@ -1144,6 +1144,17 @@
         }
       }
     },
+    "Built-in dictionary" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Встроенный словарь"
+          }
+        }
+      }
+    },
     "Bundled" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2387,17 +2398,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Недоступно"
-          }
-        }
-      }
-    },
-    "Not downloaded" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не загружено"
           }
         }
       }

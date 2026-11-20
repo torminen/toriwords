@@ -25,7 +25,7 @@ final class SyncCoordinator: SyncCoordinating {
 
     /// After the store opened (launch step 3).
     func attach(store: ToriStore) {
-        guard engine == nil else { return }
+        guard engine == nil, AppConfig.cloudSyncEnabled else { return }
         let engine = SyncEngine(.init(store: store, cloud: CloudKitDatabase(container: Self.container),
                                       appVersion: AppConfig.appVersion))
         self.engine = engine

@@ -9,6 +9,9 @@ enum AppConfig {
 
     static var appVersion: String { string("CFBundleShortVersionString") ?? "0" }
 
+    /// False in the Personal configuration (no CloudKit entitlement; creating the container would crash).
+    static var cloudSyncEnabled: Bool { string("ToriCloudSync") != "NO" }
+
     private static func string(_ key: String) -> String? {
         (Bundle.main.object(forInfoDictionaryKey: key) as? String).flatMap { $0.isEmpty ? nil : $0 }
     }

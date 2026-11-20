@@ -4,11 +4,16 @@ import ProjectDescription
 // from the ToriKit package itself (README), so the project has no test targets.
 
 let deploymentTargets = DeploymentTargets.iOS("18.0")
+let personal: ConfigurationName = "Personal"
+/// A Personal Team cannot sign iCloud or App Groups, so the Personal configuration signs without entitlements.
+let noEntitlementsInPersonal: [Configuration] = [.debug(name: personal, settings: ["CODE_SIGN_ENTITLEMENTS": ""])]
 let settings = Settings.settings(
     base: ["SWIFT_VERSION": "6.0", "SWIFT_STRICT_CONCURRENCY": "complete"],
     configurations: [
         .debug(name: .debug, xcconfig: "Config/Shared.xcconfig"),
         .release(name: .release, xcconfig: "Config/Shared.xcconfig"),
+        // Free Apple ID (Personal Team) device builds: see Config/Personal.xcconfig and the README.
+        .debug(name: personal, xcconfig: "Config/Personal.xcconfig"),
     ]
 )
 
@@ -33,7 +38,7 @@ let project = Project(
             name: "Toriwords",
             destinations: [.iPhone, .iPad],
             product: .app,
-            bundleId: "com.toriwords.app",
+            bundleId: "$(TORI_BUNDLE_ID)",
             deploymentTargets: deploymentTargets,
             infoPlist: .extendingDefault(with: [
                 "CFBundleDisplayName": "ToriWords",
@@ -52,6 +57,8 @@ let project = Project(
                 ],
                 "BGTaskSchedulerPermittedIdentifiers": ["$(TORI_BG_REFRESH_TASK_ID)"],
                 "UIBackgroundModes": ["fetch"],
+                // NO in the Personal configuration: no CloudKit entitlement, so no sync (AppConfig.cloudSyncEnabled).
+                "ToriCloudSync": "$(TORI_CLOUD_SYNC)",
             ]),
             sources: ["App/**"],
             // The full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app
@@ -82,13 +89,13 @@ let project = Project(
             settings: .settings(base: [
                 "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                 "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
-            ])
+            ], configurations: noEntitlementsInPersonal)
         ),
         .target(
             name: "ToriwordsShare",
             destinations: [.iPhone, .iPad],
             product: .appExtension,
-            bundleId: "com.toriwords.app.share",
+            bundleId: "$(TORI_BUNDLE_ID).share",
             deploymentTargets: deploymentTargets,
             infoPlist: .extendingDefault(with: [
                 "CFBundleDisplayName": "ToriWords",
@@ -110,18 +117,35 @@ let project = Project(
             sources: ["ShareExtension/**/*.swift"],
             resources: ["ShareExtension/ExtensionPreprocessing.js", "ShareExtension/*.xcstrings"],
             entitlements: extensionEntitlements,
+            scripts: [
+                // Personal builds have no App Group, so the extension could not hand words to the app. Xcode validates
+                // every embedded extension, so it cannot be left out per configuration; in Personal it never activates
+                // instead (Share does not list ToriWords): INFOPLIST_FILE points at this copy with FALSEPREDICATE.
+                .pre(script: """
+                    cp "$SCRIPT_INPUT_FILE_0" "$SCRIPT_OUTPUT_FILE_0"
+                    /usr/libexec/PlistBuddy -c "Delete :NSExtension:NSExtensionAttributes:NSExtensionActivationRule" \\
+                      -c "Add :NSExtension:NSExtensionAttributes:NSExtensionActivationRule string FALSEPREDICATE" \\
+                      "$SCRIPT_OUTPUT_FILE_0"
+                    """, name: "Personal Info.plist (never activate)",
+                    inputPaths: ["$(SRCROOT)/Derived/InfoPlists/ToriwordsShare-Info.plist"],
+                    outputPaths: ["$(DERIVED_FILE_DIR)/ToriwordsShare-Personal-Info.plist"]),
+            ],
             dependencies: [
                 .external(name: "ToriCore"),
                 .external(name: "ToriShared"),
                 .external(name: "ToriDictionary"),
                 .external(name: "ToriUI"),
-            ]
+            ],
+            settings: .settings(configurations: [.debug(name: personal, settings: [
+                "CODE_SIGN_ENTITLEMENTS": "",
+                "INFOPLIST_FILE": "$(DERIVED_FILE_DIR)/ToriwordsShare-Personal-Info.plist",
+            ])])
         ),
         .target(
             name: "ToriwordsWidget",
             destinations: [.iPhone, .iPad],
             product: .appExtension,
-            bundleId: "com.toriwords.app.widget",
+            bundleId: "$(TORI_BUNDLE_ID).widget",
             deploymentTargets: deploymentTargets,
             infoPlist: .extendingDefault(with: [
                 "CFBundleDisplayName": "ToriWords",
@@ -135,7 +159,19 @@ let project = Project(
                 .external(name: "ToriCore"),
                 .external(name: "ToriShared"),
                 .external(name: "ToriUI"),
-            ]
+            ],
+            settings: .settings(configurations: noEntitlementsInPersonal)
+        ),
+    ],
+    schemes: [
+        // Toriwords (autogenerated) is the full build; this one runs and archives the Personal configuration.
+        .scheme(
+            name: "Toriwords-Personal",
+            buildAction: .buildAction(targets: ["Toriwords"]),
+            runAction: .runAction(configuration: personal),
+            archiveAction: .archiveAction(configuration: personal),
+            profileAction: .profileAction(configuration: personal),
+            analyzeAction: .analyzeAction(configuration: personal)
         ),
     ]
 )

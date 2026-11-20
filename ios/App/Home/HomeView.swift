@@ -205,6 +205,7 @@ private struct RowPressStyle: ButtonStyle {
 
 /// Empty vocabulary.
 private struct FirstRunCard: View {
+    @Environment(AppEnvironment.self) private var env
     let add: () -> Void
 
     var body: some View {
@@ -213,7 +214,10 @@ private struct FirstRunCard: View {
             Text("Words you add come back for review just before you forget them.")
                 .font(Typography.secondary).foregroundStyle(Palette.textSecondary)
             Label { Text("Type it — tap “Add a word…” above") } icon: { Image(systemName: "keyboard") }
-            Label { Text("From any app — select text → Share → ToriWords") } icon: { Image(systemName: "square.and.arrow.up") }
+            // Share capture goes through the App Group inbox; without it (Personal builds) there is no Share Extension.
+            if env.appGroup != nil {
+                Label { Text("From any app — select text → Share → ToriWords") } icon: { Image(systemName: "square.and.arrow.up") }
+            }
             Text("Works offline: the dictionary is built in.").font(Typography.secondary).foregroundStyle(Palette.textSecondary)
             Button("Add your first word", action: add).buttonStyle(.toriPrimary)
         }

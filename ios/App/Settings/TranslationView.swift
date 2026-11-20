@@ -3,18 +3,6 @@ import ToriEnrichment
 import ToriUI
 import Translation
 
-enum TranslationStatusText {
-    /// Settings root value and the On-device translation row.
-    static func short(_ status: LanguageAvailability.Status) -> LocalizedStringResource {
-        switch status {
-        case .installed: "Ready"
-        case .supported: "Not downloaded"
-        case .unsupported: "Not available"
-        @unknown default: "Not available"
-        }
-    }
-}
-
 /// Settings → Translation: Apple Translation status
 /// with **Download**, and the bundled dictionary. When EN→RU becomes installed, words whose enrichment found nothing
 /// get another try (`retryUnavailable`).
@@ -31,7 +19,7 @@ struct TranslationView: View {
                     if status == .supported {
                         Button("Download") { requestDownload() }
                     } else if let status {
-                        Text(TranslationStatusText.short(status))
+                        status == .installed ? Text("Ready") : Text("Not available")
                     } else {
                         ProgressView()
                     }

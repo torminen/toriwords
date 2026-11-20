@@ -28,11 +28,22 @@ enum Route: Hashable {
 final class Router {
     var path: [Route] = []
     var isReviewPresented = false
+    /// The cover runs practice instead of today's review; read once when the cover opens.
+    private(set) var isPractice = false
 
     func push(_ route: Route) { path.append(route) }
 
     /// Reminder, widget and the Home Review button all land here (never Progress).
-    func openReview() { isReviewPresented = true }
+    func openReview() {
+        isPractice = false
+        isReviewPresented = true
+    }
+
+    /// Progress → Practice today's words.
+    func openPractice() {
+        isPractice = true
+        isReviewPresented = true
+    }
 }
 
 /// Destination for every `Route`, shared by the Home stack and the Review cover's own stack.

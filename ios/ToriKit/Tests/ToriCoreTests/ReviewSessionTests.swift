@@ -24,6 +24,14 @@ private extension ReviewSession {
     #expect(s.pending?.card.id == id(2))
 }
 
+@Test func withoutReshowForgotDoesNotGrowTheSession() {
+    var s = ReviewSession(cards: [card(1), card(2)], newEntries: [], reshowsForgot: false)
+    _ = s.grade(.forgot)
+    #expect(s.ids == [2] && s.total == 2)
+    _ = s.grade(.forgot)
+    #expect(s.isFinished)
+}
+
 @Test func undoBringsTheCardBackAndDropsTheAnswer() {
     var s = ReviewSession(cards: [card(1), card(2), card(3), card(4), card(5)], newEntries: [])
     _ = s.grade(.remembered)

@@ -193,15 +193,16 @@ struct EntryView: View {
     @ViewBuilder
     private func meanings(_ e: EntryDetail) -> some View {
         Section {
-            ForEach(e.senses, id: \.id) { s in
+            ForEach(MeaningRow.rows(e.senses), id: \.id) { row in
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(alignment: .firstTextBaseline) {
-                        Text(verbatim: s.translation ?? "—").font(Typography.body.weight(.semibold))
-                        if let pos = s.partOfSpeech {
+                        Text(verbatim: row.translations.isEmpty ? "—" : row.translations.joined(separator: ", "))
+                            .font(Typography.body.weight(.semibold))
+                        if let pos = row.partOfSpeech {
                             Text(verbatim: pos).font(Typography.secondary).foregroundStyle(Palette.textSecondary)
                         }
                     }
-                    if let d = s.definition, !d.isEmpty {
+                    if let d = row.definition {
                         Text(verbatim: d).font(Typography.secondary).foregroundStyle(Palette.textSecondary)
                     }
                 }
@@ -468,5 +469,29 @@ private struct EntryEditForm: View {
         }
         .listStyle(.insetGrouped)
         .environment(\.editMode, .constant(.active))
+    }
+}
+
+/// Senses with the same definition and part of speech read as one meaning: dictionaries repeat a definition per
+/// translation. Senses without a definition keep their own row.
+struct MeaningRow {
+    var id: ToriID
+    var translations: [String]
+    var partOfSpeech: String?
+    var definition: String?
+
+    static func rows(_ senses: [EntryDetail.Sense]) -> [MeaningRow] {
+        var rows: [MeaningRow] = []
+        for s in senses {
+            let definition = s.definition?.isEmpty == false ? s.definition : nil
+            let translation = s.translation.flatMap { $0.isEmpty ? nil : $0 }
+            if let definition, let i = rows.firstIndex(where: { $0.definition == definition && $0.partOfSpeech == s.partOfSpeech }) {
+                if let translation, !rows[i].translations.contains(translation) { rows[i].translations.append(translation) }
+            } else {
+                rows.append(MeaningRow(id: s.id, translations: translation.map { [$0] } ?? [], partOfSpeech: s.partOfSpeech,
+                                       definition: definition))
+            }
+        }
+        return rows
     }
 }

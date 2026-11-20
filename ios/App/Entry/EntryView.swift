@@ -41,7 +41,9 @@ struct EntryView: View {
     var body: some View {
         Group {
             if let detail {
-                if let binding = Binding($draft) {
+                if let current = draft {
+                    // Not Binding($draft): its force-unwrap traps when the form re-reads after draft = nil (Cancel/Done/Delete).
+                    let binding = Binding(get: { draft ?? current }, set: { if draft != nil { draft = $0 } })
                     EntryEditForm(draft: binding, detail: detail, allTags: allTags, tagCounts: tagCounts) { confirmDelete = true }
                 } else {
                     readMode(detail)

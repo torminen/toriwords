@@ -6,3 +6,11 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ksp) apply false
 }
+
+// Robolectric fetches its android-all jars into a local Maven repo (default ~/.m2); keep it under the Gradle user home so
+// tests also run with a read-only home directory.
+subprojects {
+    tasks.withType<Test>().configureEach {
+        systemProperty("maven.repo.local", gradle.gradleUserHomeDir.resolve("robolectric-m2").absolutePath)
+    }
+}

@@ -1,0 +1,1430 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "1e7e963e0dc37ae0250ed8e66b23d2a2",
+    "entities": [
+      {
+        "tableName": "language_pair",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `native_lang` TEXT, `target_lang` TEXT, `created_at` INTEGER, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "native_lang",
+            "columnName": "native_lang",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "target_lang",
+            "columnName": "target_lang",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "created_at",
+            "columnName": "created_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "entry",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `language_pair_id` BLOB, `text` TEXT, `ipa` TEXT, `note` TEXT, `status` TEXT, `excluded_reason` TEXT, `enrichment_status` TEXT, `needs_check` INTEGER, `origin` TEXT, `created_at` INTEGER, `updated_at` INTEGER, `match_key` TEXT, `text_fold` TEXT, `canonical_id` BLOB, `enrich_attempts` INTEGER NOT NULL DEFAULT 0, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "language_pair_id",
+            "columnName": "language_pair_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ipa",
+            "columnName": "ipa",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "excluded_reason",
+            "columnName": "excluded_reason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "enrichment_status",
+            "columnName": "enrichment_status",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "needs_check",
+            "columnName": "needs_check",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "origin",
+            "columnName": "origin",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "created_at",
+            "columnName": "created_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updated_at",
+            "columnName": "updated_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "match_key",
+            "columnName": "match_key",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "text_fold",
+            "columnName": "text_fold",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "canonical_id",
+            "columnName": "canonical_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "enrich_attempts",
+            "columnName": "enrich_attempts",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "entry_key",
+            "unique": false,
+            "columnNames": [
+              "language_pair_id",
+              "match_key"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `entry_key` ON `${TABLE_NAME}` (`language_pair_id`, `match_key`)"
+          },
+          {
+            "name": "entry_canonical",
+            "unique": false,
+            "columnNames": [
+              "canonical_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `entry_canonical` ON `${TABLE_NAME}` (`canonical_id`)"
+          },
+          {
+            "name": "entry_created",
+            "unique": false,
+            "columnNames": [
+              "created_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `entry_created` ON `${TABLE_NAME}` (`created_at`)"
+          },
+          {
+            "name": "entry_status",
+            "unique": false,
+            "columnNames": [
+              "status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `entry_status` ON `${TABLE_NAME}` (`status`)"
+          }
+        ]
+      },
+      {
+        "tableName": "sense",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `entry_id` BLOB, `translation` TEXT, `definition` TEXT, `part_of_speech` TEXT, `position` REAL, `translation_src` TEXT, `definition_src` TEXT, `pos_src` TEXT, `dict_version` TEXT, `dict_headword_key` TEXT, `dict_sense_ordinal` INTEGER, `translation_fold` TEXT, `definition_fold` TEXT, `canonical_id` BLOB, `canonical_entry_id` BLOB, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entry_id",
+            "columnName": "entry_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "translation",
+            "columnName": "translation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "definition",
+            "columnName": "definition",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "part_of_speech",
+            "columnName": "part_of_speech",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "translation_src",
+            "columnName": "translation_src",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "definition_src",
+            "columnName": "definition_src",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pos_src",
+            "columnName": "pos_src",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dict_version",
+            "columnName": "dict_version",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dict_headword_key",
+            "columnName": "dict_headword_key",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dict_sense_ordinal",
+            "columnName": "dict_sense_ordinal",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "translation_fold",
+            "columnName": "translation_fold",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "definition_fold",
+            "columnName": "definition_fold",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "canonical_id",
+            "columnName": "canonical_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "canonical_entry_id",
+            "columnName": "canonical_entry_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "sense_entry",
+            "unique": false,
+            "columnNames": [
+              "canonical_entry_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `sense_entry` ON `${TABLE_NAME}` (`canonical_entry_id`)"
+          },
+          {
+            "name": "sense_owner",
+            "unique": false,
+            "columnNames": [
+              "entry_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `sense_owner` ON `${TABLE_NAME}` (`entry_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "source",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `kind` TEXT, `url` TEXT, `title` TEXT, `app` TEXT, `url_key` TEXT, `canonical_id` BLOB, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "app",
+            "columnName": "app",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "url_key",
+            "columnName": "url_key",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "canonical_id",
+            "columnName": "canonical_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "context",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `entry_id` BLOB, `sense_id` BLOB, `sentence` TEXT, `highlight_offset` INTEGER, `highlight_length` INTEGER, `source_id` BLOB, `captured_at` INTEGER, `sentence_fold` TEXT, `canonical_id` BLOB, `canonical_entry_id` BLOB, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entry_id",
+            "columnName": "entry_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sense_id",
+            "columnName": "sense_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sentence",
+            "columnName": "sentence",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "highlight_offset",
+            "columnName": "highlight_offset",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "highlight_length",
+            "columnName": "highlight_length",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "source_id",
+            "columnName": "source_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "captured_at",
+            "columnName": "captured_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "sentence_fold",
+            "columnName": "sentence_fold",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "canonical_id",
+            "columnName": "canonical_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "canonical_entry_id",
+            "columnName": "canonical_entry_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "context_entry",
+            "unique": false,
+            "columnNames": [
+              "canonical_entry_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `context_entry` ON `${TABLE_NAME}` (`canonical_entry_id`)"
+          },
+          {
+            "name": "context_owner",
+            "unique": false,
+            "columnNames": [
+              "entry_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `context_owner` ON `${TABLE_NAME}` (`entry_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "card",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `entry_id` BLOB, `direction` TEXT, `import_ref` TEXT, `created_at` INTEGER, `stability` REAL, `difficulty` REAL, `last_review_day` INTEGER, `due_day` INTEGER, `reps` INTEGER, `lapses` INTEGER, `stage` TEXT, `params_id` TEXT, `canonical_entry_id` BLOB, `canonical_card_id` BLOB, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entry_id",
+            "columnName": "entry_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "direction",
+            "columnName": "direction",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "import_ref",
+            "columnName": "import_ref",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "created_at",
+            "columnName": "created_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "stability",
+            "columnName": "stability",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "difficulty",
+            "columnName": "difficulty",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "last_review_day",
+            "columnName": "last_review_day",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "due_day",
+            "columnName": "due_day",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "reps",
+            "columnName": "reps",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lapses",
+            "columnName": "lapses",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "stage",
+            "columnName": "stage",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "params_id",
+            "columnName": "params_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "canonical_entry_id",
+            "columnName": "canonical_entry_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "canonical_card_id",
+            "columnName": "canonical_card_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "card_due",
+            "unique": false,
+            "columnNames": [
+              "due_day"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `card_due` ON `${TABLE_NAME}` (`due_day`)"
+          },
+          {
+            "name": "card_canonical",
+            "unique": false,
+            "columnNames": [
+              "canonical_card_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `card_canonical` ON `${TABLE_NAME}` (`canonical_card_id`)"
+          },
+          {
+            "name": "card_entry",
+            "unique": false,
+            "columnNames": [
+              "canonical_entry_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `card_entry` ON `${TABLE_NAME}` (`canonical_entry_id`)"
+          },
+          {
+            "name": "card_owner",
+            "unique": false,
+            "columnNames": [
+              "entry_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `card_owner` ON `${TABLE_NAME}` (`entry_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "review_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `card_id` BLOB, `owner_entry_id` BLOB, `reviewed_at` INTEGER, `utc_offset_min` INTEGER, `rating` INTEGER, `answer_ms` INTEGER, `device_id` BLOB, `original_rating` INTEGER, `import_ref` TEXT, `review_day` INTEGER, `review_type` TEXT, `canonical_card_id` BLOB, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "card_id",
+            "columnName": "card_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "owner_entry_id",
+            "columnName": "owner_entry_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "reviewed_at",
+            "columnName": "reviewed_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "utc_offset_min",
+            "columnName": "utc_offset_min",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "answer_ms",
+            "columnName": "answer_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "device_id",
+            "columnName": "device_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "original_rating",
+            "columnName": "original_rating",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "import_ref",
+            "columnName": "import_ref",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "review_day",
+            "columnName": "review_day",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "review_type",
+            "columnName": "review_type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "canonical_card_id",
+            "columnName": "canonical_card_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "review_log_card",
+            "unique": false,
+            "columnNames": [
+              "canonical_card_id",
+              "reviewed_at",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `review_log_card` ON `${TABLE_NAME}` (`canonical_card_id`, `reviewed_at`, `id`)"
+          },
+          {
+            "name": "review_log_day",
+            "unique": false,
+            "columnNames": [
+              "review_day"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `review_log_day` ON `${TABLE_NAME}` (`review_day`)"
+          },
+          {
+            "name": "review_log_raw_card",
+            "unique": false,
+            "columnNames": [
+              "card_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `review_log_raw_card` ON `${TABLE_NAME}` (`card_id`)"
+          },
+          {
+            "name": "review_log_owner",
+            "unique": false,
+            "columnNames": [
+              "owner_entry_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `review_log_owner` ON `${TABLE_NAME}` (`owner_entry_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "tag",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `name` TEXT, `name_key` TEXT, `canonical_id` BLOB, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name_key",
+            "columnName": "name_key",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "canonical_id",
+            "columnName": "canonical_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "tag_key",
+            "unique": false,
+            "columnNames": [
+              "name_key"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `tag_key` ON `${TABLE_NAME}` (`name_key`)"
+          }
+        ]
+      },
+      {
+        "tableName": "entry_tag",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `entry_id` BLOB, `tag_id` BLOB, `present` INTEGER, `canonical_entry_id` BLOB, `canonical_tag_id` BLOB, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entry_id",
+            "columnName": "entry_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "tag_id",
+            "columnName": "tag_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "present",
+            "columnName": "present",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "canonical_entry_id",
+            "columnName": "canonical_entry_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "canonical_tag_id",
+            "columnName": "canonical_tag_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "entry_tag_entry",
+            "unique": false,
+            "columnNames": [
+              "canonical_entry_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `entry_tag_entry` ON `${TABLE_NAME}` (`canonical_entry_id`)"
+          },
+          {
+            "name": "entry_tag_owner",
+            "unique": false,
+            "columnNames": [
+              "entry_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `entry_tag_owner` ON `${TABLE_NAME}` (`entry_id`)"
+          },
+          {
+            "name": "entry_tag_tag",
+            "unique": false,
+            "columnNames": [
+              "tag_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `entry_tag_tag` ON `${TABLE_NAME}` (`tag_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `new_words_per_day` INTEGER, `desired_retention` REAL, `fsrs_w` TEXT, `params_id` TEXT, `scheduler_version` INTEGER, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "new_words_per_day",
+            "columnName": "new_words_per_day",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "desired_retention",
+            "columnName": "desired_retention",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "fsrs_w",
+            "columnName": "fsrs_w",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "params_id",
+            "columnName": "params_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "scheduler_version",
+            "columnName": "scheduler_version",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "device",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `platform` TEXT, `display_name` TEXT, `first_seen` INTEGER, `is_this_device` INTEGER NOT NULL DEFAULT 0, `field_clocks` TEXT NOT NULL DEFAULT '{}', `deleted` INTEGER NOT NULL DEFAULT 0, `merged_into` BLOB, `extra` TEXT, `schema` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "platform",
+            "columnName": "platform",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "display_name",
+            "columnName": "display_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "first_seen",
+            "columnName": "first_seen",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "is_this_device",
+            "columnName": "is_this_device",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.field_clocks",
+            "columnName": "field_clocks",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'{}'"
+          },
+          {
+            "fieldPath": "sync.deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "sync.merged_into",
+            "columnName": "merged_into",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sync.extra",
+            "columnName": "extra",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync.schema",
+            "columnName": "schema",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "pending_changes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`record_id` BLOB NOT NULL, `type` TEXT NOT NULL, `field` TEXT NOT NULL, `clock` TEXT NOT NULL, PRIMARY KEY(`record_id`, `field`))",
+        "fields": [
+          {
+            "fieldPath": "record_id",
+            "columnName": "record_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "field",
+            "columnName": "field",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clock",
+            "columnName": "clock",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "record_id",
+            "field"
+          ]
+        }
+      },
+      {
+        "tableName": "sync_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `value` TEXT, PRIMARY KEY(`key`))",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "key"
+          ]
+        }
+      },
+      {
+        "tableName": "inbox_import",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`inbox_id` BLOB NOT NULL, `imported_at` INTEGER NOT NULL, PRIMARY KEY(`inbox_id`))",
+        "fields": [
+          {
+            "fieldPath": "inbox_id",
+            "columnName": "inbox_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imported_at",
+            "columnName": "imported_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "inbox_id"
+          ]
+        }
+      },
+      {
+        "tableName": "schema_meta",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`version` INTEGER NOT NULL, PRIMARY KEY(`version`))",
+        "fields": [
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "version"
+          ]
+        }
+      },
+      {
+        "tableName": "drive_file",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`file_id` TEXT NOT NULL, `name` TEXT NOT NULL, `kind` TEXT NOT NULL, `device_id` TEXT, `layout` INTEGER NOT NULL, `generation` TEXT, `modified_time` INTEGER NOT NULL, `applied` INTEGER NOT NULL DEFAULT 0, `has_unknown` INTEGER NOT NULL DEFAULT 0, `pending_delete` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`file_id`))",
+        "fields": [
+          {
+            "fieldPath": "file_id",
+            "columnName": "file_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "device_id",
+            "columnName": "device_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "layout",
+            "columnName": "layout",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generation",
+            "columnName": "generation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "modified_time",
+            "columnName": "modified_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "applied",
+            "columnName": "applied",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "has_unknown",
+            "columnName": "has_unknown",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "pending_delete",
+            "columnName": "pending_delete",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "file_id"
+          ]
+        }
+      },
+      {
+        "tableName": "drive_file_owner",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`file_id` TEXT NOT NULL, `owner` BLOB NOT NULL, `has_live` INTEGER NOT NULL, PRIMARY KEY(`file_id`, `owner`))",
+        "fields": [
+          {
+            "fieldPath": "file_id",
+            "columnName": "file_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "owner",
+            "columnName": "owner",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "has_live",
+            "columnName": "has_live",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "file_id",
+            "owner"
+          ]
+        },
+        "indices": [
+          {
+            "name": "drive_file_owner_owner",
+            "unique": false,
+            "columnNames": [
+              "owner"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `drive_file_owner_owner` ON `${TABLE_NAME}` (`owner`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1e7e963e0dc37ae0250ed8e66b23d2a2')"
+    ]
+  }
+}

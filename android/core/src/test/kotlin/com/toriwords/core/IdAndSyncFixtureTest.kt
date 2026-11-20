@@ -1,7 +1,9 @@
 package com.toriwords.core
 
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -129,10 +131,10 @@ class IdAndSyncFixtureTest {
             """"needs_check":{"v":true,"c":"0192f3c1802000001a2b3c4d5e6f7081","u":0},""" +
             """"fsrs_w":{"v":[0.212,1],"c":"0192f3c1802000001a2b3c4d5e6f7081","u":0},"ipa":{"v":null,"c":"0192f3c1802000001a2b3c4d5e6f7081","u":0}}}"""
         val record = WireJson.decodeFromString(text)
-        assertEquals(WireValue.Str("take off"), record.fields.getValue("text").value)
-        assertEquals(WireValue.Bool(true), record.fields.getValue("needs_check").value)
-        assertEquals(WireValue.Array(listOf(WireValue.Double(0.212), WireValue.Int(1))), record.fields.getValue("fsrs_w").value)
-        assertEquals(WireValue.Null, record.fields.getValue("ipa").value)
+        assertEquals(JsonPrimitive("take off"), record.fields.getValue("text").value)
+        assertEquals(JsonPrimitive(true), record.fields.getValue("needs_check").value)
+        assertEquals("[0.212,1]", record.fields.getValue("fsrs_w").value.toString())
+        assertEquals(JsonNull, record.fields.getValue("ipa").value)
         assertEquals(AuthorRank.USER, record.fields.getValue("text").rank)
         assertNull(record.owner)
         assertEquals(text, WireJson.encodeToString(record))

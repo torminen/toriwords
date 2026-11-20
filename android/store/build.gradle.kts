@@ -14,6 +14,9 @@ android {
     testOptions { unitTests.isIncludeAndroidResources = true }
 }
 
+// Room's schema JSON is committed (doc 38 §4.3).
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+
 dependencies {
     api(project(":core"))
     api(libs.room.runtime)

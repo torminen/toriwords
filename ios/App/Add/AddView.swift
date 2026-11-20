@@ -22,58 +22,25 @@ struct AddView: View {
     }
 }
 
+/// Typing is the screen itself; the preview is pushed on top (`Route.addPreview`), so Back and the swipe work
+/// as on any pushed screen. `model.step` and the path stay in sync both ways.
 private struct AddContent: View {
     @Bindable var model: AddModel
-    @Environment(\.dismiss) private var dismiss
-    @State private var confirmDiscard = false
+    @Environment(Router.self) private var router
 
     var body: some View {
-        Group {
-            switch model.step {
-            case .typing: TypingStep(model: model)
-            case .preview: PreviewStep(model: model)
+        TypingStep(model: model)
+            .background(Palette.background)
+            .navigationTitle(Text("Add"))
+            .navigationBarTitleDisplayMode(.inline)
+            .onChange(of: model.step) { _, step in
+                if step == .preview { router.push(.addPreview(model)) }
+                else if router.path.last == .addPreview(model) { router.path.removeLast() }  // saved
             }
-        }
-        .background(Palette.background)
-        .navigationTitle(Text("Add"))
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                switch model.step {
-                case .typing:
-                    Button {
-                        if model.text.trimmingCharacters(in: .whitespaces).isEmpty { dismiss() } else { confirmDiscard = true }
-                    } label: {
-                        // After a save there is nothing to cancel: the screen is left, not undone.
-                        if model.savedWord == nil {
-                            Text("Cancel")
-                        } else {
-                            Label { Text("Back") } icon: { Image(systemName: "chevron.backward") }.labelStyle(.titleAndIcon)
-                        }
-                    }
-                case .preview:
-                    Button { model.backToTyping() } label: {
-                        Label { Text("Back") } icon: { Image(systemName: "chevron.backward") }.labelStyle(.titleAndIcon)
-                    }
-                }
+            .onChange(of: router.path) { _, path in
+                // Back or swipe from the preview.
+                if model.step == .preview, !path.contains(.addPreview(model)) { model.backToTyping() }
             }
-            if model.step == .preview {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save") { model.save() }.fontWeight(.semibold).disabled(!model.canSave)
-                }
-            }
-        }
-        .confirmationDialog(Text("Discard this word?"), isPresented: $confirmDiscard, titleVisibility: .visible) {
-            Button("Discard", role: .destructive) { dismiss() }
-            Button("Keep editing", role: .cancel) {}
-        }
-        .alert(Text("Something went wrong"), isPresented: Binding(get: { model.errorMessage != nil },
-                                                                 set: { if !$0 { model.errorMessage = nil } })) {
-            Button("OK") {}
-        } message: {
-            Text(verbatim: model.errorMessage ?? "")
-        }
     }
 }
 
@@ -206,7 +173,8 @@ private struct TypingStep: View {
 
 // MARK: Preview
 
-private struct PreviewStep: View {
+/// Pushed from typing; Save pops back to it.
+struct PreviewStep: View {
     @Bindable var model: AddModel
     @Environment(AppEnvironment.self) private var env
     @Environment(Router.self) private var router
@@ -276,6 +244,20 @@ private struct PreviewStep: View {
             }
         }
         .listStyle(.insetGrouped)
+        .background(Palette.background)
+        .navigationTitle(Text("Add"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Save") { model.save() }.fontWeight(.semibold).disabled(!model.canSave)
+            }
+        }
+        .alert(Text("Something went wrong"), isPresented: Binding(get: { model.errorMessage != nil },
+                                                                 set: { if !$0 { model.errorMessage = nil } })) {
+            Button("OK") {}
+        } message: {
+            Text(verbatim: model.errorMessage ?? "")
+        }
         .task {
             allTags = (try? env.store?.read { try $0.allTags() }) ?? []
             tagCounts = (try? env.store?.read { try $0.tagCounts() }) ?? [:]

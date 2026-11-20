@@ -4,7 +4,7 @@ import ToriCore
 import ToriEnrichment
 import ToriStore
 
-/// Add: typing with autocomplete, then the preview, then Save and clear for the next word.
+/// Add: typing with autocomplete, then the pushed preview, then Save and clear for the next word.
 @MainActor @Observable
 final class AddModel {
     enum Step: Equatable { case typing, preview }
@@ -178,4 +178,10 @@ final class AddModel {
             errorMessage = String(describing: error)
         }
     }
+}
+
+/// Identity: `Route.addPreview` pushes the preview of this very model.
+extension AddModel: Hashable {
+    nonisolated static func == (lhs: AddModel, rhs: AddModel) -> Bool { lhs === rhs }
+    nonisolated func hash(into hasher: inout Hasher) { hasher.combine(ObjectIdentifier(self)) }
 }

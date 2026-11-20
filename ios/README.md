@@ -148,7 +148,6 @@ ToriShared, ToriDictionary and ToriUI.
 
 ## Specs and fixtures
 
-- Specs: docs 34 (product), 35 (UI) and 36 (architecture) in the project workspace.
 - Parity fixtures shared with Android: `spec/fixtures/`. See `spec/fixtures/README.md`. That covers normalization, IDs,
   HLC, merge, capture, the scheduler and the multi-device `sync/` scenarios. `known-deviations.json` must be `[]`.
 - CI workflows: `.github/workflows/toriKit-linux.yml`, `tools.yml` and `ios.yml`.

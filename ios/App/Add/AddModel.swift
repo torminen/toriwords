@@ -7,15 +7,14 @@ import ToriStore
 /// Add: typing with autocomplete, then the pushed preview, then Save and clear for the next word.
 @MainActor @Observable
 final class AddModel {
-    enum Step: Equatable { case typing, preview }
-
     /// What the saved Entry with the same key looks like (it may be known or paused).
     struct Existing: Equatable {
         var id: ToriID
         var status: EntryStatus
     }
 
-    private(set) var step: Step = .typing
+    /// Bumped each time a preview is ready; the Add screen pushes it.
+    private(set) var previewRequest = 0
     var text: String { didSet { if text != oldValue { refreshCompletions() } } }
     private(set) var completions: [Completion] = []
     private(set) var russianWithoutCandidates = false
@@ -104,7 +103,7 @@ final class AddModel {
             baseForm = nil
             await load(typed, sentence: sentence)
         }
-        step = .preview
+        previewRequest += 1
     }
 
     /// Switches between the base form and the typed form (keeps sentence, source, tags and the own translation).
@@ -128,12 +127,6 @@ final class AddModel {
         d.setSuggestions(suggestions, existing: saved?.senses.compactMap(\.translation) ?? [], existingEntry: saved?.id)
         draft = d
         sentenceChanged()
-    }
-
-    /// ‹ Back: to typing with the text kept, no prompt (U10).
-    func backToTyping() {
-        helpTask?.cancel()
-        step = .typing
     }
 
     /// Debounced "In this sentence: …" (P1): never stored.
@@ -173,7 +166,6 @@ final class AddModel {
             ipa = nil
             contextHelp = nil
             text = ""
-            step = .typing
         } catch {
             errorMessage = String(describing: error)
         }

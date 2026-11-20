@@ -23,7 +23,7 @@ struct AddView: View {
 }
 
 /// Typing is the screen itself; the preview is pushed on top (`Route.addPreview`), so Back and the swipe work
-/// as on any pushed screen. `model.step` and the path stay in sync both ways.
+/// as on any pushed screen (the typed text is kept). Save pops the preview itself.
 private struct AddContent: View {
     @Bindable var model: AddModel
     @Environment(Router.self) private var router
@@ -33,13 +33,8 @@ private struct AddContent: View {
             .background(Palette.background)
             .navigationTitle(Text("Add"))
             .navigationBarTitleDisplayMode(.inline)
-            .onChange(of: model.step) { _, step in
-                if step == .preview { router.push(.addPreview(model)) }
-                else if router.path.last == .addPreview(model) { router.path.removeLast() }  // saved
-            }
-            .onChange(of: router.path) { _, path in
-                // Back or swipe from the preview.
-                if model.step == .preview, !path.contains(.addPreview(model)) { model.backToTyping() }
+            .onChange(of: model.previewRequest) {
+                if router.path.last != .addPreview(model) { router.push(.addPreview(model)) }
             }
     }
 }
@@ -176,6 +171,7 @@ private struct TypingStep: View {
 /// Pushed from typing; Save pops back to it.
 struct PreviewStep: View {
     @Bindable var model: AddModel
+    @Environment(\.dismiss) private var dismiss
     @Environment(AppEnvironment.self) private var env
     @Environment(Router.self) private var router
     @State private var allTags: [TagRow] = []
@@ -249,7 +245,11 @@ struct PreviewStep: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Save") { model.save() }.fontWeight(.semibold).disabled(!model.canSave)
+                Button("Save") {
+                    model.save()
+                    if model.errorMessage == nil { dismiss() }
+                }
+                .fontWeight(.semibold).disabled(!model.canSave)
             }
         }
         .alert(Text("Something went wrong"), isPresented: Binding(get: { model.errorMessage != nil },

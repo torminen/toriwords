@@ -136,7 +136,7 @@ ToriKit/
   ToriCore           pure domain: IDs, HLC, merge, text keys, capture rules, FSRS scheduler, daily queue, widget snapshot,
                      reminder plan
   ToriShared         App Group layout, inbox files, vocab index, deep links, Darwin notification
-  ToriDictionary     read-only dictionary.sqlite + installer
+  ToriDictionary     read-only dictionary.sqlite, read in place from the app bundle
   ToriStore          user.sqlite (GRDB): records, outbox, sync apply, queries, backup
   ToriSync           SyncEngine, CloudDatabase protocol, CloudKit adapter (iCloud private database)
   ToriEnrichment     on-device translation, dictionary lookup, enrichment orchestrator, speech

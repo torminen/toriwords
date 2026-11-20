@@ -27,10 +27,9 @@ final class ShareModel {
     @ObservationIgnored private let group: AppGroup?
     @ObservationIgnored private let sticky: CaptureSticky?
     @ObservationIgnored private let finish: (Bool) -> Void
-    /// Opened per capture, read-only `immutable=1`; nil before the app's first launch.
-    @ObservationIgnored private lazy var dictionary: BundledDictionary? = group.flatMap { g in
-        FileManager.default.fileExists(atPath: g.dictionary.path) ? try? BundledDictionary(path: g.dictionary.path) : nil
-    }
+    /// Opened per capture from the containing app's bundle, read-only `immutable=1`.
+    @ObservationIgnored private lazy var dictionary: BundledDictionary? =
+        BundledDictionary.bundledURL().flatMap { try? BundledDictionary(path: $0.path) }
     @ObservationIgnored private lazy var index: VocabIndex? = try? group?.readVocabIndex()
     @ObservationIgnored private var lookedUp: String?
 

@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <!-- ToriWords app icon: T over W. Mark box 576 px centred; stroke 0.12 of the box. -->
+  <!-- ToriWords app icon: T over W. Mark box 720 px centred; stroke 0.12 of the box. Light background = Palette.background. -->
   <defs>
     <mask id="gap" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
       <rect width="1024" height="1024" fill="#fff"/>
-      <line x1="512.0" y1="339.2" x2="512.0" y2="742.4" stroke="#000" stroke-width="131.3" stroke-linecap="round"/>
+      <line x1="512.0" y1="296.0" x2="512.0" y2="800.0" stroke="#000" stroke-width="164.1" stroke-linecap="round"/>
     </mask>
   </defs>
-  <polyline mask="url(#gap)" points="321.9,396.8 402.6,742.4 512.0,396.8 621.4,742.4 702.1,396.8" fill="none" stroke="#0A84FF" stroke-width="69.1" stroke-linecap="round" stroke-linejoin="round"/>
-  <line x1="512.0" y1="310.4" x2="512.0" y2="742.4" stroke="#FFFFFF" stroke-width="69.1" stroke-linecap="round"/>
-  <rect x="293.1" y="258.6" width="437.8" height="69.1" rx="20.7" fill="#FFFFFF"/>
+  <polyline mask="url(#gap)" points="274.4,368.0 375.2,800.0 512.0,368.0 648.8,800.0 749.6,368.0" fill="none" stroke="#0A84FF" stroke-width="86.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="512.0" y1="260.0" x2="512.0" y2="800.0" stroke="#FFFFFF" stroke-width="86.4" stroke-linecap="round"/>
+  <rect x="238.4" y="195.2" width="547.2" height="86.4" rx="25.9" fill="#FFFFFF"/>
 </svg>

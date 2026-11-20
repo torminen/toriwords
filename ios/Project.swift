@@ -51,7 +51,8 @@ let project = Project(
             infoPlist: .extendingDefault(with: [
                 "CFBundleDisplayName": "ToriWords",
                 "CFBundleLocalizations": localizations,
-                "UILaunchScreen": [:],
+                // Background only: LaunchView draws the mark in from this frame. The colour mirrors Palette.background.
+                "UILaunchScreen": ["UIColorName": "LaunchBackground"],
                 // Phone-first portrait layouts; iPad runs the same adaptive layouts in every orientation.
                 "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
                 "UISupportedInterfaceOrientations~ipad": [

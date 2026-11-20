@@ -94,6 +94,8 @@ let project = Project(
             settings: .settings(base: [
                 "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                 "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
+                // No AccentColor asset: the UI tints with Palette.accent.
+                "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "",
             ], configurations: noEntitlementsInPersonal)
         ),
         .target(

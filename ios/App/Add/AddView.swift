@@ -3,6 +3,7 @@ import ToriCore
 import ToriEnrichment
 import ToriStore
 import ToriUI
+import WidgetKit
 
 /// Add screen.
 struct AddView: View {
@@ -41,8 +42,15 @@ private struct AddContent: View {
             ToolbarItem(placement: .topBarLeading) {
                 switch model.step {
                 case .typing:
-                    Button("Cancel") {
+                    Button {
                         if model.text.trimmingCharacters(in: .whitespaces).isEmpty { dismiss() } else { confirmDiscard = true }
+                    } label: {
+                        // After a save there is nothing to cancel: the screen is left, not undone.
+                        if model.savedWord == nil {
+                            Text("Cancel")
+                        } else {
+                            Label { Text("Back") } icon: { Image(systemName: "chevron.backward") }.labelStyle(.titleAndIcon)
+                        }
                     }
                 case .preview:
                     Button { model.backToTyping() } label: {
@@ -76,6 +84,8 @@ private struct TypingStep: View {
     @Environment(Router.self) private var router
     @FocusState private var focused: Bool
     @State private var chipRange: ClosedRange<Int>?
+    @AppStorage("widgetHintDismissed") private var widgetHintDismissed = false
+    @State private var hasWidget = true
 
     var body: some View {
         List {
@@ -105,6 +115,7 @@ private struct TypingStep: View {
                 }
             } else if let word = model.savedWord, model.text.isEmpty {
                 Section { RelatedWords(word: word, title: Text("Related to “\(word)”")) }
+                if !hasWidget, !widgetHintDismissed { widgetHint }
             } else if model.text.isEmpty {
                 // Same hint as Home's empty state; gap to the field equals the side margins.
                 Section {
@@ -118,7 +129,21 @@ private struct TypingStep: View {
         .listStyle(.insetGrouped)
         .contentMargins(.horizontal, Spacing.xl, for: .scrollContent)
         .onAppear { focused = true }
+        .task { hasWidget = !((try? await WidgetCenter.shared.currentConfigurations()) ?? []).isEmpty }
         .onChange(of: model.text) { chipRange = nil }
+    }
+
+    /// After a save, while the Home Screen has no ToriWords widget.
+    private var widgetHint: some View {
+        Section {
+            Banner(.tip, title: Text("Add the ToriWords widget"),
+                   message: Text("Today's cards on your Home Screen: touch and hold an empty area, tap Edit → Add Widget, then find ToriWords.")) {
+                Button("Not now") { widgetHintDismissed = true }.buttonStyle(.borderless)
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+        }
+        .listSectionSpacing(Spacing.xl)
     }
 
     private func completionRow(_ c: Completion) -> some View {

@@ -23,7 +23,15 @@ dependencies {
 
     testImplementation(libs.junit4)
     testImplementation(libs.robolectric)
+    testImplementation(libs.sqlite.bundled.jvm)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.kotlinx.coroutines.test)
+}
+
+// Shared sync scenarios are read in place (doc 38 §15.2): no copies.
+tasks.withType<Test>().configureEach {
+    val fixtures = rootProject.layout.projectDirectory.dir("../spec/fixtures")
+    inputs.dir(fixtures).withPropertyName("fixtures").withPathSensitivity(PathSensitivity.RELATIVE)
+    systemProperty("fixturesDir", fixtures.asFile.absolutePath)
 }

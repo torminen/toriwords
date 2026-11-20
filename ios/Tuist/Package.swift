@@ -15,7 +15,11 @@ let packageSettings = PackageSettings(
         "ToriEnrichment": .staticFramework,
         "ToriUI": .staticFramework,
         "GRDB": .staticFramework,
-    ]
+    ],
+    // Packages need every configuration the project has (Project.swift adds Personal).
+    baseSettings: .settings(configurations: [
+        .debug(name: .debug), .release(name: .release), .debug(name: "Personal"),
+    ])
 )
 #endif
 

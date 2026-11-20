@@ -5,6 +5,7 @@ Derived/
 DerivedData/
 xcuserdata/
 ios/Tuist/.build/
+ios/Config/Personal.local.xcconfig
 .DS_Store
 
 # SwiftPM

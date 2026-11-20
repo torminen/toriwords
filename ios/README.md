@@ -126,6 +126,27 @@ CI builds unsigned (`CODE_SIGNING_ALLOWED=NO`). For a device:
 Without the App Group entitlement, `AppGroup.shared` is nil. Sharing, the widget snapshot and the vocab index are then
 off, and the app still runs.
 
+### Free Apple ID (Personal Team)
+
+The `Toriwords-Personal` scheme builds the `Personal` configuration (`Config/Personal.xcconfig`) for a free Apple ID.
+A Personal Team cannot sign iCloud or App Groups, so that build has no entitlements, no iCloud sync (the Settings
+row shows "—"). Share capture and the widget need the App Group, so in this build ToriWords is not listed in Share
+(the extension's activation rule is `FALSEPREDICATE`), Home does not mention it, and the widget offers no sizes (not
+in the widget gallery). Words, review, speech, translation and the
+dictionary work. It installs next to the full app under its own bundle ID, and Xcode must reinstall it every 7 days.
+
+1. Xcode → Settings → Accounts: add your Apple ID.
+2. Create `Config/Personal.local.xcconfig` (gitignored):
+
+   ```
+   DEVELOPMENT_TEAM = <your Personal Team ID>
+   TORI_BUNDLE_ID = com.<you>.toriwords
+   ```
+
+3. `tools/dictionary/fetch.sh` (full dictionary; without it the build uses the sample), then `tuist generate`.
+4. Run the `Toriwords-Personal` scheme on the iPhone. On the phone: turn on Developer Mode, and after the first install
+   trust the developer profile (Settings → General → VPN & Device Management).
+
 ## Module map
 
 ```

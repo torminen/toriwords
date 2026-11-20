@@ -15,7 +15,10 @@ struct ToriwordsWidget: Widget {
         }
         .configurationDisplayName("ToriWords")
         .description("Cards to review today.")
-        .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular])
+        // The snapshot comes through the App Group; without it (Personal builds) the widget could only show "—",
+        // so it offers no sizes and is not listed in the widget gallery.
+        .supportedFamilies(AppGroup.shared == nil ? []
+                           : [.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular])
     }
 }
 

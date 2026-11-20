@@ -3,6 +3,10 @@
 // Apple Developer Team ID (10 characters). Set your own before building for a device.
 DEVELOPMENT_TEAM = TEAMID0000
 
+// App bundle ID; the extensions append .share and .widget. Personal.xcconfig overrides it.
+TORI_BUNDLE_ID = com.toriwords.app
 TORI_APP_GROUP_ID = group.com.toriwords.app
 TORI_BG_REFRESH_TASK_ID = com.toriwords.app.refresh
 TORI_URL_SCHEME = toriwords
+// iCloud sync (CloudKit entitlement present). NO in Personal.xcconfig.
+TORI_CLOUD_SYNC = YES

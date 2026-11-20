@@ -10,6 +10,7 @@ struct ToriwordsApp: App {
         let env = env
         WindowGroup {
             RootView()
+                .overlay { LaunchView() }
                 .environment(env)
                 .environment(env.router)
                 .environment(env.deletion)
@@ -32,7 +33,8 @@ struct RootView: View {
         Group {
             switch env.phase {
             case .launching:
-                ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity).background(Palette.background)
+                // LaunchView covers this.
+                Palette.background.ignoresSafeArea()
             case .failed(let message):
                 EmptyStateView(title: Text("ToriWords could not open its data"), message: Text(verbatim: message))
             case .ready:

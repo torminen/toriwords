@@ -56,7 +56,8 @@ let project = Project(
             sources: ["App/**"],
             // The full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app
             // installs the full file when present, else the sample (Debug/CI). Release fails without the full file.
-            resources: ["App/**/*.xcstrings", "Resources/dictionary*.sqlite"],
+            // Assets.xcassets holds the app icon; its SVG sources in Resources/AppIcon are not bundled.
+            resources: ["App/**/*.xcstrings", "Resources/dictionary*.sqlite", "Resources/Assets.xcassets"],
             entitlements: appEntitlements,
             scripts: [
                 .pre(script: """
@@ -78,7 +79,10 @@ let project = Project(
             ],
             // The Release dictionary check reads Resources/ outside declared inputs (a declared input would fail Debug
             // builds without the full file), so this target's scripts run unsandboxed.
-            settings: .settings(base: ["ENABLE_USER_SCRIPT_SANDBOXING": "NO"])
+            settings: .settings(base: [
+                "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
+            ])
         ),
         .target(
             name: "ToriwordsShare",

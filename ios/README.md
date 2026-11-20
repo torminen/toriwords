@@ -76,6 +76,21 @@ The offline EN→RU dictionary `dictionary.sqlite` (about 60 MiB, CC BY-SA 4.0) 
 
 CI downloads the full file only when the Release asset exists. Otherwise it builds Debug with the sample.
 
+## App icon
+
+- **Asset:** `Resources/Assets.xcassets/AppIcon.appiconset` has single-size 1024×1024 images: `AppIcon.png` (light, opaque,
+  no alpha channel, as App Store Connect requires) and `AppIcon-dark.png` (dark, transparent background). iOS derives
+  the tinted and clear looks from these.
+- **Sources:** `Resources/AppIcon/AppIcon.svg` and `AppIcon-dark.svg`. They are not bundled. Edit the SVG, then re-render
+  with a renderer that supports SVG masks (librsvg, a browser):
+
+  ```sh
+  cd ios/Resources
+  rsvg-convert -w 1024 -h 1024 AppIcon/AppIcon.svg \
+    | magick - -background white -alpha remove -alpha off Assets.xcassets/AppIcon.appiconset/AppIcon.png
+  rsvg-convert -w 1024 -h 1024 AppIcon/AppIcon-dark.svg -o Assets.xcassets/AppIcon.appiconset/AppIcon-dark.png
+  ```
+
 ## Configuration
 
 All build settings live in `Config/Shared.xcconfig`. It holds no secrets.

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- ToriWords app icon: T over W. Mark box 576 px centred; stroke 0.12 of the box. -->
+  <defs>
+    <mask id="gap" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+      <rect width="1024" height="1024" fill="#fff"/>
+      <line x1="512.0" y1="339.2" x2="512.0" y2="742.4" stroke="#000" stroke-width="131.3" stroke-linecap="round"/>
+    </mask>
+  </defs>
+  <rect width="1024" height="1024" fill="#FFFFFF"/>
+  <polyline mask="url(#gap)" points="321.9,396.8 402.6,742.4 512.0,396.8 621.4,742.4 702.1,396.8" fill="none" stroke="#007AFF" stroke-width="69.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="512.0" y1="310.4" x2="512.0" y2="742.4" stroke="#000000" stroke-width="69.1" stroke-linecap="round"/>
+  <rect x="293.1" y="258.6" width="437.8" height="69.1" rx="20.7" fill="#000000"/>
+</svg>

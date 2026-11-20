@@ -17,7 +17,6 @@ public struct AppGroup: Sendable {
     }
     #endif
 
-    public var dictionary: URL { root.appendingPathComponent("dictionary.sqlite") }
     public var vocabIndex: URL { root.appendingPathComponent("vocab-index.json") }
     public var widgetSnapshot: URL { root.appendingPathComponent("widget-snapshot.json") }
     public var captureSticky: URL { root.appendingPathComponent("capture-sticky.json") }

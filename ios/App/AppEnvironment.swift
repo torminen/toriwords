@@ -31,10 +31,10 @@ protocol DictionaryAttribution {
     var licenceText: String { get }
 }
 
-/// Slot for the dictionary step: copy the bundled `dictionary.sqlite` into the App Group when its version changed
-/// and open it. Returns nil when no dictionary is available.
-@MainActor protocol DictionaryInstalling: AnyObject {
-    func installIfNeeded(into group: AppGroup?) async throws -> (any DictionaryLookup)?
+/// Slot for the dictionary step: open the bundled `dictionary.sqlite` in place. Returns nil when no dictionary is
+/// available.
+@MainActor protocol DictionaryLoading: AnyObject {
+    func load(appGroup: AppGroup?) async throws -> (any DictionaryLookup)?
 }
 
 /// Slot for reminders (step 9d). The Review reminder offer calls `enableDailyReminder`; commits call `refresh`.
@@ -77,7 +77,7 @@ final class AppEnvironment {
     private(set) var phase: Phase = .launching
     private(set) var store: ToriStore?
     private(set) var enrichment: EnrichmentOrchestrator?
-    /// The installed dictionary; About and Translation read its version and licence (`DictionaryAttribution`).
+    /// The bundled dictionary; About and Translation read its version and licence (`DictionaryAttribution`).
     private(set) var dictionary: (any DictionaryLookup)?
     let router = Router()
     let settings = DeviceSettings()
@@ -88,9 +88,9 @@ final class AppEnvironment {
 
     // Slots wired by later steps.
     @ObservationIgnored var sync: (any SyncCoordinating)?
-    @ObservationIgnored var dictionaryInstaller: (any DictionaryInstalling)? = AppDictionaryInstaller()
+    @ObservationIgnored var dictionaryLoader: (any DictionaryLoading)? = AppDictionaryLoader()
     @ObservationIgnored var reminders: (any ReminderScheduling)?
-    /// Dictionary searches for Add / Entry over `dictionary` (set by the installer at launch); empty while it is nil.
+    /// Dictionary searches for Add / Entry over `dictionary` (set by the loader at launch); empty while it is nil.
     var dictionarySearch: DictionarySearch { DictionarySearch(dictionary as? BundledDictionary) }
 
     /// The open Review session, so going to the background commits its undoable answer.
@@ -132,8 +132,8 @@ final class AppEnvironment {
                 try store.launch(deviceMarker: support.appending(path: "device-marker"), displayName: deviceName)
                 return store
             }.value
-            // 4: dictionary into the App Group.
-            let dictionary = try? await dictionaryInstaller?.installIfNeeded(into: appGroup)
+            // 4: dictionary, read from the app bundle.
+            let dictionary = try? await dictionaryLoader?.load(appGroup: appGroup)
             // 5: inbox import, then pending enrichment, then sync.
             if let appGroup { _ = try? store.importInbox(appGroup.inbox) }
             self.dictionary = dictionary
@@ -146,7 +146,7 @@ final class AppEnvironment {
             deletion.didDelete = { [weak self] in self?.didChangeWords() }
             phase = .ready
             observe(store)
-            let dictionaryChanged = (dictionaryInstaller as? AppDictionaryInstaller)?.versionChanged == true
+            let dictionaryChanged = (dictionaryLoader as? AppDictionaryLoader)?.versionChanged == true
             Task {
                 // After a dictionary version change `unavailable` Entries get another chance (also runs pending).
                 if dictionaryChanged { _ = try? await enrichment.updateDictionary(dictionary) }

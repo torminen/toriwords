@@ -22,6 +22,14 @@ public final class BundledDictionary: Sendable {
         licenceText = meta["licence_text"] ?? ""
     }
 
+    /// The bundled `dictionary.sqlite` (else the Debug sample), read in place: no copy, the bundle is read-only and the
+    /// file is opened `immutable=1`. From an extension (`….app/PlugIns/X.appex`) it is the containing app's bundle.
+    public static func bundledURL(bundle: URL = Bundle.main.bundleURL) -> URL? {
+        let app = bundle.pathExtension == "appex" ? bundle.deletingLastPathComponent().deletingLastPathComponent() : bundle
+        return ["dictionary.sqlite", "dictionary-sample.sqlite"].map { app.appendingPathComponent($0) }
+            .first { FileManager.default.fileExists(atPath: $0.path) }
+    }
+
     /// The whole `meta` table (dump dates, hashes, build hash, versions).
     public func meta() throws -> [String: String] { try db.read { try Self.meta($0) } }
 

@@ -185,10 +185,25 @@ func otherTimingsOnFullDictionary() throws {
     let reverse = try ms { hits = try dict.reverse("соба") }
     #expect(found.map(\.key).contains("take off") && !hits.isEmpty)
     let reverseShort = try ms { _ = try dict.reverse("д") }
+    print("full dictionary ms: resolve(run) \(lookup), resolve(ran) \(base), containedPhrases \(phrases), reverse(соба) \(reverse), reverse(д) \(reverseShort)")
+}
+
+@Test func bundledURLPrefersFullDictionaryAndResolvesFromAnExtension() throws {
     let dir = try tempDir()
     defer { try? FileManager.default.removeItem(at: dir) }
-    let install = try ms { _ = try DictionaryInstaller(bundled: fullDictionary, installed: dir.appendingPathComponent("d.sqlite")).installIfNeeded() }
-    print("full dictionary ms: resolve(run) \(lookup), resolve(ran) \(base), containedPhrases \(phrases), reverse(соба) \(reverse), reverse(д) \(reverseShort), install \(install)")
+    let app = dir.appendingPathComponent("Toriwords.app", isDirectory: true)
+    let appex = app.appendingPathComponent("PlugIns/ToriwordsShare.appex", isDirectory: true)
+    try FileManager.default.createDirectory(at: appex, withIntermediateDirectories: true)
+    #expect(BundledDictionary.bundledURL(bundle: app) == nil)
+
+    let sampleFile = app.appendingPathComponent("dictionary-sample.sqlite")
+    FileManager.default.createFile(atPath: sampleFile.path, contents: Data())
+    #expect(BundledDictionary.bundledURL(bundle: app)?.lastPathComponent == "dictionary-sample.sqlite")
+
+    FileManager.default.createFile(atPath: app.appendingPathComponent("dictionary.sqlite").path, contents: Data())
+    #expect(BundledDictionary.bundledURL(bundle: app)?.lastPathComponent == "dictionary.sqlite")
+    #expect(BundledDictionary.bundledURL(bundle: appex)?.standardizedFileURL
+            == app.appendingPathComponent("dictionary.sqlite").standardizedFileURL)
 }
 
 @Test func variantsKeepHeadwordAndRankOrderWithoutRepeats() throws {

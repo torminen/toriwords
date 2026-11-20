@@ -443,5 +443,19 @@ class StoreTest {
         assertEquals(whole.store.read { it.dump() }.filter { it.startsWith("entry") || it.startsWith("card") }, chunked.store.read { it.dump() }.filter { it.startsWith("entry") || it.startsWith("card") })
     }
 
+    @Test fun localChangeHookFiresOnlyForOutboxedLocalWrites() = runBlocking {
+        val s = TestStore()
+        var calls = 0
+        s.store.onLocalChange = { calls++ }
+        val a = s.store.capture(CaptureInput("run", T0))
+        assertEquals(0, calls) // sync off: nothing queued
+        s.activate()
+        s.ms += 1
+        s.store.setEntryNote(a, "note")
+        assertEquals(1, calls)
+        s.store.applyCloudChanges(emptyList(), token = "t", index = listOf(DriveFileIndex(file("f1"), emptyList())))
+        assertEquals(1, calls) // applied cloud pages never trigger a debounced sync
+    }
+
     private fun file(id: String) = DriveFile(id, "b-$id.json", "batch", "dev", 1, "gen", T0)
 }

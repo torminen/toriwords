@@ -17,14 +17,23 @@ import kotlinx.coroutines.Dispatchers
  */
 class ToriStore private constructor(val database: ToriDatabase, private val clock: () -> Long) {
 
+    /** Called after a committed local write that queued outbox rows (not for applied cloud pages). */
+    @Volatile var onLocalChange: (() -> Unit)? = null
+
     /** One write transaction with clock stamping and post-write maintenance. */
-    internal suspend fun <T> write(body: suspend (Tx) -> T): T = database.useWriterConnection { t ->
-        t.immediateTransaction {
-            val tx = Tx.begin(Sql(this), clock())
-            val result = body(tx)
-            tx.finish()
-            result
+    internal suspend fun <T> write(body: suspend (Tx) -> T): T {
+        var notify = false
+        val result = database.useWriterConnection { t ->
+            t.immediateTransaction {
+                val tx = Tx.begin(Sql(this), clock())
+                val result = body(tx)
+                tx.finish()
+                notify = tx.outboxed && !tx.pulled
+                result
+            }
         }
+        if (notify) onLocalChange?.invoke()
+        return result
     }
 
     /** A write transaction without clocks or maintenance (sync bookkeeping). */

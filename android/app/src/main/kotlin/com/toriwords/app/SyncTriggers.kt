@@ -90,7 +90,9 @@ class SyncTriggers(context: Context, private val controller: SyncController, pri
 /** One background sync cycle. Still waiting for network afterwards → WorkManager's exponential backoff. */
 class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
-        val controller = (applicationContext as ToriApp).syncController
+        val app = applicationContext as ToriApp
+        app.ready.await()
+        val controller = app.syncController
         if (!controller.status.value.phase.triggersActive) return Result.success()
         val trigger = inputData.getString(TRIGGER)?.let(SyncTrigger::valueOf) ?: SyncTrigger.Periodic
         controller.sync(trigger, foreground = false)

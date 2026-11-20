@@ -32,6 +32,8 @@ internal class Tx private constructor(
     var paramsChanged = false
     /** Applying cloud records: Entry tombstones that arrive purge their group's children (queued as cloud purges). */
     var pulled = false
+    /** A local change entered the outbox (drives the debounced sync trigger). */
+    var outboxed = false
 
     fun touched(type: RecordType): Set<ToriId> = touched[type.name] ?: emptySet()
     fun touched(name: String): Set<ToriId> = touched[name] ?: emptySet()
@@ -45,6 +47,7 @@ internal class Tx private constructor(
 
     suspend fun outbox(type: RecordType, id: ToriId, field: String, clock: HlcTimestamp) {
         if (!outboxActive) return
+        outboxed = true
         sql.exec("INSERT OR REPLACE INTO pending_changes (record_id, type, field, clock) VALUES (?, ?, ?, ?)", id, type.name, field, clock.toString())
     }
 

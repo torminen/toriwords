@@ -8,7 +8,12 @@ let personal: ConfigurationName = "Personal"
 /// A Personal Team cannot sign iCloud or App Groups, so the Personal configuration signs without entitlements.
 let noEntitlementsInPersonal: [Configuration] = [.debug(name: personal, settings: ["CODE_SIGN_ENTITLEMENTS": ""])]
 let settings = Settings.settings(
-    base: ["SWIFT_VERSION": "6.0", "SWIFT_STRICT_CONCURRENCY": "complete"],
+    base: [
+        "SWIFT_VERSION": "6.0", "SWIFT_STRICT_CONCURRENCY": "complete",
+        // Off, against Xcode 27's recommendation: keys like "Add a word" / "Add a word…" map to one symbol and fail
+        // the build, and the app uses Text("…") literals, not generated symbols.
+        "STRING_CATALOG_GENERATE_SYMBOLS": "NO",
+    ],
     configurations: [
         .debug(name: .debug, xcconfig: "Config/Shared.xcconfig"),
         .release(name: .release, xcconfig: "Config/Shared.xcconfig"),

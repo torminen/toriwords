@@ -49,6 +49,12 @@ public final class SpeechPlayer: NSObject {
             }())
         }
         guard let picked = VoicePicker.pick(accent, among: candidates) else { return nil }
+        // Among default-quality voices the identifier tie-break lands on Eloquence/novelty voices (Eddy, Albert…);
+        // the system default for the language (Samantha for en-US, Daniel for en-GB) sounds far better.
+        if picked.quality == .default, picked.language == accent.language,
+           let system = AVSpeechSynthesisVoice(language: accent.language) {
+            return system
+        }
         return AVSpeechSynthesisVoice(identifier: picked.identifier)
     }
 

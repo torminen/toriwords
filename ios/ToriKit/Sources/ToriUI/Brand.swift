@@ -76,14 +76,14 @@ public struct LogoMark: View {
     }
 }
 
-/// Header layout E: 26 pt mark + 17 pt semibold "ToriWords", for the leading toolbar item (no large title).
+/// Header layout E: 32 pt mark + 17 pt semibold "ToriWords", for the leading toolbar item (no large title).
 /// The name is never truncated; text is capped at xxxLarge so it cannot crowd the trailing items.
 public struct BrandHeader: View {
     public init() {}
 
     public var body: some View {
         HStack(spacing: Spacing.s) {
-            LogoMark(size: 26)
+            LogoMark(size: 32)
             Text(verbatim: "ToriWords").font(Typography.heading)
         }
         .fixedSize()

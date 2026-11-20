@@ -136,11 +136,10 @@ in the widget gallery). Words, review, speech, translation and the
 dictionary work. It installs next to the full app under its own bundle ID, and Xcode must reinstall it every 7 days.
 
 1. Xcode → Settings → Accounts: add your Apple ID.
-2. Create `Config/Personal.local.xcconfig` (gitignored):
+2. Copy the template and fill in your Personal Team ID and a bundle ID prefix of your own. The copy is gitignored:
 
-   ```
-   DEVELOPMENT_TEAM = <your Personal Team ID>
-   TORI_BUNDLE_ID = com.<you>.toriwords
+   ```sh
+   cp Config/Personal.local.xcconfig.example Config/Personal.local.xcconfig
    ```
 
 3. `tools/dictionary/fetch.sh` (full dictionary; without it the build uses the sample), then `tuist generate`.

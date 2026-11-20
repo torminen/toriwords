@@ -1,9 +1,10 @@
 // "Personal" configuration (scheme Toriwords-Personal): a device build with a free Apple ID (Personal Team).
-// No iCloud and no App Group (a Personal Team cannot sign them): no sync, the Share Extension cannot hand words
-// to the app, the widget stays empty. Words, review, speech, translation and the dictionary work.
+// No iCloud and no App Group (a Personal Team cannot sign them): no sync; Share capture and the widget are hidden.
+// Words, review, speech, translation and the dictionary work.
 #include "Shared.xcconfig"
 
-// Set both in Personal.local.xcconfig (gitignored): your Personal Team ID and a bundle ID prefix nobody else has.
+// Set both in Personal.local.xcconfig (gitignored; copy Personal.local.xcconfig.example): your Personal Team ID and a
+// bundle ID prefix nobody else has.
 DEVELOPMENT_TEAM = TEAMID0000
 TORI_BUNDLE_ID = com.example.toriwords
 

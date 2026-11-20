@@ -203,10 +203,10 @@ private struct RowPressStyle: ButtonStyle {
 
 // MARK: First run
 
-/// Empty vocabulary.
-private struct FirstRunCard: View {
+/// Empty vocabulary; also the hint under the Add screen's field (without the button).
+struct FirstRunCard: View {
     @Environment(AppEnvironment.self) private var env
-    let add: () -> Void
+    var add: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.l) {
@@ -219,7 +219,7 @@ private struct FirstRunCard: View {
                 Label { Text("From any app — select text → Share → ToriWords") } icon: { Image(systemName: "square.and.arrow.up") }
             }
             Text("Works offline: the dictionary is built in.").font(Typography.secondary).foregroundStyle(Palette.textSecondary)
-            Button("Add your first word", action: add).buttonStyle(.toriPrimary)
+            if let add { Button("Add your first word", action: add).buttonStyle(.toriPrimary) }
         }
         .font(Typography.body)
         .padding(Spacing.xl)

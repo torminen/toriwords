@@ -93,6 +93,7 @@ private struct TypingStep: View {
                         .foregroundStyle(Palette.success).font(Typography.secondary)
                 }
             }
+            .listSectionSpacing(Spacing.xl)
 
             if model.looksLikeSentence {
                 sentencePicker
@@ -104,9 +105,18 @@ private struct TypingStep: View {
                 }
             } else if let word = model.savedWord, model.text.isEmpty {
                 Section { RelatedWords(word: word, title: Text("Related to “\(word)”")) }
+            } else if model.text.isEmpty {
+                // Same hint as Home's empty state; gap to the field equals the side margins.
+                Section {
+                    FirstRunCard()
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+                .listSectionSpacing(Spacing.xl)
             }
         }
         .listStyle(.insetGrouped)
+        .contentMargins(.horizontal, Spacing.xl, for: .scrollContent)
         .onAppear { focused = true }
         .onChange(of: model.text) { chipRange = nil }
     }

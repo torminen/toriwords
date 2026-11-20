@@ -44,3 +44,22 @@ app. Each developer build needs an OAuth client registered for its signing key:
    Settings → Google Drive sync on each and tap **Turn on Google Drive sync**.
 
 Without a matching OAuth client the consent sheet fails and sync stays off.
+
+## Sync fixtures on Drive
+
+`:sync:test` runs every `spec/fixtures/sync/*.json` scenario in place (`SyncScenarioTest`, Robolectric) with a real
+`ToriStore` + `SyncEngine` per device against `DriveFake`. The fixtures and `known-deviations.json` are unchanged; the
+runner adapts them to Drive (doc 38 §11.2):
+
+1. **Accounts.** One `DriveFake` namespace per account: `enableSync account` is Turn-on for that account (its SHA-256
+   becomes `driveAccount`), `cloudSwitch` is Turn-on for another namespace (a silent token never switches), and
+   `sync.user` is checked as `driveAccount == sha256(user)`.
+2. **Cloud expectations** (`entries`, `purged`, `types`): all layout-1 files' envelopes are folded per id with the
+   envelope merge, then counted. `purged` also asserts that no file still holds a non-tombstone envelope of the group.
+3. **`limit`** (012) = the engine's `applyChunk` in envelopes (and changes per page).
+4. **`racedBy`** (037): the racer's whole cycle runs from `beforeNextUpload`; after the last step every raced device runs
+   one more sync, then `expected` is checked.
+5. **State names:** `iCloudOff` ↔ `Off`, `cloudDeleted` ↔ `DriveDeleted`, `synced` ↔ `Idle` with a `lastSyncAt`.
+6. **`upgradeSchema`** (028, 029): a batch file from node `feedfacecafebeef` is put into the account; files with unknown
+   types are never covered or deleted.
+7. **Clock** (027): `lastServerTime` comes from the fake's `modifiedTime` (the shared clock, without device offsets).

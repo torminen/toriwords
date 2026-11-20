@@ -3,6 +3,7 @@ import ToriCore
 import ToriEnrichment
 import ToriStore
 import ToriUI
+import WidgetKit
 
 /// Add screen.
 struct AddView: View {
@@ -21,51 +22,20 @@ struct AddView: View {
     }
 }
 
+/// Typing is the screen itself; the preview is pushed on top (`Route.addPreview`), so Back and the swipe work
+/// as on any pushed screen (the typed text is kept). Save pops the preview itself.
 private struct AddContent: View {
     @Bindable var model: AddModel
-    @Environment(\.dismiss) private var dismiss
-    @State private var confirmDiscard = false
+    @Environment(Router.self) private var router
 
     var body: some View {
-        Group {
-            switch model.step {
-            case .typing: TypingStep(model: model)
-            case .preview: PreviewStep(model: model)
+        TypingStep(model: model)
+            .background(Palette.background)
+            .navigationTitle(Text("Add"))
+            .navigationBarTitleDisplayMode(.inline)
+            .onChange(of: model.previewRequest) {
+                if router.path.last != .addPreview(model) { router.push(.addPreview(model)) }
             }
-        }
-        .background(Palette.background)
-        .navigationTitle(Text("Add"))
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                switch model.step {
-                case .typing:
-                    Button("Cancel") {
-                        if model.text.trimmingCharacters(in: .whitespaces).isEmpty { dismiss() } else { confirmDiscard = true }
-                    }
-                case .preview:
-                    Button { model.backToTyping() } label: {
-                        Label { Text("Back") } icon: { Image(systemName: "chevron.backward") }.labelStyle(.titleAndIcon)
-                    }
-                }
-            }
-            if model.step == .preview {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save") { model.save() }.fontWeight(.semibold).disabled(!model.canSave)
-                }
-            }
-        }
-        .confirmationDialog(Text("Discard this word?"), isPresented: $confirmDiscard, titleVisibility: .visible) {
-            Button("Discard", role: .destructive) { dismiss() }
-            Button("Keep editing", role: .cancel) {}
-        }
-        .alert(Text("Something went wrong"), isPresented: Binding(get: { model.errorMessage != nil },
-                                                                 set: { if !$0 { model.errorMessage = nil } })) {
-            Button("OK") {}
-        } message: {
-            Text(verbatim: model.errorMessage ?? "")
-        }
     }
 }
 
@@ -76,6 +46,9 @@ private struct TypingStep: View {
     @Environment(Router.self) private var router
     @FocusState private var focused: Bool
     @State private var chipRange: ClosedRange<Int>?
+    /// "Not now" on the widget hint hides it for a day (seconds since 1970).
+    @AppStorage("widgetHintSnoozedUntil") private var widgetHintSnoozedUntil: Double = 0
+    @State private var hasWidget = true
 
     var body: some View {
         List {
@@ -93,6 +66,7 @@ private struct TypingStep: View {
                         .foregroundStyle(Palette.success).font(Typography.secondary)
                 }
             }
+            .listSectionSpacing(Spacing.xl)
 
             if model.looksLikeSentence {
                 sentencePicker
@@ -104,11 +78,32 @@ private struct TypingStep: View {
                 }
             } else if let word = model.savedWord, model.text.isEmpty {
                 Section { RelatedWords(word: word, title: Text("Related to “\(word)”")) }
+                if !hasWidget, Date.now.timeIntervalSince1970 >= widgetHintSnoozedUntil { widgetHint }
+            } else if model.text.isEmpty {
+                // Same hint as Home's empty state; gap to the field equals the side margins.
+                Section {
+                    FirstRunCard()
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+                .listSectionSpacing(Spacing.xl)
             }
         }
         .listStyle(.insetGrouped)
+        .contentMargins(.horizontal, Spacing.xl, for: .scrollContent)
         .onAppear { focused = true }
+        .task { hasWidget = !((try? await WidgetCenter.shared.currentConfigurations()) ?? []).isEmpty }
         .onChange(of: model.text) { chipRange = nil }
+    }
+
+    /// After a save, while the Home Screen has no ToriWords widget.
+    private var widgetHint: some View {
+        Section {
+            WidgetHint { widgetHintSnoozedUntil = Date.now.addingTimeInterval(24 * 60 * 60).timeIntervalSince1970 }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+        }
+        .listSectionSpacing(Spacing.xl)
     }
 
     private func completionRow(_ c: Completion) -> some View {
@@ -173,8 +168,10 @@ private struct TypingStep: View {
 
 // MARK: Preview
 
-private struct PreviewStep: View {
+/// Pushed from typing; Save pops back to it.
+struct PreviewStep: View {
     @Bindable var model: AddModel
+    @Environment(\.dismiss) private var dismiss
     @Environment(AppEnvironment.self) private var env
     @Environment(Router.self) private var router
     @State private var allTags: [TagRow] = []
@@ -243,6 +240,24 @@ private struct PreviewStep: View {
             }
         }
         .listStyle(.insetGrouped)
+        .background(Palette.background)
+        .navigationTitle(Text("Add"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Save") {
+                    model.save()
+                    if model.errorMessage == nil { dismiss() }
+                }
+                .fontWeight(.semibold).disabled(!model.canSave)
+            }
+        }
+        .alert(Text("Something went wrong"), isPresented: Binding(get: { model.errorMessage != nil },
+                                                                 set: { if !$0 { model.errorMessage = nil } })) {
+            Button("OK") {}
+        } message: {
+            Text(verbatim: model.errorMessage ?? "")
+        }
         .task {
             allTags = (try? env.store?.read { try $0.allTags() }) ?? []
             tagCounts = (try? env.store?.read { try $0.tagCounts() }) ?? [:]

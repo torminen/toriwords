@@ -8,6 +8,7 @@ import ToriUI
 /// Words select mode belong to their screens; Review is a full-screen cover (`Router.isReviewPresented`).
 enum Route: Hashable {
     case add(text: String?)
+    case addPreview(AddModel)
     case words(WordsQuery)
     case entry(ToriID)
     case entryEdit(ToriID)
@@ -22,6 +23,7 @@ enum Route: Hashable {
     case export
     case tags
     case about
+    case widget
 }
 
 @MainActor @Observable
@@ -59,6 +61,7 @@ struct RouteView: View {
     private func destination(_ store: ToriStore) -> some View {
         switch route {
         case .add(let text): AddView(store: store, initialText: text)
+        case .addPreview(let model): PreviewStep(model: model)
         case .words(let q): WordsView(store: store, query: q)
         case .entry(let id): EntryView(store: store, id: id)
         case .entryEdit(let id): EntryView(store: store, id: id, editOnly: true)
@@ -73,6 +76,7 @@ struct RouteView: View {
         case .export: ExportView(store: store)
         case .tags: TagsView(store: store)
         case .about: AboutView()
+        case .widget: WidgetView()
         }
     }
 }

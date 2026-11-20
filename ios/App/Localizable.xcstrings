@@ -724,6 +724,17 @@
         }
       }
     },
+    "Add the ToriWords widget" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте виджет ToriWords"
+          }
+        }
+      }
+    },
     "A–Z" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1603,17 +1614,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отменить изменения?"
-          }
-        }
-      }
-    },
-    "Discard this word?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не сохранять это слово?"
           }
         }
       }
@@ -3472,6 +3472,17 @@
         }
       }
     },
+    "Today's cards on your Home Screen: touch and hold an empty area, tap Edit → Add Widget, then find ToriWords." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Карточки на сегодня — прямо на экране «Домой»: нажмите и удерживайте пустое место, затем «Править» → «Добавить виджет» и найдите ToriWords."
+          }
+        }
+      }
+    },
     "Top sources" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4005,6 +4016,17 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Widget" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виджет"
           }
         }
       }

@@ -31,7 +31,7 @@ struct HomeView: View {
         }
         .background(Palette.background)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) { BrandHeader() }
+            ToolbarItem(placement: .topBarLeading) { BrandHeader() }.hidingSharedBackground()
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button("Words") { router.push(.words(WordsQuery())) }
                 Button { router.push(.settings) } label: { Image(systemName: "gearshape") }

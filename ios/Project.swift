@@ -13,6 +13,9 @@ let settings = Settings.settings(
         // Off, against Xcode 27's recommendation: keys like "Add a word" / "Add a word…" map to one symbol and fail
         // the build, and the app uses Text("…") literals, not generated symbols.
         "STRING_CATALOG_GENERATE_SYMBOLS": "NO",
+        // Off: the string catalogs are edited by hand (all keys "manual"). Xcode 27's extraction rewrote them on every
+        // build and added untranslated "%@" duplicates of the "%lld" keys the app actually looks up.
+        "SWIFT_EMIT_LOC_STRINGS": "NO",
     ],
     configurations: [
         .debug(name: .debug, xcconfig: "Config/Shared.xcconfig"),

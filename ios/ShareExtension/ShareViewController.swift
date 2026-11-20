@@ -8,8 +8,9 @@ final class ShareViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let items = extensionContext?.inputItems.compactMap { $0 as? NSExtensionItem } ?? []
-        Task { @MainActor in
+        Task { @MainActor [weak self] in
             let payload = await Self.payload(from: items)
+            guard let self else { return }
             let model = ShareModel(payload: payload, group: AppGroup.shared) { [weak self] saved in
                 if saved { self?.extensionContext?.completeRequest(returningItems: nil) }
                 else { self?.extensionContext?.cancelRequest(withError: CocoaError(.userCancelled)) }

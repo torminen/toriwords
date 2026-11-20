@@ -87,7 +87,7 @@ struct SettingsView: View {
     }
 }
 
-func openAppSettings() {
+@MainActor func openAppSettings() {
     if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
 }
 

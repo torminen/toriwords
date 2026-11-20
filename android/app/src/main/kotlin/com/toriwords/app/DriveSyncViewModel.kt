@@ -43,7 +43,10 @@ class DriveSyncViewModel(
     private val api: DriveApi,
     private val driveAvailable: Boolean,
     private val actions: CoroutineScope,
-    private val revokeAccess: suspend (accountLabel: String?) -> Unit = {},
+    /** Revokes the drive.appdata grant of the account with this email (null = unknown, nothing to revoke). */
+    private val revokeAccess: suspend (email: String?) -> Unit = {},
+    /** Email of the granted account, memory only; read before Turn off clears it. */
+    private val accountEmail: () -> String? = { null },
     private val now: () -> Long = System::currentTimeMillis,
 ) : ViewModel() {
     private val dialog = MutableStateFlow<DriveSyncDialog?>(null)
@@ -62,10 +65,10 @@ class DriveSyncViewModel(
 
     fun onTurnOffConfirmed() {
         dialog.value = null
-        val label = controller.status.value.accountLabel
+        val email = accountEmail()
         actions.launch {
             controller.turnOff()
-            revokeAccess(label)
+            revokeAccess(email)
         }
     }
 

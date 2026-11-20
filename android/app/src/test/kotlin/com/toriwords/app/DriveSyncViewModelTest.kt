@@ -36,7 +36,7 @@ class DriveSyncViewModelTest {
     @After fun tearDown() = Dispatchers.resetMain()
 
     private fun vm(driveAvailable: Boolean = true) = DriveSyncViewModel(
-        controller, FakeApi, driveAvailable, actions, revokeAccess = { revoked += it }, now = { NOW },
+        controller, FakeApi, driveAvailable, actions, revokeAccess = { revoked += it }, accountEmail = { "ann@example.com" }, now = { NOW },
     )
 
     private fun DriveSyncViewModel.ui() = state.value
@@ -142,8 +142,8 @@ class DriveSyncViewModelTest {
         assertEquals(0, controller.turnOffs)
     }
 
-    @Test fun turnOffConfirmedTurnsOffAndRevokesTheShownAccount() {
-        controller.status.value = SyncStatus(SyncPhase.Idle, null, "ann@example.com", null, 0)
+    @Test fun turnOffConfirmedTurnsOffAndRevokesByEmailNotDisplayName() {
+        controller.status.value = SyncStatus(SyncPhase.Idle, null, "Ann Example", null, 0)
         val vm = vm()
         vm.onTurnOffClicked()
         vm.onTurnOffConfirmed()

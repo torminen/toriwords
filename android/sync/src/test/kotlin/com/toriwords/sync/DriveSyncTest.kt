@@ -195,6 +195,35 @@ class DriveSyncTest {
         assertTrue(drive.files("alice").any { it.file.id == future.id && it.bytes.contentEquals(byteArrayOf(1, 2, 3)) })
     }
 
+    @Test fun pageTokenAdvancesWhenNewerLayoutFileIsLastChange() = runBlocking {
+        val a = device("A", "run")
+        a.turnOn("alice")
+        val b = device("B", "walk")
+        b.turnOn("alice")
+        tick()
+        drive.put(
+            "alice", "b-x-1.json.gz",
+            mapOf("layout" to "2", "generation" to generation(), "kind" to DriveFormat.BATCH, "deviceId" to "00000000000000ee", "seq" to "1", "part" to "0"),
+            byteArrayOf(1, 2, 3),
+        )
+        val before = a.store.syncState(SyncStateKey.PAGE_TOKEN)
+        tick()
+        a.sync()
+        assertEquals(2, a.store.liveEntryCount())
+        assertNotEquals(before, a.store.syncState(SyncStateKey.PAGE_TOKEN))
+        drive.calls.clear()
+        tick()
+        a.sync()
+        assertFalse("nothing re-downloaded", DriveFake.Op.Download in drive.calls)
+    }
+
+    @Test fun accountEmailIsKeptInMemoryForRevocation() = runBlocking {
+        val a = device("A", "run")
+        a.turnOn("alice")
+        assertEquals("alice@example.com", a.engine.accountEmail)
+        assertEquals(SyncPhase.Idle, a.phase)
+    }
+
     @Test fun expiredPageTokenFallsBackToNilTokenFetch() = runBlocking {
         val a = device("A", "run")
         a.turnOn("alice")

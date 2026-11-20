@@ -171,13 +171,14 @@ internal class DriveCloud(
 
     /** Applies one file in chunks of ≤ [applyChunk] envelopes; `token` is stored with its last chunk. */
     private suspend fun applyFile(f: DriveFile, token: String?) {
-        if (f.layout != DriveFormat.LAYOUT) return
-        if (isStray(f)) return deleteIgnoringMissing(f.id)
-        val body = download(f.id)
-        if (body == null) {
-            if (token != null) store.setSyncState(mapOf(SyncStateKey.PAGE_TOKEN to token))
-            return
+        // Files that are never applied (newer layout, strays, gone) still advance the page token when last in a page.
+        val skip: suspend () -> Unit = { if (token != null) store.setSyncState(mapOf(SyncStateKey.PAGE_TOKEN to token)) }
+        if (f.layout != DriveFormat.LAYOUT) return skip()
+        if (isStray(f)) {
+            deleteIgnoringMissing(f.id)
+            return skip()
         }
+        val body = download(f.id) ?: return skip()
         val records = body.records()
         val unknown = records.size != body.raw.size || records.any { it.type !in KNOWN_TYPES }
         val index = DriveFileIndex(f.indexed(applied = true, hasUnknown = unknown), DriveFileOwner.of(f.id, records))

@@ -21,7 +21,8 @@ class MainActivity : ComponentActivity() {
                     api = app.driveApi,
                     driveAvailable = app.authorizer.isAvailable(),
                     actions = app.appScope,
-                    revokeAccess = { label -> app.authorizer.revoke(label) },
+                    revokeAccess = { email -> app.authorizer.revoke(email) },
+                    accountEmail = { app.syncEngine.accountEmail },
                 )
             }
         }

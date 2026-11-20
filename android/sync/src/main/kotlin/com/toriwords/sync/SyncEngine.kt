@@ -61,6 +61,10 @@ class SyncEngine(
     private var backoffAttempt = 0
     private var retryJob: Job? = null
 
+    /** Email of the granted account, memory only (never persisted); needed to revoke the grant on Turn off. */
+    @Volatile var accountEmail: String? = null
+        private set
+
     /** The state from storage alone. Call once after `ToriStore.launch`. */
     suspend fun start() {
         val lastSyncAt = store.syncState(SyncStateKey.LAST_SYNC_AT)?.toLongOrNull()
@@ -88,6 +92,8 @@ class SyncEngine(
         } finally {
             running.unlock()
         }
+        // A trigger that lost tryLock between the last `rerun` read and unlock would otherwise be dropped.
+        rerun?.let { (t, fg) -> sync(t, fg) }
     }
 
     override suspend fun turnOn(api: DriveApi) {
@@ -99,6 +105,7 @@ class SyncEngine(
             val account = accountHash(user)
             // An explicit Turn-on is the only place an account switch (silent merge into that Drive) happens.
             if (store.syncState(SyncStateKey.DRIVE_ACCOUNT) != account) store.activateDrive(account)
+            accountEmail = user.emailAddress
             _status.update { it.copy(accountLabel = user.displayName ?: user.emailAddress) }
         } catch (e: CancellationException) {
             throw e
@@ -155,6 +162,7 @@ class SyncEngine(
             check()
             // A silent token never switches accounts: a different account outside Turn-on needs the user.
             if (accountHash(user) != stored) return needsResolution(foreground)
+            accountEmail = user.emailAddress
             if (foreground) _status.update { it.copy(accountLabel = user.displayName ?: user.emailAddress) }
             set(SyncPhase.Syncing)
             store.syncState(SyncStateKey.LAST_SERVER_TIME)?.toLongOrNull()?.let { store.recoverClockAhead(it) }

@@ -53,8 +53,9 @@ public struct DailyQueue: Hashable, Sendable {
     public var catchUp: Bool
     public var normalLoad: Int
     public var homeState: HomeState
-    /// Distinct Cards with a rated log today (Progress → Today).
-    public var cardsAnsweredToday: Int
+    /// Distinct Cards of active Entries with a rated log today (Progress → Today, practice), in Entry order.
+    public var answeredToday: [ToriID]
+    public var cardsAnsweredToday: Int { answeredToday.count }
     /// |introducedToday|: Entries with no rated log before today and at least one today.
     public var introducedToday: Int
     /// "Learn more new words" is offered: a New Entry is left untaken and `newWordsPerDay > 0`.
@@ -167,7 +168,7 @@ public struct DailyQueue: Hashable, Sendable {
             : !answeredToday.isEmpty ? .allDone
             : .nothingDue
         return DailyQueue(reviews: reviews, new: new, reshow: reshow, waiting: waiting.count, catchUp: catchUp,
-                          normalLoad: normalLoad, homeState: home, cardsAnsweredToday: answeredToday.count,
+                          normalLoad: normalLoad, homeState: home, answeredToday: answeredToday.map(\.id),
                           introducedToday: introducedToday, canLearnMore: newEntryLeft && newWordsPerDay > 0)
     }
 }

@@ -8,6 +8,7 @@ import ToriUI
 struct ReviewView: View {
     let store: ToriStore
     @Environment(AppEnvironment.self) private var env
+    @Environment(Router.self) private var router
     @State private var model: ReviewModel?
     @State private var path: [Route] = []
 
@@ -23,7 +24,7 @@ struct ReviewView: View {
         .overlay(alignment: .bottom) { UndoToast().animation(.default, value: env.deletion.current) }
         .task {
             guard model == nil else { return }
-            let m = ReviewModel(store: store, env: env)
+            let m = ReviewModel(store: store, env: env, isPractice: router.isPractice)
             model = m
             m.start()
         }
@@ -52,6 +53,10 @@ private struct ReviewContent: View {
             case .nothingDue(let next, let canLearnMore):
                 Finished(title: Text("Nothing to review today"), detail: nil, next: next, canLearnMore: canLearnMore,
                          model: model, done: close)
+            case .practiceDone(let summary):
+                Finished(title: Text("Practice done"),
+                         detail: Text("\(summary.reviewed) cards · \(summary.remembered) remembered"),
+                         next: nil, canLearnMore: false, model: model, done: close)
             case .nothingAdded:
                 Spacer()
                 EmptyStateView(title: Text("Add words to start reviewing"), actionTitle: Text("Add a word")) {
@@ -78,9 +83,12 @@ private struct ReviewContent: View {
     private var header: some View {
         ZStack {
             if case .card = model.screen {
-                Text(verbatim: "\(model.position) / \(model.total)")
-                    .font(Typography.secondary).foregroundStyle(Palette.textSecondary)
-                    .accessibilityLabel(Text("Card \(model.position) of \(model.total)"))
+                Group {
+                    if model.isPractice { Text("Practice · \(model.position) / \(model.total)") }
+                    else { Text(verbatim: "\(model.position) / \(model.total)") }
+                }
+                .font(Typography.secondary).foregroundStyle(Palette.textSecondary)
+                .accessibilityLabel(Text("Card \(model.position) of \(model.total)"))
             }
             HStack(spacing: Spacing.l) {
                 Button(action: close) { Image(systemName: "xmark") }
@@ -116,10 +124,21 @@ private struct CardSession: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var dragX: CGFloat = 0
     @State private var demoX: CGFloat = 0
+    /// The answered card is flying off; further swipes and taps on the grade buttons are ignored until it is gone.
+    @State private var isFlying = false
+    /// Decided by the first movement of a drag: only a horizontal drag moves the card; a vertical one scrolls the back.
+    @State private var isHorizontalDrag: Bool?
 
-    private static let swipeThreshold: CGFloat = 100
-    /// Swipes starting this close to the leading edge are the system Back gesture, not a grade.
-    private static let edgeInset: CGFloat = 24
+    /// The card tilts one degree per this many points of drag.
+    static let pointsPerDegree: CGFloat = 15
+    /// Released at this tilt or more, the card grades; less, it springs back upright.
+    static let gradeAngle: Double = 10
+    static func angle(_ x: CGFloat) -> Double { Double(x / pointsPerDegree) }
+    /// Far enough that the tilted card is fully off screen.
+    private static let flyOffDistance: CGFloat = 1000
+    /// One spring for springing back, flying off and the next card growing in.
+    private static let springDuration = 0.35
+    private static let springBounce = 0.4
 
     var body: some View {
         let x = dragX + demoX
@@ -129,14 +148,21 @@ private struct CardSession: View {
             } back: {
                 CardBack(model: model, content: content)
             }
+            // Inside the offset and rotation, so the label travels and tilts with the card.
+            // One label per side, always present: switching one label's side as x crosses 0 (the spring back
+            // overshoots) would slide it across the card.
+            .overlay(alignment: .leading) { SwipeLabel(rating: .remembered, x: x) }
+            .overlay(alignment: .trailing) { SwipeLabel(rating: .forgot, x: x) }
             .offset(x: x)
-            .rotationEffect(.degrees(Double(x / 25)))
-            .overlay(alignment: .bottom) { SwipeLabel(x: x).padding(.bottom, Spacing.xl) }
+            .rotationEffect(.degrees(Self.angle(x)))
             .contentShape(Rectangle())
             .onTapGesture { model.flip() }
-            .gesture(drag, including: model.isFlipped ? .all : .subviews)
+            // Simultaneous: the back's ScrollView would otherwise take drags that start on its content.
+            .simultaneousGesture(drag, including: model.isFlipped ? .all : .subviews)
             .accessibilityAction { model.flip() }
             .id(content.card.id)
+            // The next card grows in; the answered one has already flown off screen.
+            .transition(.asymmetric(insertion: .scale(scale: 0.9).combined(with: .opacity), removal: .identity))
 
             HStack(spacing: Spacing.m) {
                 Button { grade(.forgot) } label: { Text(Strings.forgot) }
@@ -154,20 +180,40 @@ private struct CardSession: View {
     private var drag: some Gesture {
         DragGesture(minimumDistance: 20, coordinateSpace: .global)
             .onChanged { v in
-                guard v.startLocation.x > Self.edgeInset else { return }
+                guard !isFlying else { return }
+                if isHorizontalDrag == nil { isHorizontalDrag = abs(v.translation.width) > abs(v.translation.height) }
+                guard isHorizontalDrag == true else { return }
                 dragX = v.translation.width
             }
             .onEnded { v in
-                guard v.startLocation.x > Self.edgeInset else { return }
-                if dragX > Self.swipeThreshold { grade(.remembered) }
-                else if dragX < -Self.swipeThreshold { grade(.forgot) }
-                else { withAnimation(.spring) { dragX = 0 } }
+                defer { isHorizontalDrag = nil }
+                guard !isFlying, isHorizontalDrag == true else { return }
+                let angle = Self.angle(dragX)
+                if angle >= Self.gradeAngle { grade(.remembered, velocity: v.velocity.width) }
+                else if angle <= -Self.gradeAngle { grade(.forgot, velocity: v.velocity.width) }
+                else { withAnimation(.spring(duration: Self.springDuration, bounce: Self.springBounce)) { dragX = 0 } }
             }
     }
 
-    private func grade(_ rating: Rating) {
-        dragX = 0
-        model.grade(rating)
+    /// Swipe and buttons alike: the card flies off screen to its side with the spring it springs back with, carrying
+    /// the finger's speed; only once it is gone does the next card grow in. `velocity`: points per second at release
+    /// (0 for the buttons, so the card accelerates from rest). Not reduced for Reduce Motion: it continues the user's
+    /// own drag (the demo and the flip are).
+    private func grade(_ rating: Rating, velocity: CGFloat = 0) {
+        guard !isFlying else { return }
+        isFlying = true
+        let target = rating == .remembered ? Self.flyOffDistance : -Self.flyOffDistance
+        // A spring's initial velocity is relative: the fraction of the remaining distance covered per second.
+        let relative = min(max(velocity / (target - dragX), 0), 8)
+        withAnimation(.interpolatingSpring(duration: Self.springDuration, bounce: 0, initialVelocity: relative)) {
+            dragX = target
+        } completion: {
+            isFlying = false
+            withAnimation(.spring(duration: Self.springDuration, bounce: Self.springBounce)) {
+                dragX = 0
+                model.grade(rating)
+            }
+        }
     }
 
     /// Once, on the first flipped card ever: nudge right (Remembered), then left (Forgot), spring back.
@@ -184,15 +230,30 @@ private struct CardSession: View {
     }
 }
 
+/// Mid-height, trailing the card: Remembered left of it while it moves right, Forgot right of it while it moves left.
+/// Grows and fades in with the tilt toward its side, fully shown at the grading angle.
 private struct SwipeLabel: View {
+    let rating: Rating
     let x: CGFloat
 
     var body: some View {
-        if x > 20 {
-            Badge(Strings.rememberedArrow, fill: Palette.successFill, ink: Palette.success).font(Typography.heading)
-        } else if x < -20 {
-            Badge(Strings.forgotArrow, fill: Palette.danger.opacity(0.15), ink: Palette.danger).font(Typography.heading)
+        let remembered = rating == .remembered
+        let angle = remembered ? CardSession.angle(x) : -CardSession.angle(x)
+        let progress = min(max(angle, 0) / CardSession.gradeAngle, 1)
+        Group {
+            if remembered {
+                Badge(Strings.rememberedArrow, fill: Palette.successFill, ink: Palette.success)
+            } else {
+                Badge(Strings.forgotArrow, fill: Palette.danger.opacity(0.15), ink: Palette.danger)
+            }
         }
+        .font(Typography.heading)
+        .scaleEffect(0.7 + 0.3 * progress)
+        .opacity(progress)
+        // Outside the card, one card padding away from its edge; it follows the card at the same tilt.
+        .alignmentGuide(remembered ? .leading : .trailing) { remembered ? $0.width + Spacing.xl : -Spacing.xl }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 }
 
@@ -281,7 +342,7 @@ private struct CardBack: View {
                 if !content.translations.isEmpty {
                     Text(verbatim: content.translations.joined(separator: ", ")).font(Typography.heading)
                 }
-                ForEach(Array(content.meanings.compactMap(\.definition).filter { !$0.isEmpty }.enumerated()), id: \.offset) {
+                ForEach(Array(content.definitions.enumerated()), id: \.offset) {
                     Text(verbatim: $0.element).font(Typography.secondary).foregroundStyle(Palette.textSecondary)
                 }
                 if let s = content.backSentence {

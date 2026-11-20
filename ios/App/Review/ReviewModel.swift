@@ -28,7 +28,14 @@ struct CardContent: Equatable {
     /// The back repeats the front's sentence, or shows the rotated one when the front had none.
     var backSentence: Sentence?
 
-    var translations: [String] { meanings.compactMap(\.translation).filter { !$0.isEmpty } }
+    /// Distinct, in Sense order: dictionary Senses often repeat one definition across translations.
+    var translations: [String] { Self.distinct(meanings.compactMap(\.translation)) }
+    var definitions: [String] { Self.distinct(meanings.compactMap(\.definition)) }
+
+    private static func distinct(_ values: [String]) -> [String] {
+        var seen = Set<String>()
+        return values.filter { !$0.isEmpty && seen.insert($0).inserted }
+    }
 }
 
 @MainActor @Observable
@@ -39,6 +46,7 @@ final class ReviewModel {
         case allDone(ReviewSession.Summary, nextDueInDays: Int?, canLearnMore: Bool)
         case nothingDue(nextDueInDays: Int?, canLearnMore: Bool)
         case nothingAdded
+        case practiceDone(ReviewSession.Summary)
     }
 
     private(set) var screen: Screen = .loading
@@ -55,16 +63,29 @@ final class ReviewModel {
     private var extraNewBatches = 0
     private let store: ToriStore
     private let env: AppEnvironment
+    /// Practice: today's answered cards again; answers are not stored, so the schedule does not change.
+    let isPractice: Bool
 
-    init(store: ToriStore, env: AppEnvironment) {
+    init(store: ToriStore, env: AppEnvironment, isPractice: Bool = false) {
         self.store = store
         self.env = env
+        self.isPractice = isPractice
     }
 
     // MARK: Lifecycle
 
     func start() {
         env.activeReview = self
+        if isPractice {
+            do {
+                let ids = try store.read { try $0.dailyQueue(now: Now.ms, utcOffsetMin: Now.utcOffsetMin) }.answeredToday
+                session = ReviewSession(cards: try cards(ids.shuffled()), newEntries: [], reshowsForgot: false)
+                showCurrent()
+            } catch {
+                fail(error)
+            }
+            return
+        }
         do {
             let (queue, newEntries) = try store.read { r in
                 (try r.dailyQueue(now: Now.ms, utcOffsetMin: Now.utcOffsetMin), try Self.newEntries(r))
@@ -191,6 +212,10 @@ final class ReviewModel {
 
     private func finish() {
         commitPending()
+        if isPractice {
+            screen = .practiceDone(session.summary)
+            return
+        }
         do {
             let queue = try store.read { try $0.dailyQueue(now: Now.ms, utcOffsetMin: Now.utcOffsetMin) }
             let next = try nextDueInDays()
@@ -205,6 +230,7 @@ final class ReviewModel {
     }
 
     private func commit(_ a: ReviewSession.Answer) {
+        guard !isPractice else { return }
         perform {
             try store.commitAnswer(card: a.card.id, rating: a.rating, reviewedAt: a.reviewedAt, utcOffsetMin: a.utcOffsetMin,
                                    answerMs: a.answerMs)

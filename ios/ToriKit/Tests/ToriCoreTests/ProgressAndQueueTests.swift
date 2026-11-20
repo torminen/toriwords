@@ -64,6 +64,14 @@ private func review(_ card: QueueCard, _ day: Int, _ rating: Rating, n: UInt64) 
     #expect(t == ProgressStats.Today(cardsReviewed: 2, toReview: 1, new: 0, newWordsIntroduced: 1))
 }
 
+@Test func answeredTodayListsTodaysCardsOfActiveEntries() {
+    let e1 = entry(1, created: today - 5), e2 = entry(2, created: today - 5), paused = entry(3, created: today - 5, active: false)
+    let logs = [review(e1.cards[0], today - 3, .remembered, n: 1), review(e2.cards[0], today, .forgot, n: 2),
+                review(e2.cards[0], today, .remembered, n: 3), review(paused.cards[0], today, .remembered, n: 4)]
+    let q = DailyQueue.build(entries: [e1, e2, paused], logs: logs, today: today, newWordsPerDay: 10)
+    #expect(q.answeredToday == [e2.cards[0].id])
+}
+
 @Test func progressVocabulary() {
     let v = ProgressStats.vocabulary([.active(.new), .active(.learning), .active(.learning), .active(.knownWell), .alreadyKnown, .paused])
     #expect(v == ProgressStats.Vocabulary(new: 1, learning: 2, knownWell: 1, alreadyKnown: 1, paused: 1))

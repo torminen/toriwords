@@ -46,14 +46,22 @@ struct ProgressScreen: View {
     private func content(_ s: ProgressSummary) -> some View {
         List {
             Section {
-                HStack(spacing: Spacing.s) {
-                    Tile(value: s.today.cardsReviewed, label: Text("reviewed"))
-                    Tile(value: s.today.toReview + s.today.new, label: Text("still due"))
-                    Tile(value: s.today.newWordsIntroduced, label: Text("new words"))
+                // One row: a second List row would sit flush against the tiles with a separator between them.
+                VStack(spacing: Spacing.s) {
+                    HStack(spacing: Spacing.s) {
+                        Tile(value: s.today.cardsReviewed, label: Text("reviewed"))
+                        Tile(value: s.today.toReview + s.today.new, label: Text("still due"))
+                        Tile(value: s.today.newWordsIntroduced, label: Text("new words"))
+                    }
+                    if s.today.cardsReviewed > 0 {
+                        Button("Practice today's words") { router.openPractice() }.buttonStyle(.toriSecondary)
+                    }
                 }
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
-            } header: { Text("Today") }
+            } header: { Text("Today") } footer: {
+                if s.today.cardsReviewed > 0 { Text("Doesn't change your schedule.") }
+            }
 
             Section {
                 vocabularyRow(Text(Strings.stageNew), s.vocabulary.new, .new)

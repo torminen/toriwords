@@ -38,11 +38,14 @@ public struct ReviewSession: Sendable {
     private var beforePending: [Card] = []
     private var committed: [Answer] = []
     private let newEntries: Set<ToriID>
+    private let reshowsForgot: Bool
 
     /// `newEntries`: Entries with no rated log before the session started.
-    public init(cards: [Card], newEntries: Set<ToriID>) {
+    /// `reshowsForgot: false` (practice) shows every card once: Forgot does not bring it back.
+    public init(cards: [Card], newEntries: Set<ToriID>, reshowsForgot: Bool = true) {
         remaining = cards
         self.newEntries = newEntries
+        self.reshowsForgot = reshowsForgot
     }
 
     public var current: Card? { remaining.first }
@@ -59,7 +62,7 @@ public struct ReviewSession: Sendable {
         let toCommit = flush()
         beforePending = remaining
         remaining.removeFirst()
-        if rating == .forgot {
+        if rating == .forgot && reshowsForgot {
             remaining.insert(card, at: min(Self.reshowGap, remaining.count))
         }
         pending = Answer(card: card, rating: rating, reviewedAt: now, utcOffsetMin: utcOffsetMin,

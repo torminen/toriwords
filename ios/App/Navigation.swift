@@ -22,6 +22,7 @@ enum Route: Hashable {
     case export
     case tags
     case about
+    case widget
 }
 
 @MainActor @Observable
@@ -73,6 +74,7 @@ struct RouteView: View {
         case .export: ExportView(store: store)
         case .tags: TagsView(store: store)
         case .about: AboutView()
+        case .widget: WidgetView()
         }
     }
 }

@@ -47,6 +47,7 @@ struct SettingsView: View {
                         Button("Open iOS Settings ›", action: openAppSettings)
                     }
                 }
+                DrillRow(title: Text("Widget"), value: nil) { router.push(.widget) }
             } header: { Text("Reminders") }
 
             Section {

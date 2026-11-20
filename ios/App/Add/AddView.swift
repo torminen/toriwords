@@ -84,7 +84,8 @@ private struct TypingStep: View {
     @Environment(Router.self) private var router
     @FocusState private var focused: Bool
     @State private var chipRange: ClosedRange<Int>?
-    @AppStorage("widgetHintDismissed") private var widgetHintDismissed = false
+    /// "Not now" on the widget hint hides it for a day (seconds since 1970).
+    @AppStorage("widgetHintSnoozedUntil") private var widgetHintSnoozedUntil: Double = 0
     @State private var hasWidget = true
 
     var body: some View {
@@ -115,7 +116,7 @@ private struct TypingStep: View {
                 }
             } else if let word = model.savedWord, model.text.isEmpty {
                 Section { RelatedWords(word: word, title: Text("Related to “\(word)”")) }
-                if !hasWidget, !widgetHintDismissed { widgetHint }
+                if !hasWidget, Date.now.timeIntervalSince1970 >= widgetHintSnoozedUntil { widgetHint }
             } else if model.text.isEmpty {
                 // Same hint as Home's empty state; gap to the field equals the side margins.
                 Section {
@@ -136,10 +137,7 @@ private struct TypingStep: View {
     /// After a save, while the Home Screen has no ToriWords widget.
     private var widgetHint: some View {
         Section {
-            Banner(.tip, title: Text("Add the ToriWords widget"),
-                   message: Text("Today's cards on your Home Screen: touch and hold an empty area, tap Edit → Add Widget, then find ToriWords.")) {
-                Button("Not now") { widgetHintDismissed = true }.buttonStyle(.borderless)
-            }
+            WidgetHint { widgetHintSnoozedUntil = Date.now.addingTimeInterval(24 * 60 * 60).timeIntervalSince1970 }
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
         }

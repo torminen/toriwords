@@ -4031,6 +4031,17 @@
         }
       }
     },
+    "Widget" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виджет"
+          }
+        }
+      }
+    },
     "Word or phrase" : {
       "extractionState" : "manual",
       "localizations" : {

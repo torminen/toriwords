@@ -128,6 +128,8 @@ private struct CardSession: View {
     @State private var isFlying = false
     /// Decided by the first movement of a drag: only a horizontal drag moves the card; a vertical one scrolls the back.
     @State private var isHorizontalDrag: Bool?
+    /// What releasing the drag now would grade: set past `gradeAngle`, nil while the card would spring back.
+    @State private var armed: Rating?
 
     /// The card tilts one degree per this many points of drag.
     static let pointsPerDegree: CGFloat = 15
@@ -184,13 +186,18 @@ private struct CardSession: View {
                 if isHorizontalDrag == nil { isHorizontalDrag = abs(v.translation.width) > abs(v.translation.height) }
                 guard isHorizontalDrag == true else { return }
                 dragX = v.translation.width
+                let angle = Self.angle(dragX)
+                let now: Rating? = angle >= Self.gradeAngle ? .remembered : angle <= -Self.gradeAngle ? .forgot : nil
+                guard now != armed else { return }
+                // A firm detent as the release starts to count, a soft one as it stops counting.
+                if now != nil { UIImpactFeedbackGenerator(style: .rigid).impactOccurred() }
+                else { UIImpactFeedbackGenerator(style: .soft).impactOccurred(intensity: 0.6) }
+                armed = now
             }
             .onEnded { v in
-                defer { isHorizontalDrag = nil }
+                defer { isHorizontalDrag = nil; armed = nil }
                 guard !isFlying, isHorizontalDrag == true else { return }
-                let angle = Self.angle(dragX)
-                if angle >= Self.gradeAngle { grade(.remembered, velocity: v.velocity.width) }
-                else if angle <= -Self.gradeAngle { grade(.forgot, velocity: v.velocity.width) }
+                if let armed { grade(armed, velocity: v.velocity.width) }
                 else { withAnimation(.spring(duration: Self.springDuration, bounce: Self.springBounce)) { dragX = 0 } }
             }
     }

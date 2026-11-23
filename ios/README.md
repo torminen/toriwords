@@ -31,6 +31,77 @@ xcodebuild build -workspace Toriwords.xcworkspace -scheme Toriwords -configurati
   -destination "generic/platform=iOS Simulator" CODE_SIGNING_ALLOWED=NO
 ```
 
+## Architecture
+
+Offline-first, no backend. Each user's data lives in a local SQLite database and syncs through their iCloud private
+database. The app target is a thin layer of screens and platform glue; the logic lives in the ToriKit package, split
+into modules with dependencies declared in `ToriKit/Package.swift`.
+
+```mermaid
+flowchart TB
+    subgraph Processes["iOS processes"]
+        App["App (Toriwords)<br/>SwiftUI screens, @Observable models,<br/>AppEnvironment, Router, Platform/"]
+        Share["ShareExtension<br/>capture sheet"]
+        Widget["WidgetExtension"]
+    end
+    Group[("App Group<br/>inbox files, vocab index,<br/>widget-snapshot.json")]
+    Share -- "writes inbox" --> Group
+    Group -- "imports inbox" --> App
+    App -- "writes snapshot" --> Group
+    Group -- "reads snapshot" --> Widget
+
+    subgraph ToriKit
+        UI[ToriUI]
+        Core["ToriCore<br/>pure domain"]
+        Shared[ToriShared]
+        Dict[ToriDictionary]
+        Store[ToriStore]
+        Sync["ToriSync<br/>actor SyncEngine"]
+        Enrich[ToriEnrichment]
+    end
+    App --> UI & Store & Sync & Enrich & Dict & Shared
+    UI --> Core
+    Shared --> Core
+    Dict --> Core
+    Store --> Core & Shared
+    Sync --> Store
+    Enrich --> Dict & Store
+
+    Dict --- DictDB[("dictionary.sqlite<br/>read-only, in the bundle")]
+    Store --- UserDB[("user.sqlite<br/>GRDB")]
+    Sync <--> Cloud[("iCloud private database<br/>CloudKit")]
+```
+
+The extensions link only ToriCore, ToriShared, ToriDictionary and ToriUI, and never open the database: the Share
+Extension drops a file into the App Group inbox and the app imports it; the widget reads a JSON snapshot the app writes.
+
+| Module | What it holds |
+|---|---|
+| App (Toriwords) | SwiftUI screens with one `@MainActor @Observable` model each, `AppEnvironment` (composition root, passed through `@Environment`), `Router`, `Platform/` (sync coordinator, reminders, config) |
+| ShareExtension | Capture sheet → App Group inbox |
+| WidgetExtension | Reads `widget-snapshot.json` from the App Group |
+| ToriCore | Pure domain, no UI or storage: IDs, HLC, merge, text keys, capture rules, FSRS scheduler, daily queue, widget snapshot, reminder plan. Builds and tests on Linux |
+| ToriShared | App Group layout, inbox files, vocab index, deep links, Darwin notification |
+| ToriDictionary | `dictionary.sqlite`, read in place from the app bundle (`immutable=1`) |
+| ToriStore | `user.sqlite` on GRDB (`DatabasePool`, WAL): records, outbox, sync apply, queries observed by the UI, backup and export |
+| ToriSync | `SyncEngine` (an actor) over the `CloudDatabase` protocol; `CloudKitDatabase` is the iCloud adapter, tests use an in-memory cloud |
+| ToriEnrichment | On-device translation (Apple Translation), dictionary lookup, enrichment orchestrator, speech (AVFoundation) |
+| ToriUI | Design tokens and shared SwiftUI components |
+
+### Technologies
+
+- **Language and UI:** Swift 6 with complete strict concurrency, SwiftUI, Observation, Swift Charts. iOS 18+, built
+  with the iOS 27 SDK.
+- **Storage:** GRDB over SQLite. The only third-party runtime dependency, plus swift-crypto on Linux in place of
+  CryptoKit.
+- **Apple frameworks:** CloudKit, Translation, AVFoundation, UserNotifications, BackgroundTasks, WidgetKit,
+  CoreHaptics, CryptoKit.
+- **Build:** Tuist generates the project; ToriKit modules link as static frameworks (`Tuist/Package.swift`); settings
+  come from xcconfig files (Debug, Release, Personal).
+- **Tests:** Swift Testing, with parity fixtures shared with Android (`spec/fixtures`).
+- **Tools:** Python with uv builds the dictionary from Wiktionary and validates the fixtures (`tools/`).
+- **CI:** GitHub Actions: ToriKit on the iOS Simulator and on Linux, the app build, the Python tools.
+
 ## ToriKit tests
 
 On a Mac (iOS Simulator, all test targets including `ToriUITests`):
@@ -145,26 +216,6 @@ dictionary work. It installs next to the full app under its own bundle ID, and X
 3. `tools/dictionary/fetch.sh` (full dictionary; without it the build uses the sample), then `tuist generate`.
 4. Run the `Toriwords-Personal` scheme on the iPhone. On the phone: turn on Developer Mode, and after the first install
    trust the developer profile (Settings → General → VPN & Device Management).
-
-## Module map
-
-```
-App (Toriwords)      SwiftUI screens, AppEnvironment (composition root), Router, Platform/ (sync, reminders, config)
-ShareExtension       capture sheet → App Group inbox (no database access)
-WidgetExtension      reads widget-snapshot.json from the App Group
-ToriKit/
-  ToriCore           pure domain: IDs, HLC, merge, text keys, capture rules, FSRS scheduler, daily queue, widget snapshot,
-                     reminder plan
-  ToriShared         App Group layout, inbox files, vocab index, deep links, Darwin notification
-  ToriDictionary     read-only dictionary.sqlite, read in place from the app bundle
-  ToriStore          user.sqlite (GRDB): records, outbox, sync apply, queries, backup
-  ToriSync           SyncEngine, CloudDatabase protocol, CloudKit adapter (iCloud private database)
-  ToriEnrichment     on-device translation, dictionary lookup, enrichment orchestrator, speech
-  ToriUI             design tokens and shared SwiftUI components
-```
-
-Allowed dependencies are declared in `ToriKit/Package.swift`. The extensions link only ToriCore,
-ToriShared, ToriDictionary and ToriUI.
 
 ## Specs and fixtures
 

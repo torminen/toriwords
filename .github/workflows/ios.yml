@@ -33,57 +33,30 @@ env:
   # setup-xcode picks the newest installed 27.x. Bump with `.swift-version`.
   XCODE_VERSION: "27"
 
-# Pull requests build and test. A push to main (the merge of a PR that already passed) runs no tests: it only builds,
-# to refresh the Xcode compilation caches (CAS) that pull requests restore. Caches saved on a PR are visible to that
-# PR only, so main is the one place a cache every PR can read gets saved. Main builds cold and saves a fresh CAS, so
-# it never grows across runs; pull requests restore the newest one and save nothing.
+# Pull requests build and test. A push to main (the merge of a PR that already passed) runs no tests: only the app
+# build, to refresh the Xcode compilation cache (CAS) that pull requests restore. Caches saved on a PR are visible to
+# that PR only, so main is the one place a cache every PR can read gets saved. Main builds cold and saves a fresh CAS,
+# so it never grows across runs; pull requests restore the newest one and save nothing.
 jobs:
+  # ToriKit tests run natively on macOS: booting an iOS Simulator on the runner took about 7 of the job's 9-10 minutes,
+  # the tests themselves about one. No build cache: a cold `swift test` is quick, and .build is close to 1 GB. The
+  # iOS-only branches (`#if canImport(UIKit)` in ToriUI and SpeechPlayer) still compile in the app build below; run
+  # `xcodebuild test -scheme ToriKit-Package` on a simulator locally (README) to execute them.
   toriKit-package:
-    name: ToriKit-Package (iOS Simulator)
+    name: ToriKit (macOS)
+    if: github.event_name != 'push'
     runs-on: xcode-27
-    timeout-minutes: 60
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
-      - name: Pick an iPhone simulator
-        id: sim
-        run: |
-          ID=$(xcrun simctl list devices available --json \
-            | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for k in sorted(d, reverse=True) if "iOS" in k for x in d[k] if x["name"].startswith("iPhone")))')
-          echo "id=$ID" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
-        with:
-          path: ~/spm-toriKit
-          key: spm-toriKit-${{ env.XCODE_VERSION }}-${{ hashFiles('ios/ToriKit/Package.resolved') }}
-      - name: Restore compilation cache
-        if: github.event_name != 'push'
-        uses: actions/cache/restore@v4
-        with:
-          path: ~/compilation-cache
-          key: cc-toriKit-${{ env.XCODE_VERSION }}-${{ github.sha }}
-          restore-keys: cc-toriKit-${{ env.XCODE_VERSION }}-
-      - name: xcodebuild test (all ToriKit test targets, incl. ToriUITests; build only on main)
+      - name: swift test
         working-directory: ios/ToriKit
         env:
-          # Passed to the test process (TEST_RUNNER_ prefix is stripped).
-          TEST_RUNNER_TORI_FIXTURES: ${{ github.workspace }}/spec/fixtures
-        run: |
-          set -o pipefail
-          xcodebuild ${{ github.event_name == 'push' && 'build-for-testing' || 'test' }} \
-            -scheme ToriKit-Package \
-            -destination "id=${{ steps.sim.outputs.id }}" \
-            -clonedSourcePackagesDirPath ~/spm-toriKit \
-            -skipMacroValidation \
-            COMPILATION_CACHE_ENABLE_CACHING=YES COMPILATION_CACHE_CAS_PATH="$HOME/compilation-cache" \
-            CODE_SIGNING_ALLOWED=NO 2>&1 | xcbeautify --renderer github-actions
-      - name: Save compilation cache
-        if: github.event_name == 'push'
-        uses: actions/cache/save@v4
-        with:
-          path: ~/compilation-cache
-          key: cc-toriKit-${{ env.XCODE_VERSION }}-${{ github.sha }}
+          TORI_FIXTURES: ${{ github.workspace }}/spec/fixtures
+        run: swift test
 
   app-build:
     name: App build (Debug, simulator)

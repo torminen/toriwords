@@ -8,10 +8,42 @@ import SwiftUI
 public struct LogoMark: View {
     public var size: CGFloat
     public var drawing: Drawing
+    public var pose: Pose
+    /// A detached leaf falling from the branch, drawn over the mark and outside its frame.
+    public var fall: Fall?
 
-    public init(size: CGFloat = 26, drawing: Drawing = .finished) {
+    public init(size: CGFloat = 26, drawing: Drawing = .finished, pose: Pose = .still, fall: Fall? = nil) {
         self.size = size
         self.drawing = drawing
+        self.pose = pose
+        self.fall = fall
+    }
+
+    /// The header's sway, in degrees (positive is clockwise): the crown (branch and leaf) turns about the stem top,
+    /// the leaf about its base on top of that, the W skews from its baseline. The stem and the gap in the W stay put.
+    public struct Pose: Equatable, Sendable {
+        public var crown: Double
+        public var leaf: Double
+        public var grass: Double
+
+        public init(crown: Double = 0, leaf: Double = 0, grass: Double = 0) {
+            self.crown = crown
+            self.leaf = leaf
+            self.grass = grass
+        }
+
+        public static let still = Pose()
+    }
+
+    /// A leaf falling from the pose it had when it came off; `progress` runs 0...1 over the fall.
+    public struct Fall: Equatable, Sendable {
+        public var progress: Double
+        public var from: Pose
+
+        public init(progress: Double, from: Pose) {
+            self.progress = progress
+            self.from = from
+        }
     }
 
     /// How far each part is drawn, 0...1 (the launch animation grows the mark in); `.finished` is the static mark.
@@ -37,26 +69,51 @@ public struct LogoMark: View {
         ZStack {
             WShape().trim(from: 0, to: drawing.w)
                 .stroke(Palette.accent, style: StrokeStyle(lineWidth: s, lineCap: .round, lineJoin: .round))
+                .transformEffect(skew(pose.grass))
             // The gap shares the stem's path and trim, so while the stem grows up it cuts the W just ahead of its tip.
             StemShape().trim(from: 0, to: drawing.stem)
                 .stroke(Color.black, style: StrokeStyle(lineWidth: s * 1.9, lineCap: .round))
                 .blendMode(.destinationOut)
             StemShape().trim(from: 0, to: drawing.stem)
                 .stroke(Palette.text, style: StrokeStyle(lineWidth: s, lineCap: .round))
-            // Both halves start at the stem top, so the branch grows out both ways at once.
-            ForEach(BranchShape.halves.indices, id: \.self) { i in
-                BranchShape.halves[i].trim(from: 0, to: drawing.bar)
-                    .stroke(Palette.text, style: StrokeStyle(lineWidth: s, lineCap: .round))
+            ZStack {
+                // Both halves start at the stem top, so the branch grows out both ways at once.
+                ForEach(BranchShape.halves.indices, id: \.self) { i in
+                    BranchShape.halves[i].trim(from: 0, to: drawing.bar)
+                        .stroke(Palette.text, style: StrokeStyle(lineWidth: s, lineCap: .round))
+                }
+                // The leaf unfolds from its base on the branch end: it grows from a tenth of its size, turning up 45°.
+                LeafShape().fill(Palette.accent)
+                    .scaleEffect(0.1 + 0.9 * drawing.leaf, anchor: LeafShape.base)
+                    .rotationEffect(.degrees(45 * (1 - drawing.leaf)), anchor: LeafShape.base)
+                    .opacity(drawing.leaf > 0 ? 1 : 0)
+                    .rotationEffect(.degrees(pose.leaf), anchor: LeafShape.base)
             }
-            // The leaf unfolds from its base on the branch end: it grows from a tenth of its size, turning up 45°.
-            LeafShape().fill(Palette.accent)
-                .scaleEffect(0.1 + 0.9 * drawing.leaf, anchor: LeafShape.base)
-                .rotationEffect(.degrees(45 * (1 - drawing.leaf)), anchor: LeafShape.base)
-                .opacity(drawing.leaf > 0 ? 1 : 0)
+            .rotationEffect(.degrees(pose.crown), anchor: UnitPoint(x: 0.5, y: BranchShape.top))
         }
         .compositingGroup()
         .frame(width: size, height: size)
+        .overlay { if let fall { falling(fall) } }
         .accessibilityHidden(true)
+    }
+
+    /// Skews the W by `degrees` about its baseline (0.90), so its tips lean and its feet stay planted.
+    private func skew(_ degrees: Double) -> CGAffineTransform {
+        let t = tan(-degrees * .pi / 180)
+        return CGAffineTransform(a: 1, b: 0, c: t, d: 1, tx: -t * size * 0.90, ty: 0)
+    }
+
+    /// Drops about 1.5 mark sizes, drifting side to side and spinning about the leaf's centre; fades over the last 40 %.
+    private func falling(_ fall: Fall) -> some View {
+        let t = min(max(fall.progress, 0), 1)
+        let sway = sin(t * .pi * 2.4)
+        return LeafShape().fill(Palette.accent)
+            .rotationEffect(.degrees(160 * t + 25 * sway), anchor: UnitPoint(x: 0.84, y: 0.12))
+            .rotationEffect(.degrees(fall.from.leaf), anchor: LeafShape.base)
+            .rotationEffect(.degrees(fall.from.crown), anchor: UnitPoint(x: 0.5, y: BranchShape.top))
+            .offset(x: size * (0.10 * t + 0.14 * sway), y: size * 1.5 * (0.35 * t * t + 0.65 * t))
+            .opacity(t < 0.6 ? 1 : 1 - (t - 0.6) / 0.4)
+            .frame(width: size, height: size)
     }
 
     private struct WShape: Shape {
@@ -113,24 +170,6 @@ public struct LogoMark: View {
             path.closeSubpath()
             return path
         }
-    }
-}
-
-/// Header layout E: 32 pt mark + 17 pt semibold "ToriWords", for the leading toolbar item (no large title).
-/// The name is never truncated; text is capped at xxxLarge so it cannot crowd the trailing items.
-public struct BrandHeader: View {
-    public init() {}
-
-    public var body: some View {
-        HStack(spacing: Spacing.s) {
-            LogoMark(size: 32)
-            Text(verbatim: "ToriWords").font(Typography.heading)
-        }
-        .fixedSize()
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: "ToriWords"))
-        .accessibilityAddTraits(.isHeader)
     }
 }
 

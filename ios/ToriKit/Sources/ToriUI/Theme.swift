@@ -9,7 +9,7 @@ import AppKit
 /// Theme tokens. Light values are the wireframe tokens; dark values are the iOS system dark equivalents
 /// (UQ-5 is open: no dark palette is drawn, the assignment asks for system semantics).
 public enum Palette {
-    public static let accent = Color.dynamic(light: 0x007AFF, dark: 0x0A84FF)
+    public static let accent = Color.dynamic(light: 0x12875A, dark: 0x2FBF7F)
     public static let background = Color.dynamic(light: 0xF2F2F7, dark: 0x000000)
     public static let surface = Color.dynamic(light: 0xFFFFFF, dark: 0x1C1C1E)
     public static let text = Color.dynamic(light: 0x000000, dark: 0xFFFFFF)
@@ -23,7 +23,7 @@ public enum Palette {
     public static let tip = Color.dynamic(light: 0xFFF4D6, dark: 0x3A3220)
 
     /// Badge and banner fills.
-    public static let infoFill = Color.dynamic(light: 0xD6E8FF, dark: 0x0A2A4D)
+    public static let infoFill = Color.dynamic(light: 0xD5EEE2, dark: 0x0C3324)
     public static let successFill = Color.dynamic(light: 0xD8F5DF, dark: 0x0F3A1C)
     public static let warningFill = Color.dynamic(light: 0xFFF0D1, dark: 0x3D2E0A)
     public static let neutralFill = Color.dynamic(light: 0xE5E5EA, dark: 0x2C2C2E)

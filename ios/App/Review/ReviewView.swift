@@ -431,7 +431,7 @@ private struct Finished: View {
             if canLearnMore {
                 Button("Learn more new words") { model.learnMore() }.buttonStyle(.toriSecondary)
             }
-            Button("Done", action: done).font(Typography.heading).frame(minHeight: 44)
+            Button("Done", action: done).buttonStyle(.toriPrimary)
         }
         .multilineTextAlignment(.center)
     }

@@ -87,15 +87,25 @@ final class ReminderScheduler: NSObject, ReminderScheduling, UNUserNotificationC
 
     // MARK: UNUserNotificationCenterDelegate
 
+    // Completion-handler forms, not `async`: in Swift 6 a nonisolated async delegate method finishes on the
+    // global executor, so the generated thunk called the system's completion handler off the main thread (tap crash).
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                            didReceive response: UNNotificationResponse) async {
+                                            didReceive response: UNNotificationResponse,
+                                            withCompletionHandler completionHandler: @escaping () -> Void) {
         let url = (response.notification.request.content.userInfo["url"] as? String).flatMap(URL.init(string:))
             ?? DeepLink.review.url
-        await MainActor.run { open(url) }
+        nonisolated(unsafe) let done = completionHandler
+        // The delivery queue is undocumented: run inline on main, otherwise hop there.
+        MainThreadHandoff.run { [self] in
+            MainActor.assumeIsolated { open(url) }
+            done()
+        }
     }
 
     /// The app is open: no banner, the user is already here.
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                            willPresent notification: UNNotification) async
-        -> UNNotificationPresentationOptions { [] }
+                                            willPresent notification: UNNotification,
+                                            withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([])
+    }
 }

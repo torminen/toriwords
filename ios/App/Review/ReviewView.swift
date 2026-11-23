@@ -91,10 +91,10 @@ private struct ReviewContent: View {
                 .accessibilityLabel(Text("Card \(model.position) of \(model.total)"))
             }
             HStack(spacing: Spacing.l) {
-                Button(action: close) { Image(systemName: "xmark") }
+                Button(action: close) { Image(systemName: "xmark").headerIcon() }
                     .accessibilityLabel(Text("Close"))
                 if model.canUndo {
-                    Button { model.undo() } label: { Image(systemName: "arrow.uturn.backward") }
+                    Button { model.undo() } label: { Image(systemName: "arrow.uturn.backward").headerIcon() }
                         .accessibilityLabel(Text("Undo last answer"))
                 }
                 Spacer()
@@ -385,7 +385,7 @@ private struct CardMenu: View {
             Button("Pause", systemImage: "pause") { model.setStatus(.paused) }
             Button("Delete", systemImage: "trash", role: .destructive) { confirmDelete = true }
         } label: {
-            Image(systemName: "ellipsis")
+            Image(systemName: "ellipsis").headerIcon()
         }
         .accessibilityLabel(Text("More"))
         .alert(Text("Delete “\(word)”?"), isPresented: $confirmDelete) {
@@ -393,6 +393,18 @@ private struct CardMenu: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("It is removed with its review history on all your devices.")
+        }
+    }
+}
+
+private extension View {
+    /// Header icon: 44pt hit target, in a Liquid Glass circle on iOS 26 like the Entry screen's toolbar.
+    @ViewBuilder func headerIcon() -> some View {
+        let sized = frame(width: 44, height: 44).contentShape(.circle)
+        if #available(iOS 26, *) {
+            sized.glassEffect(.regular.interactive(), in: .circle)
+        } else {
+            sized
         }
     }
 }

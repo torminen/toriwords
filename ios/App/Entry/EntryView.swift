@@ -44,7 +44,9 @@ struct EntryView: View {
                 if let current = draft {
                     // Not Binding($draft): its force-unwrap traps when the form re-reads after draft = nil (Cancel/Done/Delete).
                     let binding = Binding(get: { draft ?? current }, set: { if draft != nil { draft = $0 } })
-                    EntryEditForm(draft: binding, detail: detail, allTags: allTags, tagCounts: tagCounts) { confirmDelete = true }
+                    EntryEditForm(draft: binding, detail: detail, suggestions: suggestions, allTags: allTags, tagCounts: tagCounts) {
+                        confirmDelete = true
+                    }
                 } else {
                     readMode(detail)
                 }
@@ -279,7 +281,10 @@ struct EntryView: View {
 
     private func beginEditing(_ e: EntryDetail, addMeaning: Bool = false) {
         var d = EntryDraft(e)
-        if addMeaning { d.meanings.append(.init()) }
+        // Suggestions come first: a blank row only when the form has none to offer.
+        if addMeaning, unused(suggestions, in: d).isEmpty {
+            d.meanings.append(.init())
+        }
         draft = d
     }
 
@@ -385,11 +390,12 @@ enum CardLabels {
 
 // MARK: Edit mode
 
-/// Contacts-style edit form: ⊖ delete and ≡ reorder on meanings, ⊕ Add meaning / Add sentence, tags, note, IPA,
-/// Delete word.
+/// Contacts-style edit form: ⊖ delete and ≡ reorder on meanings, ⊕ suggested meanings then ⊕ Add meaning / Add sentence,
+/// tags, note, IPA, Delete word.
 private struct EntryEditForm: View {
     @Binding var draft: EntryDraft
     let detail: EntryDetail
+    let suggestions: [Suggestion]
     let allTags: [TagRow]
     let tagCounts: [ToriID: Int]
     let delete: () -> Void
@@ -418,6 +424,18 @@ private struct EntryEditForm: View {
                 }
                 .onDelete { draft.meanings.remove(atOffsets: $0) }
                 .onMove { draft.meanings.move(fromOffsets: $0, toOffset: $1) }
+                ForEach(unused(suggestions, in: draft), id: \.self) { s in
+                    Button { draft.meanings.append(.init(suggested: s.sense)) } label: {
+                        HStack {
+                            Label { Text(verbatim: s.sense.translation ?? "") } icon: {
+                                Image(systemName: "plus.circle.fill").foregroundStyle(Palette.success)
+                            }
+                            Spacer(minLength: Spacing.s)
+                            if s.isMachine { Badge(Strings.machineTranslation, fill: Palette.infoFill, ink: Palette.accent) }
+                        }
+                    }
+                    .accessibilityLabel(Text("Add meaning \(s.sense.translation ?? "")"))
+                }
                 Button { draft.meanings.append(.init()) } label: {
                     Label { Text("Add meaning") } icon: { Image(systemName: "plus.circle.fill").foregroundStyle(Palette.success) }
                 }
@@ -470,6 +488,12 @@ private struct EntryEditForm: View {
         .listStyle(.insetGrouped)
         .environment(\.editMode, .constant(.active))
     }
+}
+
+/// Suggestions not yet in the draft: removing a meaning offers it again.
+private func unused(_ suggestions: [Suggestion], in draft: EntryDraft) -> [Suggestion] {
+    let inDraft = Set(draft.meanings.map { TextKey.translationKey($0.translation) })
+    return suggestions.filter { !inDraft.contains(TextKey.translationKey($0.sense.translation ?? "")) }
 }
 
 /// Senses with the same definition and part of speech read as one meaning: dictionaries repeat a definition per

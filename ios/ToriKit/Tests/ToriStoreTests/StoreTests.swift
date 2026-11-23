@@ -577,6 +577,24 @@ func alphabeticalQueryOrder(_ c: FixtureCase) throws {
     #expect(after.tags.map(\.name) == ["money", "travel"])
 }
 
+@Test func entryDraftSuggestedMeaningKeepsProvenanceUntilEdited() throws {
+    let s = try TestStore()
+    let e = try s.store.capture(CaptureInput(term: "bank", capturedAt: t0, senses: [.tr("банк")]))
+    let detail = try #require(try s.store.read { try $0.entry(e) })
+    let dict = { (tr: String) in NewSense(translation: tr, definition: "edge of a river", partOfSpeech: "noun", source: .wiktionary,
+                                          dictVersion: "1", dictHeadwordKey: "bank", dictSenseOrdinal: 2) }
+    var d = EntryDraft(detail)
+    d.meanings.append(.init(suggested: dict("берег")))
+    var edited = EntryDraft.Meaning(suggested: dict("отмель"))
+    edited.translation = "мель"
+    d.meanings.append(edited)
+    #expect(try s.store.save(d, original: detail) == .saved)
+    let after = try #require(try s.store.read { try $0.entry(e) })
+    #expect(after.senses.map(\.translation) == ["банк", "берег", "мель"])
+    #expect(after.senses[1].translationSource == .wiktionary && after.senses[1].definition == "edge of a river")
+    #expect(after.senses[2].translationSource == .user)
+}
+
 @Test func entryDraftDuplicateTextWritesNothingUntilMergeConfirmed() throws {
     let s = try TestStore()
     let a = try s.store.capture(CaptureInput(term: "colour", capturedAt: t0, senses: [.tr("цвет")]))

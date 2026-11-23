@@ -10,6 +10,8 @@ public struct EntryDraft: Equatable, Sendable {
         public var translation: String
         public var definition: String
         public var partOfSpeech: String
+        /// The suggested meaning this row was picked from: saved as is, with its dictionary provenance, unless edited.
+        public var origin: NewSense?
 
         public init(sense: ToriID? = nil, translation: String = "", definition: String = "", partOfSpeech: String = "") {
             id = UUID()
@@ -19,12 +21,24 @@ public struct EntryDraft: Equatable, Sendable {
             self.partOfSpeech = partOfSpeech
         }
 
+        public init(suggested s: NewSense) {
+            self.init(translation: s.translation ?? "", definition: s.definition ?? "", partOfSpeech: s.partOfSpeech ?? "")
+            origin = s
+        }
+
         /// Content equality: the row identity does not count as a change.
         public static func == (a: Meaning, b: Meaning) -> Bool {
             a.sense == b.sense && a.translation == b.translation && a.definition == b.definition && a.partOfSpeech == b.partOfSpeech
         }
 
         var isBlank: Bool { [translation, definition].allSatisfy { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } }
+
+        var newSense: NewSense {
+            if let origin, (origin.translation ?? "", origin.definition ?? "", origin.partOfSpeech ?? "") == (translation, definition, partOfSpeech) {
+                return origin
+            }
+            return NewSense(translation: nonEmpty(translation), definition: nonEmpty(definition), partOfSpeech: nonEmpty(partOfSpeech))
+        }
     }
 
     /// Existing sentences can only be removed (no Context edit API); new ones are added with a typed highlight.
@@ -105,8 +119,7 @@ extension ToriStore {
                 }
                 order.append(id)
             } else if !m.isBlank {
-                order.append(try addSense(to: e.id, NewSense(translation: nonEmpty(m.translation), definition: nonEmpty(m.definition),
-                                                            partOfSpeech: nonEmpty(m.partOfSpeech))))
+                order.append(try addSense(to: e.id, m.newSense))
             }
         }
         // New Senses are appended; renumber only when the edited order differs from "kept in old order, then new".

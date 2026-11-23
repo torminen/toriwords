@@ -834,6 +834,17 @@
         }
       }
     },
+    "Add meaning %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить значение %@"
+          }
+        }
+      }
+    },
     "Add sentence" : {
       "extractionState" : "manual",
       "localizations" : {

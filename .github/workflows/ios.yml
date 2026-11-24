@@ -10,14 +10,9 @@ on:
       - "tools/dictionary/dictionary.sqlite.sha256"
       - "tools/dictionary/fetch.sh"
       - ".github/workflows/ios.yml"
+  # Every pull request runs this workflow: both jobs are required checks, and a PR that never reports them can never
+  # merge. The `changes` job skips them when the PR touches none of the paths above; a skipped job counts as passed.
   pull_request:
-    paths:
-      - "ios/**"
-      - "spec/fixtures/**"
-      - "tools/dictionary/release.json"
-      - "tools/dictionary/dictionary.sqlite.sha256"
-      - "tools/dictionary/fetch.sh"
-      - ".github/workflows/ios.yml"
   workflow_dispatch:
 
 concurrency:
@@ -38,13 +33,31 @@ env:
 # that PR only, so main is the one place a cache every PR can read gets saved. Main builds cold and saves a fresh CAS,
 # so it never grows across runs; pull requests restore the newest one and save nothing.
 jobs:
+  # Pull requests only: did the PR touch the iOS paths (the same list as `on.push.paths`)? Other events always build.
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    outputs:
+      ios: ${{ steps.diff.outputs.ios }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: diff
+        run: |
+          # A PR checks out its merge commit: the diff against its first parent is exactly the PR's change.
+          if [ "${{ github.event_name }}" != pull_request ] || git diff --name-only HEAD^1 HEAD | grep -qE \
+            '^(ios/|spec/fixtures/|tools/dictionary/(release\.json|dictionary\.sqlite\.sha256|fetch\.sh)$|\.github/workflows/ios\.yml$)'
+          then echo ios=true >> "$GITHUB_OUTPUT"; else echo ios=false >> "$GITHUB_OUTPUT"; fi
+
   # ToriKit tests run natively on macOS: booting an iOS Simulator on the runner took about 7 of the job's 9-10 minutes,
   # the tests themselves about one. No build cache: a cold `swift test` is quick, and .build is close to 1 GB. The
   # iOS-only branches (`#if canImport(UIKit)` in ToriUI and SpeechPlayer) still compile in the app build below; run
   # `xcodebuild test -scheme ToriKit-Package` on a simulator locally (README) to execute them.
   toriKit-package:
     name: ToriKit (macOS)
-    if: github.event_name != 'push'
+    needs: changes
+    if: github.event_name != 'push' && needs.changes.outputs.ios == 'true'
     runs-on: xcode-27
     timeout-minutes: 30
     steps:
@@ -60,6 +73,8 @@ jobs:
 
   app-build:
     name: App build (Debug, simulator)
+    needs: changes
+    if: needs.changes.outputs.ios == 'true'
     runs-on: xcode-27
     timeout-minutes: 60
     defaults:

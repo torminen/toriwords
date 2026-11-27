@@ -301,7 +301,7 @@ The widget also uses the shared strings "{n} to review", "{n} new", "{n} to revi
 
 ## 4. Capture sheet strings
 
-The capture sheet also uses the shared strings Save, Cancel, Save as, Phrases, Translation, Sentence (optional), Tags, Resume learning, Already in your vocabulary, You marked this as known, Saved.
+The capture sheet also uses the shared strings Save, Cancel, Save as, Phrases, Translation, Sentence (optional), Tags, Resume learning, Already in your vocabulary, You marked this as known, You paused this word, Saved.
 
 | English | Russian | Where / note |
 |---|---|---|
@@ -314,7 +314,6 @@ The capture sheet also uses the shared strings Save, Cancel, Save as, Phrases, T
 | Translation (optional) | Перевод (необязательно) |  |
 | Translation · Wiktionary | Перевод · Викисловарь |  |
 | Without a translation the word is saved as "Translation pending". | Без перевода слово сохранится с пометкой «Перевод ожидается». |  |
-| You paused this word | Вы приостановили это слово |  |
 | work, travel | работа, поездки |  |
 
 ## 5. Android-only and replacing strings
@@ -435,4 +434,3 @@ These iOS strings have no Android use, because the feature differs (see [ios-dif
 ## 7. Open questions
 
 1. The Russian strings in section 5 are new and have not been reviewed by a native speaker. In particular: "Доступ к Google Диску отозван" vs a softer "ToriWords больше не имеет доступа к Google Диску".
-2. The capture sheet uses "You paused this word" with a different Russian text from the app ("Вы приостановили это слово" vs "Вы поставили это слово на паузу"). Android should use one of them in both places; this file assumes the app's wording should win, pending confirmation.

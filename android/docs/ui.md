@@ -97,8 +97,8 @@ flowchart TD
 |---|---|---|---|
 | Something due | "12 to review · 5 new" (a zero part is dropped: "12 to review", "5 new"). In catch-up, a secondary line under it: "Welcome back — N cards are waiting. We'll spread them over about a week." | Progress | filled **Review** |
 | All done today | "All done for today" plus a secondary "Next review: tomorrow" / "in N days" line (left out when nothing is scheduled) | Progress | none |
-| Nothing due today | "Next review: tomorrow" / "Next review: in N days", or "Nothing to review today" when nothing is scheduled | Progress | none |
-| Words exist but none is reviewable (all without translation) | "N words need a translation" | Words with the **Needs translation** filter | none |
+| Nothing due today (also when every word is paused or known) | "Next review: tomorrow" / "Next review: in N days", or "Nothing to review today" when nothing is scheduled | Progress | none |
+| Nothing reviewable, and at least one word needs a translation (N ≥ 1) | "N words need a translation"; never shown with 0 | Words with the **Needs translation** filter | none |
 | Empty vocabulary | the block is not shown; the empty-state card shows instead | — | — |
 
 - **Recently added:** a "Recently added" heading and the 5 newest words. Each row shows the word (semibold) and its second line: the primary translation, or "Translation pending" / "No translation found — add your own" / "No translation yet". A tap opens the entry. Under the list: **All words ›** opens Words.

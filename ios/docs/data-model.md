@@ -405,10 +405,10 @@ The source title and tags are offered again for **30 minutes** after `updatedAt`
 
 ### 9.2 Export
 
-Settings → Data → Export, offline, no iCloud needed. The screen offers "Backup (JSON)" and "Spreadsheet (CSV)". The Export button is disabled with a note ("Add words to export them.") when there are no live words.
+What the user sees (format choice, the disabled state, the share sheet): [product.md](product.md#516-export-and-backup). Mechanism:
 - The file is built off the main actor in one call, held in memory, and written to the temporary directory under its file name. The screen shows indeterminate progress with Cancel; there is no per-word progress.
-- The file is then offered in the system share sheet (`UIActivityViewController`): Save to Files, AirDrop, Mail and so on. There is no separate "Save to device" picker; Save to Files covers it. No permission is needed.
-- On failure: "Something went wrong".
+- The file is then handed to the system share sheet (`UIActivityViewController`) as a file URL only. No permission is needed.
+- On failure, the screen shows an error alert ([copy.md](copy.md)).
 
 > Partly implemented: export is not streamed. A very large vocabulary is held in memory twice (records and encoded file) while exporting.
 

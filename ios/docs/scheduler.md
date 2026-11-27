@@ -197,7 +197,7 @@ Review type and elapsed days are derived during the fold, never read from storag
 | `known_well` | `stability ≥ 21` and the last rating ≠ 1. |
 | `learning` | Everything else. |
 
-**Entry-level stage** (Words list, Progress). It applies to active Entries that have a translation. The full marker order (Needs translation → Known → Paused → stage) is in [domain.md](domain.md#entry).
+**Entry-level stage** (Words list, Progress). It applies to active Entries that have a translation. The full marker order (Known → Paused → Needs translation → stage; `ToriStore/Queries.swift` `stage(_:translation:)`) is in [domain.md](domain.md#entry).
 
 | Entry stage | Condition |
 |---|---|
@@ -251,7 +251,7 @@ catchUp = load > 2 · normalLoad
 quota   = catchUp ? normalLoad + ceil((load − normalLoad) / 3) : ∞
 ```
 
-Catch-up spreads a backlog over several days. There is **no "Review all now" control** in the app: the quota cannot be lifted. (`QueueExtensions.reviewAll` exists in `ToriCore` and lifts the quota, but no screen sets it.)
+Catch-up spreads a backlog over several days. **Not yet implemented:** "Review all now" (open question, see [product.md](product.md#56-review)). `QueueExtensions.reviewAll` exists in `ToriCore` and lifts the quota, but no screen sets it.
 
 ### Building today's queue
 
@@ -277,7 +277,7 @@ The queue is built in one walk.
   - M = step 2.
   - Home, the widget and the reminder all use this number.
 - **Catch-up:** `|waiting|` appears as {n} in the welcome-back line inside Due today ("Welcome back — {n} cards are waiting. We'll spread them over about a week.", see [copy.md](copy.md)).
-- **Next due**, when nothing is due: the smallest `due_day > T`, shown as a day ("tomorrow" or a date), never a time.
+- **Next due**, when nothing is due: the smallest `due_day > T`, shown as a day, never a time: Home and Review show "tomorrow" / "in N days"; the widget shows "tomorrow" / a date.
 
 **Home "Due today" states**, also written to the widget snapshot:
 

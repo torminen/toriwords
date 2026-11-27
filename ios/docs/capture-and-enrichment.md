@@ -371,13 +371,11 @@ Input is **Russian** when it has a Cyrillic letter (U+0400–U+04FF) and no ASCI
 
 **Settings → About** shows the short attribution row "Dictionary data from Wiktionary, CC BY-SA" ([copy.md](copy.md)), linking to the licence.
 
-**Full attribution text:** the Licences screen and the backup file's `attribution` field carry it: "Dictionary data from Wiktionary (en.wiktionary.org, ru.wiktionary.org), contributors, CC BY-SA 4.0, extracted with wiktextract (kaikki.org); modified (filtered, merged, normalised)", with links to the sources and the licence.
+**Full attribution text:** the dictionary's licence text (`meta.licence_text` in `dictionary.sqlite`; a fallback copy is in `ios/ToriKit/Sources/ToriStore/ExportFile.swift`). The Licences screen in About shows the licences.
 
 **Wiktionary mark:** shown next to Sense values whose provenance is `wiktionary`.
 
-**Exports:**
-- A CSV export gets a trailing one-cell attribution row, but only when it contains Wiktionary-derived text.
-- The share message carries the attribution too.
+**Exports:** carry the attribution as described in [data-model.md](data-model.md#91-formats) (the single owner of the export attribution rule).
 
 ## Enrichment
 

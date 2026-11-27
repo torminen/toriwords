@@ -96,7 +96,7 @@
     },
     {
       "id": "qb-003",
-      "note": "only excluded Entries → noneReviewable",
+      "note": "only excluded Entries, all translated → nothingDue",
       "input": {
         "now": 1794927600000,
         "utcOffsetMin": 180,
@@ -133,7 +133,7 @@
         "waiting": 0,
         "catchUp": false,
         "normalLoad": 50,
-        "homeState": "noneReviewable"
+        "homeState": "nothingDue"
       }
     },
     {

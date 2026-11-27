@@ -163,7 +163,7 @@ public struct DailyQueue: Hashable, Sendable {
 
         let home: HomeState =
             entries.isEmpty ? .empty
-            : active.isEmpty ? .noneReviewable
+            : active.isEmpty && entries.contains(where: { $0.cards.isEmpty }) ? .noneReviewable
             : !(reviews.isEmpty && new.isEmpty && reshow.isEmpty) ? .due
             : !answeredToday.isEmpty ? .allDone
             : .nothingDue

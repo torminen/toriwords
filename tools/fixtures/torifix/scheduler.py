@@ -248,7 +248,7 @@ def build_queue(entries: list[Entry], logs: list[Log], today: int, new_words_per
 
     if not live:
         home = "empty"
-    elif not active:
+    elif not active and any(not e.cards for e in live):
         home = "noneReviewable"
     elif reviews or new or reshow:
         home = "due"

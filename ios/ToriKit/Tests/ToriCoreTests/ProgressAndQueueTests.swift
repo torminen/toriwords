@@ -104,3 +104,10 @@ private func review(_ card: QueueCard, _ day: Int, _ rating: Rating, n: UInt64) 
     #expect(top.map(\.label) == ["nytimes.com", "The Bear S2", "b", "b", "z"])
     #expect(top[2].id == uid(4))
 }
+
+@Test func noneReviewableOnlyWhenAWordNeedsATranslation() {
+    let paused = [entry(1, created: today - 5, active: false), entry(2, created: today - 4, active: false)]
+    #expect(DailyQueue.build(entries: paused, logs: [], today: today, newWordsPerDay: 10).homeState == .nothingDue)
+    let untranslated = entry(3, created: today - 3, directions: [])
+    #expect(DailyQueue.build(entries: paused + [untranslated], logs: [], today: today, newWordsPerDay: 10).homeState == .noneReviewable)
+}

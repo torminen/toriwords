@@ -222,7 +222,7 @@ def queue_basic() -> None:
     w = World(); w.entry(T - 3, ()); w.entry(T - 2, ())
     cases.append(queue_case("qb-002", w, "Entries without Cards (Needs translation) → noneReviewable"))
     w = World(); w.entry(T - 3, status="excluded"); 
-    cases.append(queue_case("qb-003", w, "only excluded Entries → noneReviewable"))
+    cases.append(queue_case("qb-003", w, "only excluded Entries, all translated → nothingDue"))
     w = World(); [w.entry(T - 3 + i) for i in range(3)]
     cases.append(queue_case("qb-004", w, "three New Entries: one Card each (sibling filter), oldest Entry first, recognition first"))
     w = World()

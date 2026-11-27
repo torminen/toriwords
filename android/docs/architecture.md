@@ -290,7 +290,11 @@ Frames are driven by `withFrameNanos` only while something moves; at rest there 
 
 ## 14. Performance targets
 
-Reference device: a mid-range phone on Android 12 (for example a Pixel 6a), to be replaced by the owner's device when known.
+Reference devices:
+- **Android 12 (API 31) emulator**, the minimum supported version. Used for the CI and pre-release runs.
+- **Redmi Note 14 Pro**, for physical-device tests (Macrobenchmark, haptics, widget, reminders).
+
+Every target must hold on both devices. A target that only an emulator can't meet (for example because the CI host is slow) is checked on the Redmi Note 14 Pro, and the emulator result is recorded alongside it.
 
 | Operation | Target |
 |---|---|
@@ -299,7 +303,7 @@ Reference device: a mid-range phone on Android 12 (for example a Pixel 6a), to b
 | Selection → saved (dictionary hit) | ≤ 2 s |
 | App cold start to Home | ≤ 1.5 s (Baseline Profile; the launch animation's own 1.7 s plus hold is not counted) |
 | First-launch dictionary install | measured; never blocks Home (background) |
-| Full Card rebuild (40k Cards / 200k logs; after a change of `fsrs_w`, `desired_retention` or `scheduler_version`, [scheduler.md](scheduler.md#replay-and-rebuild)) | < 1 s on the reference device, the same target as iOS. Runs in the background; the UI stays usable. |
+| Full Card rebuild (40k Cards / 200k logs; after a change of `fsrs_w`, `desired_retention` or `scheduler_version`, [scheduler.md](scheduler.md#replay-and-rebuild)) | < 1 s on the reference devices, the same target as iOS. Runs in the background; the UI stays usable. |
 | Applying one pulled chunk (≤ 400 envelopes) | < 1 s, off the main thread |
 | First pull of 300k records | paged, resumable, UI usable throughout |
 | Main thread | no disk or network I/O (StrictMode in debug); no ANRs in Play vitals |
@@ -355,5 +359,4 @@ tools/dictionary/, tools/fixtures/   dev tools (Python), not app code
 
 ## 17. Open questions
 
-1. The reference device for the performance targets is a placeholder until the owner names their test phone.
-2. Whether the `drive.appdata` scope needs Google's OAuth verification before public release; confirm in the Google Cloud console when the project is set up.
+1. Whether the `drive.appdata` scope needs Google's OAuth verification before public release; confirm in the Google Cloud console when the project is set up.

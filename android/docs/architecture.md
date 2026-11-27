@@ -299,7 +299,7 @@ Reference device: a mid-range phone on Android 12 (for example a Pixel 6a), to b
 | Selection → saved (dictionary hit) | ≤ 2 s |
 | App cold start to Home | ≤ 1.5 s (Baseline Profile; the launch animation's own 1.7 s plus hold is not counted) |
 | First-launch dictionary install | measured; never blocks Home (background) |
-| Full Card rebuild (40k Cards / 200k logs) | < 2 s, background (iOS target < 1 s) |
+| Full Card rebuild (40k Cards / 200k logs; after a change of `fsrs_w`, `desired_retention` or `scheduler_version`, [scheduler.md](scheduler.md#replay-and-rebuild)) | < 1 s on the reference device, the same target as iOS. Runs in the background; the UI stays usable. |
 | Applying one pulled chunk (≤ 400 envelopes) | < 1 s, off the main thread |
 | First pull of 300k records | paged, resumable, UI usable throughout |
 | Main thread | no disk or network I/O (StrictMode in debug); no ANRs in Play vitals |

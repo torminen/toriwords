@@ -39,7 +39,7 @@ Product files describe behaviour only and link to the engineering files for mech
 |---|---|---|
 | word / phrase | Entry | An English item the user is learning |
 | meaning | Sense | One translation (and optional definition and part of speech) of an Entry |
-| sentence | Context | A real sentence where the user met the Entry, with the word highlighted |
+| sentence | Context | A real sentence where the user met the Entry (the word highlighted when found), or a source-only record with no sentence |
 | source | Source | Where a sentence came from: a web page, an app, a typed title, or a related-word suggestion |
 | card | Card | One reviewable prompt of an Entry (recognition, recall, cloze) |
 | review | ReviewLog | One graded answer to a card |

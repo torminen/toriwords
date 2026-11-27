@@ -736,7 +736,7 @@ Settings are short; the defaults are meant to be right. The review-day start (04
   - nothing due today: **"Next review: tomorrow"**, or the date ("Next review: Mon, 30 Nov"); never a time;
   - **"Open ToriWords"** when nothing is scheduled, when no word is reviewable or there are no words, when it was placed before the app was ever opened, or when it has not updated for 7 days.
 - Tapping it opens Review (or the app, for "Open ToriWords").
-- **Updates.** The count is the same as Home's. It updates after reviewing, after sync, and at the 04:00 day start; on Android the day-start update may come up to about an hour late.
+- **Updates.** The count is the same as Home's. It updates after reviewing, after sync, and at the 04:00 day start; on Android the day-start update can come a little late, at the latest when the phone is next used.
 - **Colours.** The fixed ToriWords palette (light and dark), not wallpaper colours.
 
 **Widget hint**

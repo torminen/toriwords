@@ -261,9 +261,10 @@ Synced settings changed on two devices: the most recent change wins.
 **Device-local state that is not a setting** (never synced):
 - the swipe demo was shown;
 - the reminder offer was shown;
-- the widget hint's **Not now** until-time.
+- the widget hint's **Not now** until-time;
+- the capture sheet's last source title and tags (offered again for 30 minutes; not in the device backup).
 
-Practice sessions, the Add hint and dismissed related words store nothing.
+Nothing else is stored for practice sessions, the Add hint or dismissed related words.
 
 ## Enrichment
 

@@ -287,7 +287,7 @@ The queue is built in one walk.
 | `noneReviewable` | Live Entries exist, none has a live card, **and** at least one live Entry needs a translation (no Sense with a translation, see [domain.md](domain.md#entry)). |
 | `nothingDue` | Everything else: "Nothing to review today", or the "Next review…" line when a card is scheduled. |
 
-- Example: live Entries exist, none has a live card, and none needs a translation. That is `nothingDue`, not `noneReviewable`. Same on iOS; shared fixture `spec/fixtures/scheduler/queue-basic.json` case qb-003.
+- Example: live Entries exist, none has a live card, and none needs a translation. That is `nothingDue`, not `noneReviewable`. Same on iOS; shared fixture `fixtures/scheduler/queue-basic.json` case qb-003.
 
 ### Learn more new words
 

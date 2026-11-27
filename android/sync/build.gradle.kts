@@ -31,7 +31,7 @@ dependencies {
 
 // Shared sync scenarios are read in place (doc 38 §15.2): no copies.
 tasks.withType<Test>().configureEach {
-    val fixtures = rootProject.layout.projectDirectory.dir("../spec/fixtures")
+    val fixtures = rootProject.layout.projectDirectory.dir("../fixtures")
     inputs.dir(fixtures).withPropertyName("fixtures").withPathSensitivity(PathSensitivity.RELATIVE)
     systemProperty("fixturesDir", fixtures.asFile.absolutePath)
 }

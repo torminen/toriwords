@@ -63,7 +63,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import java.io.File
 import java.nio.file.Files
 
-/** `spec/fixtures/sync/` (read in place): the real ToriStore + SyncEngine per simulated device, against [DriveFake]. */
+/** `fixtures/sync/` (read in place): the real ToriStore + SyncEngine per simulated device, against [DriveFake]. */
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class SyncScenarioTest(private val name: String, private val case: JsonElement) {
     companion object {

@@ -111,7 +111,7 @@ suspend fun StoreReader.allRecords(): List<SyncRecord> =
     RecordType.ALL.flatMap { type -> sql.rows("SELECT * FROM ${type.name} ORDER BY id").map { RecordIO.envelope(type, it) } }
 
 /**
- * Scenario word projection (`spec/fixtures/sync`): `{text, note, ipa, status, needsCheck, translations, contexts, tags,
+ * Scenario word projection (`fixtures/sync`): `{text, note, ipa, status, needsCheck, translations, contexts, tags,
  * reviews, extra}`; null when the Entry is not live.
  */
 suspend fun StoreReader.word(id: ToriId): Map<String, JsonElement>? {

@@ -16,7 +16,7 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     // Shared parity fixtures are read in place (doc 38 §15.2): no copies.
-    val fixtures = rootProject.layout.projectDirectory.dir("../spec/fixtures")
+    val fixtures = rootProject.layout.projectDirectory.dir("../fixtures")
     inputs.dir(fixtures).withPropertyName("fixtures").withPathSensitivity(PathSensitivity.RELATIVE)
     systemProperty("fixturesDir", fixtures.asFile.absolutePath)
 }

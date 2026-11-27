@@ -47,7 +47,7 @@ Without a matching OAuth client the consent sheet fails and sync stays off.
 
 ## Sync fixtures on Drive
 
-`:sync:test` runs every `spec/fixtures/sync/*.json` scenario in place (`SyncScenarioTest`, Robolectric) with a real
+`:sync:test` runs every `fixtures/sync/*.json` scenario in place (`SyncScenarioTest`, Robolectric) with a real
 `ToriStore` + `SyncEngine` per device against `DriveFake`. The fixtures and `known-deviations.json` are unchanged; the
 runner adapts them to Drive (doc 38 §11.2):
 

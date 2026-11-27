@@ -3,7 +3,7 @@ package com.toriwords.core
 import java.text.Normalizer
 
 /**
- * Text keys. Character sets are the explicit lists in `spec/fixtures/README.md`, never a Unicode property lookup or a
+ * Text keys. Character sets are the explicit lists in `fixtures/README.md`, never a Unicode property lookup or a
  * locale-dependent call, so all platforms agree. Everything iterates by code point, never by UTF-16 `Char`.
  */
 object TextKey {

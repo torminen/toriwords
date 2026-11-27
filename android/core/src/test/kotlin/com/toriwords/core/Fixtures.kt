@@ -22,7 +22,7 @@ class FixtureCase(val file: JsonObject, val json: JsonObject) {
     override fun toString(): String = json.getValue("id").jsonPrimitive.content
 }
 
-/** Reads `spec/fixtures` in place; the path comes from the `fixturesDir` system property set by Gradle. */
+/** Reads `fixtures` in place; the path comes from the `fixturesDir` system property set by Gradle. */
 object Fixtures {
     private val dir = File(System.getProperty("fixturesDir") ?: error("fixturesDir system property not set"))
 

@@ -66,6 +66,10 @@ def _counts(db_path: Path) -> dict[str, int]:
         "related": "SELECT count(*) FROM related",
     }
     out = {k: con.execute(v).fetchone()[0] for k, v in q.items()}
+    out["headword with ≥ 1 related"] = con.execute("SELECT count(DISTINCT headword_id) FROM related").fetchone()[0]
+    # dbstat must be compiled in (SQLITE_ENABLE_DBSTAT_VTAB), so the size line is the same on every machine.
+    assert con.execute("SELECT 1 FROM pragma_module_list WHERE name = 'dbstat'").fetchone(), "sqlite lacks dbstat"
+    out["_related_bytes"] = con.execute("SELECT coalesce(sum(pgsize), 0) FROM dbstat WHERE name = 'related'").fetchone()[0]
     meta = dict(con.execute("SELECT key, value FROM meta"))
     con.close()
     return out | {"_meta": meta}
@@ -88,10 +92,12 @@ def render(db_path: Path, digest: str, sources: dict, cov_list: tuple[Path, list
            seconds: float) -> str:
     counts = _counts(db_path)
     meta = counts.pop("_meta")
+    related_bytes = counts.pop("_related_bytes")
     cov = coverage(db_path, cov_list[1])
     size = db_path.stat().st_size
     sample_counts = _counts(sample)
     sample_counts.pop("_meta")
+    sample_counts.pop("_related_bytes")
     lines = [
         f"# Dictionary build report — {meta['dictionary_version']}",
         "",
@@ -102,10 +108,11 @@ def render(db_path: Path, digest: str, sources: dict, cov_list: tuple[Path, list
         "| | |",
         "|---|---|",
         f"| File | `dictionary.sqlite` (GitHub Release asset `dictionary-{meta['dictionary_version']}`) |",
-        f"| Size | {size:,} bytes ({size / 1048576:.1f} MiB; budget 60 MiB) |",
-        f"| gzip -6 size | {_gzip_size(db_path):,} bytes (budget 25 MB compressed in the app package) |",
+        f"| Size | {size:,} bytes ({size / 1048576:.1f} MiB; budget 61 MiB) |",
+        f"| gzip -6 size | {_gzip_size(db_path):,} bytes (budget 25.5 MB compressed in the app package) |",
         f"| SHA-256 | `{digest}` |",
-        f"| Prune step applied | `{meta['prune']}` (ladder: none → examples → related → rare-untranslated [base] → untranslated-50k → -20k → -10k [extension]) |",
+        f"| Prune step applied | `{meta['prune']}` (ladder: none → examples → rare-untranslated → untranslated-50k → -20k → -10k → related) |",
+        f"| Related words (`related` table, ≤ 8 per headword) | {related_bytes:,} bytes ({related_bytes / 1048576:.1f} MiB) of the file |",
         f"| Build hash (`meta.build_hash`) | `{meta['build_hash']}` |",
         f"| Build time | {seconds:.0f} s on {platform.machine()} |",
         "",

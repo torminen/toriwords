@@ -36,7 +36,7 @@ uv run pytest                        # unit tests; the < 10 ms autocomplete test
 
 Outputs:
 
-- `dictionary.sqlite` (gitignored, ≤ 60 MiB; prune ladder applied automatically if over budget, see below),
+- `dictionary.sqlite` (gitignored, ≤ 61 MiB; prune ladder applied automatically if over budget, see below),
 - `dictionary.sqlite.sha256`, `release.json`, `build-report.md` (counts, size, coverage, inputs, versions) — committed,
 - `ios/Resources/dictionary-sample.sqlite` — a few hundred headwords of the same build, same schema,
   `dictionary_version = <ver>-sample`; committed so Debug/CI builds and tests work without the full file.
@@ -99,8 +99,12 @@ key leading to a base headword, with ≥ 1 Russian translation. Target ≥ 90 % 
   archaic/obsolete/nonstandard forms dropped.
 - ruwikt variants longer than 100 characters are dropped (encyclopedic definitions, not translations); `;` splits
   only outside parentheses.
-- Size budget 60 MiB. Prune ladder: base (`examples` → `related` → `rare-untranslated`: drop headwords without an RU
-  translation and `freq_rank` > 100,000 or NULL), then — our extension, because the base ladder ends at ~64 MiB —
-  the same rule with thresholds 50k → 20k → 10k. The first step that fits is used and recorded in `meta.prune`.
-  The ladder is cumulative: once headwords are pruned, examples and related are already gone.
+- `related` rows: Wiktionary synonyms, related and derived terms (derived terms with a space become `phrase`) that
+  resolve to another headword with ≥ 1 Russian translation (the most frequent headword of that key); per headword only
+  the first 8 in the app's order (kind synonym → related → derived → phrase, then `freq_rank` NULL last, then id), the
+  most the app shows. Table is `WITHOUT ROWID`, primary key `(headword_id, related_headword_id)`.
+- Size budget 61 MiB raw / 25.5 MB gzip (raised from 60 MiB / 25 MB by the owner to fit related rows, ~2.5 MiB).
+  Prune ladder: `examples` → `rare-untranslated` (drop headwords without an RU translation and `freq_rank` > 100,000
+  or NULL) → the same rule with thresholds 50k → 20k → 10k → `related` (last resort). The first step that fits is used
+  and recorded in `meta.prune`. The ladder is cumulative: each step keeps every cut of the steps before it.
 - IDs in (key, pos, text) order; rows inserted in key/id order; `encoding = 'UTF-8'` asserted; `page_size = 4096`; `VACUUM`.

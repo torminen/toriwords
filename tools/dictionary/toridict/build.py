@@ -9,10 +9,12 @@ from .text import match_key, search_fold
 PHRASE_POS = {"phrase", "prep_phrase", "adv_phrase", "proverb"}
 RELATED_ORDER = {"synonym": 0, "related": 1, "derived": 2, "phrase": 3}
 ORIGIN_ORDER = {"enwikt": 0, "ruwikt": 1}
-# Prune ladder from the architecture spec: examples → related → headwords without RU translation and freq_rank > 100,000.
-# The tighter thresholds after it are our extension, used only if that ladder still misses the budget.
-PRUNE_STEPS = ["none", "examples", "related", "rare-untranslated", "untranslated-50k", "untranslated-20k",
-               "untranslated-10k"]
+# Prune ladder (cumulative): examples → headwords without RU translation and freq_rank > 100,000 → the same with
+# 50k/20k/10k → related rows as the last resort. Related rows are small once capped, and the app's Related words row
+# needs them, so they outlive rare headwords.
+PRUNE_STEPS = ["none", "examples", "rare-untranslated", "untranslated-50k", "untranslated-20k", "untranslated-10k",
+               "related"]
+RELATED_LIMIT = 8  # the app shows the first 8 related headwords; rows past that are never read
 UNTRANSLATED_MAX_RANK = {"rare-untranslated": 100_000, "untranslated-50k": 50_000, "untranslated-20k": 20_000,
                          "untranslated-10k": 10_000}
 
@@ -128,8 +130,8 @@ def lay_out(lex: Lexicon, prune: str = "none", keep_keys: set[str] | None = None
     """Select, give IDs in (key, pos, text) order and produce rows in insert order (key, then id)."""
     level = PRUNE_STEPS.index(prune)
     hws = [h for h in lex.headwords if keep_keys is None or h.key in keep_keys]
-    if prune in UNTRANSLATED_MAX_RANK:
-        limit = UNTRANSLATED_MAX_RANK[prune]
+    limit = min((UNTRANSLATED_MAX_RANK[p] for p in PRUNE_STEPS[:level + 1] if p in UNTRANSLATED_MAX_RANK), default=None)
+    if limit is not None:
         hws = [h for h in hws if h.translations or (h.freq_rank is not None and h.freq_rank <= limit)]
     hws.sort(key=lambda h: (h.key, h.pos, h.text))
     hid = {id(h): i for i, h in enumerate(hws, 1)}
@@ -166,18 +168,21 @@ def lay_out(lex: Lexicon, prune: str = "none", keep_keys: set[str] | None = None
                     forms.setdefault((fk, hid[id(h)]), f.tags)
     rows.form = [(fk, i, tags or None) for (fk, i), tags in sorted(forms.items())]
 
-    if level < 2:
+    if prune != "related":
+        kinds = {v: k for k, v in RELATED_ORDER.items()}
         for h in hws:
-            best: dict[int, int] = {}
+            best: dict[int, tuple[int, Headword]] = {}
             for word, kind in h.related:
-                targets = [t for t in by_key.get(match_key(word), ()) if t.key != h.key]
+                # Targets need a Russian translation: the app's Add saves the suggestion with it.
+                targets = [t for t in by_key.get(match_key(word), ()) if t.key != h.key and t.translations]
                 if not targets:
                     continue
                 t = min(targets, key=lambda t: (_null_last(t.freq_rank), hid[id(t)]))
                 j = hid[id(t)]
-                best[j] = min(best.get(j, 9), RELATED_ORDER[kind])
-            kinds = {v: k for k, v in RELATED_ORDER.items()}
-            rows.related += [(hid[id(h)], j, kinds[k]) for j, k in sorted(best.items())]
+                best[j] = (min(best.get(j, (9,))[0], RELATED_ORDER[kind]), t)
+            # Keep the first RELATED_LIMIT in the app's order: kind, freq_rank NULL last, target id.
+            top = sorted(best.items(), key=lambda jk: (jk[1][0], _null_last(jk[1][1].freq_rank), jk[0]))[:RELATED_LIMIT]
+            rows.related += [(hid[id(h)], j, kinds[k]) for j, (k, _) in sorted(top)]
     return rows
 
 

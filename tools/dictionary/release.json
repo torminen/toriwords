@@ -1,7 +1,7 @@
 {
-  "dictionary_version": "2026.11.1",
-  "tag": "dictionary-2026.11.1",
-  "asset_url": "https://github.com/torminen/toriwords/releases/download/dictionary-2026.11.1/dictionary.sqlite",
-  "sha256": "f551cbea042a1ee17ac50042dbbba4c9478b434d2fa987eaa253c2d3bef17b2d",
-  "size": 60473344
+  "dictionary_version": "2026.11.2",
+  "tag": "dictionary-2026.11.2",
+  "asset_url": "https://github.com/torminen/toriwords/releases/download/dictionary-2026.11.2/dictionary.sqlite",
+  "sha256": "936c6213e5ae5e81a753bf86dded1f872de8526eb1050673f14230ced70085ee",
+  "size": 63111168
 }

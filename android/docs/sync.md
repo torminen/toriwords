@@ -423,7 +423,7 @@ stateDiagram-v2
 |---|---|---|
 | Off | off: words stay on this device | hidden |
 | Syncing (the first sync shows progress; the app stays usable) | "Syncing…" | disabled |
-| Synced | "Synced 2 minutes ago" | enabled |
+| Synced | "Synced {time ago}", e.g. "Synced 2 min ago" | enabled |
 | WaitingForNetwork | "Waiting for network" | enabled |
 | StorageFull | "Google Drive storage is full" | enabled |
 | AccessRemoved | "Google Drive access was removed" | disabled |
@@ -504,6 +504,8 @@ Settings → Google Drive sync, after a confirmation dialog:
    - clear `pageToken`, `generation` and the file index;
    - keep the words.
 3. Other devices find the generation gone or newer on their next sync and enter the same state.
+
+**Offline or on failure:** nothing changes locally. The app shows the no-connection dialog: "No internet connection" / "Connect to the internet and try again. Nothing was changed." ([copy.md](copy.md)). A partial deletion is completed by the next Delete Drive data…; other devices that see a missing or newer marker treat it as deleted anyway.
 
 ### Back up this device again
 

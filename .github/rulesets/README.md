@@ -22,7 +22,8 @@ Accepted risk: a push to `main` runs no tests. `ios.yml` only builds the app on 
 Two pull requests that pass separately but break the build or tests once combined are not caught on `main`; the checks
 of the next iOS pull request catch them.
 
-`require_extra_approval_for_unattributed_changes` is also off: no approvals are required, so it adds nothing here.
+`require_extra_approval_for_unattributed_changes` is also off. Its exact effect is not documented, and it may require an
+approval that automation cannot give. Do not turn it back on.
 
 ## Applying a change
 

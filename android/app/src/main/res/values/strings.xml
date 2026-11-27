@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">ToriWords</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="drive_sync_title">Google Drive sync</string>
+    <string name="drive_sync_off_explainer">Your words are stored on this device. Turn on Google Drive sync to back them up and sync between your Android devices. Optional.</string>
+    <string name="drive_sync_not_available">Google Drive sync is not available on this device</string>
+    <string name="drive_sync_turn_on">Turn on Google Drive sync</string>
+    <string name="drive_sync_account">Google account</string>
+    <string name="drive_sync_status">Status</string>
+    <string name="drive_sync_status_synced">Synced %1$d min ago</string>
+    <string name="drive_sync_status_syncing">Syncing…</string>
+    <string name="drive_sync_status_waiting">Waiting for network</string>
+    <string name="drive_sync_status_storage_full">Google Drive storage is full</string>
+    <string name="drive_sync_status_check_time">Check your device time</string>
+    <string name="drive_sync_status_drive_deleted">Drive data was deleted</string>
+    <string name="drive_sync_status_access_removed">Google Drive access was removed</string>
+    <string name="drive_sync_first_download">Downloading: %1$d of %2$d files</string>
+    <string name="drive_sync_sync_now">Sync now</string>
+    <string name="drive_sync_back_up_again">Back up this device again</string>
+    <string name="drive_sync_turn_off">Turn off Google Drive sync</string>
+    <string name="drive_sync_turn_off_title">Turn off sync?</string>
+    <string name="drive_sync_turn_off_body">Your words stay on this phone and in Google Drive.</string>
+    <string name="drive_sync_turn_off_confirm">Turn off</string>
+    <string name="drive_sync_delete">Delete Drive data…</string>
+    <string name="drive_sync_delete_title">Delete Drive data?</string>
+    <string name="drive_sync_delete_body">This deletes your words from Google Drive. Your other devices keep their copies but stop syncing.</string>
+    <string name="drive_sync_delete_confirm">Delete</string>
+    <string name="drive_sync_offline_title">No internet connection</string>
+    <string name="drive_sync_offline_body">Connect to the internet to delete your Drive data. Nothing was changed.</string>
+</resources>

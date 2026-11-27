@@ -1,6 +1,7 @@
 # ToriWords for iOS
 
-The native iOS app (SwiftUI, iOS 18+) and its Swift package **ToriKit**.
+The native iOS app (SwiftUI, iOS 18+) and its Swift package **ToriKit**. The specification of the app is in
+[docs/](docs/README.md).
 
 ## Prerequisites
 
@@ -100,7 +101,7 @@ Extension drops a file into the App Group inbox and the app imports it; the widg
   come from xcconfig files (Debug, Release, Personal).
 - **Tests:** Swift Testing, with parity fixtures shared with Android (`fixtures`).
 - **Tools:** Python with uv builds the dictionary from Wiktionary and validates the fixtures (`tools/`).
-- **CI:** GitHub Actions: ToriKit on the iOS Simulator and on Linux, the app build, the Python tools.
+- **CI:** GitHub Actions: ToriKit with `swift test` on macOS and on Linux, an unsigned simulator build of the app, the Python tools.
 
 ## ToriKit tests
 
@@ -213,6 +214,7 @@ dictionary work. It installs next to the full app under its own bundle ID, and X
 
 ## Specs and fixtures
 
+- iOS specification: [docs/README.md](docs/README.md).
 - Parity fixtures shared with Android: `fixtures/`. See `fixtures/README.md`. That covers normalization, IDs,
   HLC, merge, capture, the scheduler and the multi-device `sync/` scenarios. `known-deviations.json` must be `[]`.
 - CI workflows: `.github/workflows/toriKit-linux.yml`, `tools.yml` and `ios.yml`.

@@ -41,7 +41,7 @@ This file contains no storage schemas, APIs or algorithms.
 - **Daily load.** 10 new words a day by default (0–50; counts words, not cards). There is no cap on due reviews. The review day starts at 04:00. After a break the app spreads the backlog over about a week.
 - **Organisation.** Flat tags; one review queue; no decks.
 - **Pronunciation.** The system text-to-speech voice (US by default, UK as a setting) plus Wiktionary IPA. No recorded audio.
-- **Related words.** Up to 8, from bundled dictionary data. The same word gives the same suggestions on Android and iOS.
+- **Related words.** Up to 8, from bundled dictionary data. The same word gives the same suggestions on Android and iOS. The current dictionary build carries no relation data, so the section stays hidden until a build does ([5.13](#513-related-words)).
 - **Reminders.** One opt-in daily local reminder, only on days with cards, offered after the first finished session. A home-screen widget.
 - **Progress.** Minimal stats: today, vocabulary by stage, 30-day activity, captures.
 - **Deletion.** A confirmation, then a short Undo; the deletion takes effect when the Undo closes. Deletion is terminal and wins over concurrent edits and reviews. There is no trash.
@@ -497,7 +497,7 @@ Identical on Android and iOS. The full rules are in [domain.md](domain.md#normal
 - **Very large first upload:** runs in the background and resumes after interruptions.
 - **Device clock wrong:** never loses answers or creates duplicates. If the clock is off by more than an hour, the status asks to fix the device time.
 - **Phone without Google Play services:** the screen says **"Not available on this device"**, has no button, and the app works locally. **Android difference.**
-- **Phone restored from a device backup or transfer:** the vocabulary may come back, but the Drive permission does not. The user turns sync on again, and the data merges.
+- **Phone restored from a device backup or transfer:** the vocabulary may come back, and sync stays on. If the same Google account is on the new phone, sync resumes by itself and the data merges. Otherwise the status is **"Google Drive access was removed"**, and the user turns sync on again.
 
 **Offline.** Everything except sync itself, turning sync on, and Delete Drive data works offline.
 
@@ -576,7 +576,8 @@ Settings are short; the defaults are meant to be right. The review-day start (04
   2. the T's stem rises through it;
   3. the branch unfurls from the top of the stem;
   4. the leaf unfolds at its end.
-- A short rolling haptic ends as the leaf opens. It plays on every launch.
+- A short rolling haptic ends as the leaf opens.
+- The animation and the haptic play each time the app starts. Returning to the app while it is still running shows Home directly.
 - The finished mark holds briefly, even when the data is already ready.
 - If the app is still loading after that, a dim band sweeps across the mark until it is ready. Then the mark fades out and Home appears.
 - **Animations off** (system setting): the finished mark fades in, the haptic plays at once, then the same hold and fade.
@@ -703,6 +704,7 @@ Settings are short; the defaults are meant to be right. The review-day start (04
 
 **Edge cases**
 - **No relations known** (common for slang and phrases): the section is hidden.
+- **Dictionary build without relation data.** A dictionary build may leave relations out to fit its size budget. The current build (2026.11.1) has none, so the section is hidden for every word, on Android and on iOS, until a build includes relations ([capture-and-enrichment.md](capture-and-enrichment.md)).
 - **All suggestions already saved:** "You have all related words".
 - **Quality.** Wiktionary relations are narrower than real topics ("down payment" is not offered for "mortgage"). Accepted.
 
@@ -811,7 +813,7 @@ Opened by tapping the Home **Due today** block. It is its own screen titled **"P
 **Android device backup.** Android's own backup (Google backup and phone-to-phone transfer) also carries the vocabulary to a new phone without any action in the app.
 - It is a silent safety net. The app does not promise it and says nothing about it.
 - Android stops backing up an app's data above 25 MB without telling the user, so very large vocabularies may not be included.
-- The Drive sync permission is never restored this way ([5.8](#58-google-drive-sync)).
+- Drive sync resumes after such a restore only if the same Google account is on the new phone; otherwise the user turns it on again ([5.8](#58-google-drive-sync)).
 - **Android difference.**
 
 **Edge cases**
@@ -819,8 +821,8 @@ Opened by tapping the Home **Due today** block. It is its own screen titled **"P
 - **Very large vocabulary:** export shows progress and can be cancelled.
 - **Same backup restored twice:** no duplicates and no doubled history.
 - **Backup from a newer app version:**
-  - same major format version: restored, and data this version does not understand is kept unchanged;
-  - newer major version: refused with **"Update the app"** — "This backup was made by a newer version of ToriWords. Update the app to restore it. Nothing was changed."
+  - same backup format: restored, and data this version does not understand is kept unchanged;
+  - newer backup format: refused with **"Update the app"** — "This backup was made by a newer version of ToriWords. Update the app to restore it. Nothing was changed."
 - **Backup from an older version:** restored.
 - **Corrupt or foreign file:** **"This is not a ToriWords backup"** — "Choose a .json file exported from ToriWords. Nothing was changed."
 - **Deleted words:** not exported.

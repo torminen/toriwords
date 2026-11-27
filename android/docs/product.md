@@ -611,7 +611,7 @@ Settings are short; the defaults are meant to be right. The review-day start (04
   | No words | No block; the empty state instead | — |
 
   - **TalkBack.** The block is one button: "Due today, 12 to review · 5 new" (or "All done for today, next review tomorrow", and so on). Its hint is "Opens your progress." ("Opens words that need a translation." in the none-reviewable state). The Review button is separate, with the hint "Starts today's review.".
-  - **Every word paused or marked known** (nothing reviewable and nothing needs a translation): the block shows the nothing-due state, "Nothing to review today", or "Next review: …" when something is scheduled, and a tap opens Progress. It never shows "0 words need a translation". **Android difference:** iOS currently shows "0 words need a translation" here.
+  - **Every word paused or marked known** (nothing reviewable and nothing needs a translation): the block shows the nothing-due state, "Nothing to review today", or "Next review: …" when something is scheduled, and a tap opens Progress. It never shows "0 words need a translation".
 - **Back** on Home leaves the app, as usual on Android.
 
 **First launch**

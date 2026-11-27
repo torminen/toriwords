@@ -279,13 +279,16 @@ The queue is built in one walk.
 
 **Home "Due today" states**, also written to the widget snapshot:
 
-| State | Condition |
+| State | Condition (first match wins) |
 |---|---|
+| `empty` | No live Entries. |
 | `due` | The queue is non-empty. |
 | `allDone` | The queue is empty and at least one rated log exists on `T`. |
-| `nothingDue` | The queue is empty and there is no rated log on `T`. |
-| `noneReviewable` | Live Entries exist but none has a live card. |
-| `empty` | No live Entries. |
+| `noneReviewable` | Live Entries exist, none has a live card, **and** at least one live Entry needs a translation (no Sense with a translation, see [domain.md](domain.md#entry)). |
+| `nothingDue` | Everything else: "Nothing to review today", or the "Next review…" line when a card is scheduled. |
+
+- Example: every Entry has a translation but all are Known or Paused, so no live card exists. That is `nothingDue`, not `noneReviewable`.
+- This differs from iOS on purpose. iOS shows `noneReviewable` whenever no live card exists, even when 0 words need a translation.
 
 ### Learn more new words
 

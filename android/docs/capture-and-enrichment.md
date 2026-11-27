@@ -333,7 +333,9 @@ All text comparisons are SQLite `BINARY` on UTF-8. There is no in-memory sort by
 
 ### Licence
 
-**Settings → About** carries the attribution: "Dictionary data from Wiktionary (en.wiktionary.org, ru.wiktionary.org), contributors, CC BY-SA 4.0, extracted with wiktextract (kaikki.org); modified (filtered, merged, normalised)", with links to the sources and the licence.
+**Settings → About** shows the short attribution row "Dictionary data from Wiktionary, CC BY-SA" ([copy.md](copy.md)).
+
+**Full attribution text:** the Licences screen and the backup file's `attribution` field carry it: "Dictionary data from Wiktionary (en.wiktionary.org, ru.wiktionary.org), contributors, CC BY-SA 4.0, extracted with wiktextract (kaikki.org); modified (filtered, merged, normalised)", with links to the sources and the licence.
 
 **Wiktionary mark:** shown next to Sense values whose provenance is `wiktionary`.
 
@@ -402,7 +404,7 @@ Derived, never stored. An Entry **has a translation** when it has at least one l
 | State | Condition (first match wins) | UI |
 |---|---|---|
 | has translation | ≥ 1 live Sense with a non-empty translation | the primary translation |
-| not found | `enrichment_status = unavailable` | "No translation found" |
+| not found | `enrichment_status = unavailable` | Status label "No translation found"; the list's second line and the Entry screen banner say "No translation found — add your own" ([copy.md](copy.md)) |
 | pending | `enrichment_status = pending` | "Translation pending" |
 | none | otherwise | "No translation yet" |
 
@@ -432,7 +434,7 @@ Derived, never stored. An Entry **has a translation** when it has at least one l
 - the dictionary was replaced;
 - **Try again**.
 
-**Large backlogs:** many pending Entries are processed in one run, and the Words list shows the progress.
+**Large backlogs:** many pending Entries are processed in one run.
 
 ## ML Kit translation
 
@@ -528,6 +530,7 @@ This covers no engine, an init error, or no offline English voice.
 
 - **Tap:** the English word or phrase.
 - **Long-press:** the sentence.
+- **▶ next to a sentence** (Entry screen, card back): speaks that sentence.
 - Russian is not spoken in v1.
 
 ### Audio

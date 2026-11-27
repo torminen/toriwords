@@ -197,7 +197,7 @@ Review type and elapsed days are derived during the fold, never read from storag
 | `known_well` | `stability ≥ 21` and the last rating ≠ 1. |
 | `learning` | Everything else. |
 
-**Entry-level stage** (Words list, Progress):
+**Entry-level stage** (Words list, Progress). It applies to active Entries that have a translation. The full marker order (Needs translation → Known → Paused → stage) is in [domain.md](domain.md#entry).
 
 | Entry stage | Condition |
 |---|---|
@@ -212,7 +212,7 @@ Review type and elapsed days are derived during the fold, never read from storag
 | Committed local answer | One incremental step (equal to a full replay by construction). |
 | A pull brings logs for a card | Full replay of that card. |
 | A duplicate merge changes a card's canonical card, a restore | Full replay of the affected cards. |
-| Change of `fsrs_w`, `desired_retention` or `scheduler_version` (local or pulled) | Full rebuild of every card. It runs in the application scope on `Dispatchers.Default`, the UI stays usable, and the target is under 1 s for 40k cards and 200k logs. |
+| Change of `fsrs_w`, `desired_retention` or `scheduler_version` (local or pulled) | Full rebuild of every card. It runs in the application scope on `Dispatchers.Default` and the UI stays usable. Its time target is owned by [architecture.md](architecture.md#14-performance-targets). |
 
 - Resuming an excluded Entry triggers **no** replay. Excluded Entries keep their cache and are simply not queued, so on resume their existing `due_day` applies.
 
@@ -274,7 +274,7 @@ The queue is built in one walk.
   - N = steps 1 + 3;
   - M = step 2.
   - Home, the widget and the reminder all use this number.
-- **Catch-up:** Home also shows `|waiting|` as "N waiting", with a welcome-back message (copy in [copy.md](copy.md)).
+- **Catch-up:** `|waiting|` appears as {n} in the welcome-back line inside Due today ("Welcome back — {n} cards are waiting. We'll spread them over about a week.", see [copy.md](copy.md)).
 - **Next due**, when nothing is due: the smallest `due_day > T`, shown as a day ("tomorrow" or a date), never a time.
 
 **Home "Due today" states**, also written to the widget snapshot:

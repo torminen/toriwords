@@ -214,7 +214,18 @@ While a Review card is dragged horizontally, crossing the grade angle (±10°) i
 
 Played with `View.performHapticFeedback` on the Compose host view (`LocalView.current`). This needs no permission and follows the system touch-feedback setting.
 
-No other haptics in v1.
+### 9.3 Home header taps
+
+The live header (behaviour in [ui.md](ui.md)) gives a light click on every tap and a softer click when the leaf falls. iOS uses a light impact and a soft impact.
+
+| Event | All supported API levels |
+|---|---|
+| Tap on the header | `HapticFeedbackConstants.CONTEXT_CLICK` |
+| Leaf falls (every 5th tap) | `HapticFeedbackConstants.CLOCK_TICK` |
+
+Played with `View.performHapticFeedback` on the Compose host view, like the detent. No permission needed, and the system touch-feedback setting applies. The header ignores Remove animations, and so do its haptics.
+
+No other haptics in v1. The swipe demo and the grade buttons play none.
 
 ## 10. Background work and entry points
 
@@ -241,6 +252,12 @@ All `PendingIntent`s are `FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT` with fixed reque
 - `ON_STOP`: commit the pending review answer and pending deletions, flush the widget snapshot, WAL checkpoint.
 
 The Review screen also commits on its host activity's `onStop` when `isChangingConfigurations` is false, so rotation, resizing and theme changes do not commit ([scheduler.md](scheduler.md)).
+
+**Widget pin request** (the **Add widget** button in the widget hint, behaviour in [product.md](product.md)):
+- The button is shown only when `AppWidgetManager.isRequestPinAppWidgetSupported()` is true and no ToriWords widget is placed yet. Both are checked each time the hint or the Widget screen is shown, and again on `ON_RESUME`.
+- "Placed" means `GlanceAppWidgetManager(context).getGlanceIds(TodayWidget::class.java)` is not empty.
+- Tapping calls `requestPinAppWidget(ComponentName(context, TodayWidgetReceiver::class.java), null, null)`. The launcher shows its own confirmation. The app needs no permission and passes no success callback. On return, the `ON_RESUME` check hides the hint once the widget is placed.
+- If `requestPinAppWidget` returns false, the button hides for the rest of the visit.
 
 ## 11. Header sway model
 

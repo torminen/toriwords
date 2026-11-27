@@ -127,7 +127,7 @@ active / excluded → deleted (terminal)
 - At least one of translation and definition is non-empty.
 - Only meanings the user chose or typed are stored. Variants the user did not choose are discarded.
 - A suggested meaning added in the Edit form keeps its dictionary or machine-translation provenance, unless the user edits it before saving.
-- Senses are displayed by position. Equal positions (concurrent inserts on two devices) are ordered by a deterministic tie-break ([sync.md](sync.md)). There are no gaps.
+- Senses are displayed by position. Equal positions (concurrent inserts on two devices) are ordered by a deterministic tie-break ([sync.md](sync.md)).
 - **Display grouping only:** on the entry screen, Senses with the same definition and part of speech show as one row with their translations joined. On card backs, each translation and each definition shows once. Stored Senses are not changed by this.
 
 ## Context

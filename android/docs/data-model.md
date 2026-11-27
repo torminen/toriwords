@@ -6,13 +6,13 @@ This file specifies the local database `user.sqlite`: its tables, columns, deriv
 
 - **Engine:** Room (KSP) on `BundledSQLiteDriver`. That gives the same SQLite version on every device, independent of the OS copy. Queries run on `Dispatchers.IO`. One database instance per process ([architecture.md](architecture.md#5-concurrency)).
 - **Room mapping:** entities mirror the tables one to one. Complex reads (canonical joins, queue inputs, replay inputs, search) are explicit SQL in `@Query`/`@RawQuery`, not Room relations.
-- **IDs:** 16-byte `BLOB` UUIDs, mapped to a Kotlin value class `RecordId(bytes: ByteArray)` with a type converter, value equality and an **unsigned** byte comparator. UUIDv7 for random IDs, UUIDv5 under the ToriWords namespace for deterministic IDs ([sync.md](sync.md)). Kotlin `Byte` is signed, so a naive comparison sorts `0x80…` before `0x7F…`. Every "smallest ID" rule (survivor choice, ties, sort keys) uses the unsigned comparator, or SQL `ORDER BY` on the BLOB (SQLite compares BLOBs with `memcmp`, which is unsigned). Pinned by `spec/fixtures/ids/byte-order.json`.
+- **IDs:** 16-byte `BLOB` UUIDs, mapped to a Kotlin value class `RecordId(bytes: ByteArray)` with a type converter, value equality and an **unsigned** byte comparator. UUIDv7 for random IDs, UUIDv5 under the ToriWords namespace for deterministic IDs ([sync.md](sync.md)). Kotlin `Byte` is signed, so a naive comparison sorts `0x80…` before `0x7F…`. Every "smallest ID" rule (survivor choice, ties, sort keys) uses the unsigned comparator, or SQL `ORDER BY` on the BLOB (SQLite compares BLOBs with `memcmp`, which is unsigned). Pinned by `fixtures/ids/byte-order.json`.
 - **Instants:** `INTEGER` Unix milliseconds UTC. **Offsets:** `INTEGER` minutes east of UTC. **Days:** `INTEGER` day numbers; a day starts at 04:00 local time ([scheduler.md](scheduler.md)).
 - **Enums:** `TEXT` with exactly the spellings in this file.
 - **Booleans:** `INTEGER` 0/1 (sent as JSON `true`/`false` on the wire).
 - **JSON columns** (`field_clocks`, `extra`, `fsrs_w`, some `sync_state` values) are written with kotlinx.serialization. `extra` keeps each unknown value as a raw `JsonElement`, so numbers and strings round-trip byte for byte.
 - **Highlights:** `highlight_offset` / `highlight_length` are UTF-16 code units, which are Kotlin `String` indices directly. Capture length limits (500 and 5,000 characters) count Unicode code points instead.
-- **Text order.** Both databases use `PRAGMA encoding = 'UTF-8'`; the app asserts it when it opens `user.sqlite`. Every order or prefix range that must match iOS is done in SQL with the default `BINARY` collation, which on UTF-8 is Unicode scalar order. That covers user `match_key` and `name_key` and dictionary `key` and `form_key` (Words A–Z, autocomplete, tag lists). Kotlin `String.compareTo` compares UTF-16 code units, which differs from that order for characters above U+FFFF and in U+E000–U+FFFF, so it is never used for these lists. Where an in-memory sort cannot be avoided, it compares UTF-8 bytes. `COLLATE NOCASE` and `LOCALIZED` are never used. Pinned by `spec/fixtures/normalization/text-order.json`.
+- **Text order.** Both databases use `PRAGMA encoding = 'UTF-8'`; the app asserts it when it opens `user.sqlite`. Every order or prefix range that must match iOS is done in SQL with the default `BINARY` collation, which on UTF-8 is Unicode scalar order. That covers user `match_key` and `name_key` and dictionary `key` and `form_key` (Words A–Z, autocomplete, tag lists). Kotlin `String.compareTo` compares UTF-16 code units, which differs from that order for characters above U+FFFF and in U+E000–U+FFFF, so it is never used for these lists. Where an in-memory sort cannot be avoided, it compares UTF-8 bytes. `COLLATE NOCASE` and `LOCALIZED` are never used. Pinned by `fixtures/normalization/text-order.json`.
 
 ### 1.1 Sync columns
 
@@ -247,7 +247,7 @@ The local index of the files in the Drive appDataFolder, used by compaction and 
 
 ## 5. Derived text keys and folds
 
-Computed in `core`, stored in *local* columns in the same transaction as their source field (local write, applying a pulled record, restore, migration), and never synced. The exact character lists and corner cases are normative in `spec/fixtures/README.md` ("Rules for the text functions") and the `spec/fixtures/normalization/` cases. Summary:
+Computed in `core`, stored in *local* columns in the same transaction as their source field (local write, applying a pulled record, restore, migration), and never synced. The exact character lists and corner cases are normative in `fixtures/README.md` ("Rules for the text functions") and the `fixtures/normalization/` cases. Summary:
 
 - **Match key** (`entry.match_key`; also the *translation key* used to compare translations):
   1. Unicode NFC.

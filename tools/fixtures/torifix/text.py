@@ -1,4 +1,4 @@
-"""Text keys. Character sets are explicit lists (see spec/fixtures/README.md)."""
+"""Text keys. Character sets are explicit lists (see fixtures/README.md)."""
 
 import unicodedata
 

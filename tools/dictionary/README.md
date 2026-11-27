@@ -89,7 +89,7 @@ key leading to a base headword, with ≥ 1 Russian translation. Target ≥ 90 % 
   the POS table in `toridict/parse.py` (`phrase` may match an enwikt verb/noun/…; `unknown` matches any);
   unmatched ruwikt entries become headwords of their own (headword-level translations, no senses).
 - Text: NFC, quotes/dashes/spaces to ASCII, default-ignorables and wiki markup removed, Russian stress marks removed.
-  `key` = match key (tested against `spec/fixtures/normalization/`), `text_folded` = search fold.
+  `key` = match key (tested against `fixtures/normalization/`), `text_folded` = search fold.
 - `translation_ru.rank` per headword: sense ordinal (headword-level last), then enwikt (table order) before ruwikt
   (first sense first); duplicates by translation key removed (first kept).
 - `freq_rank` = 1 + number of wordfreq `large` entries more frequent than the key, only when the key itself is a

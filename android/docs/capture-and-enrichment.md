@@ -15,10 +15,10 @@ Related files:
 - [ui.md](ui.md) and [copy.md](copy.md): screens and wording.
 
 **Fixtures win.** These are normative:
-- `spec/fixtures/capture/`: `clean`, `extract`, `typed-highlight`;
-- `spec/fixtures/normalization/`: match, translation, sentence, tag and search keys, URL and source keys, text order.
+- `fixtures/capture/`: `clean`, `extract`, `typed-highlight`;
+- `fixtures/normalization/`: match, translation, sentence, tag and search keys, URL and source keys, text order.
 
-The exact character lists (quotes, dashes, spaces, ignorables, closers, speaker labels, annotations, what counts as a Latin letter) are in `spec/fixtures/README.md` under "Rules for the text functions". They are not repeated here.
+The exact character lists (quotes, dashes, spaces, ignorables, closers, speaker labels, annotations, what counts as a Latin letter) are in `fixtures/README.md` under "Rules for the text functions". They are not repeated here.
 
 ## Capture surfaces
 

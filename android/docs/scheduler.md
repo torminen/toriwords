@@ -2,14 +2,14 @@
 
 How ToriWords decides what to review and when, on Android. The rules are shared with the iOS app and must give **bit-identical due days** for the same history.
 
-**Fixtures win.** The JSON cases in `spec/fixtures/scheduler/` are normative:
+**Fixtures win.** The JSON cases in `fixtures/scheduler/` are normative:
 - `fsrs-step.json`
 - `fsrs-replay.json`
 - `day-boundary.json`
 - the `queue-*.json` files
 - `snapshot.json`
 
-Their case format and tolerances are in `spec/fixtures/README.md`. If this file and a fixture disagree, the fixture is right and this file gets fixed. How the Android suites run them: [testing.md](testing.md).
+Their case format and tolerances are in `fixtures/README.md`. If this file and a fixture disagree, the fixture is right and this file gets fixed. How the Android suites run them: [testing.md](testing.md).
 
 Related files:
 - [data-model.md](data-model.md): `card` and `review_log` columns, settings.

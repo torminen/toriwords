@@ -6,7 +6,7 @@ import ToriTestSupport
 @testable import ToriStore
 @testable import ToriSync
 
-/// `spec/fixtures/sync/`: the real ToriStore + SyncEngine for each simulated device, in-process, against `InMemoryCloud`.
+/// `fixtures/sync/`: the real ToriStore + SyncEngine for each simulated device, in-process, against `InMemoryCloud`.
 enum SyncScenarios {
     static var all: [FixtureCase] {
         let dir = FixtureLocator.url("sync")

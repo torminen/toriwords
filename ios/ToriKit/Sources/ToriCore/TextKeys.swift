@@ -1,6 +1,6 @@
 import Foundation
 
-/// Text keys. Character sets are the explicit lists in `spec/fixtures/README.md`,
+/// Text keys. Character sets are the explicit lists in `fixtures/README.md`,
 /// never a Unicode property lookup or a locale-dependent call, so all platforms agree.
 public enum TextKey {
     /// Key for duplicate detection of Entry texts and dictionary lookups.

@@ -7,7 +7,7 @@ This folder is the canonical specification of the ToriWords Android app (v1). To
 - **Platform:** Android 12 (API 31) and later; target and compile SDK 37. Kotlin and Jetpack Compose with Material 3. No code is shared with iOS.
 - **Template:** the iOS app on `main` (`ios/`) is the reference for behaviour and UI. Android matches it wherever the platform allows. Every deliberate difference, with its reason, is listed in [ios-differences.md](ios-differences.md).
 - **No account and no server.** All data lives on the phone. Sync between the user's Android devices is optional and goes through the app data folder in their Google Drive. Android and iPhone do not sync with each other; the JSON backup moves words between them.
-- **Shared with iOS:** only the parity fixtures in `spec/fixtures/` (normative test data for the text rules, IDs, clock, merge, scheduler and sync) and the dictionary built by `tools/dictionary/`. Where this spec and a fixture disagree, the fixture wins.
+- **Shared with iOS:** only the parity fixtures in `fixtures/` (normative test data for the text rules, IDs, clock, merge, scheduler and sync) and the dictionary built by `tools/dictionary/`. Where this spec and a fixture disagree, the fixture wins.
 - **Languages:** v1 has one language pair: native Russian, learning English. The app UI is in English and Russian. This spec is written in English.
 
 ## Files

@@ -98,7 +98,7 @@ Extension drops a file into the App Group inbox and the app imports it; the widg
   CoreHaptics, CryptoKit.
 - **Build:** Tuist generates the project; ToriKit modules link as static frameworks (`Tuist/Package.swift`); settings
   come from xcconfig files (Debug, Release, Personal).
-- **Tests:** Swift Testing, with parity fixtures shared with Android (`spec/fixtures`).
+- **Tests:** Swift Testing, with parity fixtures shared with Android (`fixtures`).
 - **Tools:** Python with uv builds the dictionary from Wiktionary and validates the fixtures (`tools/`).
 - **CI:** GitHub Actions: ToriKit on the iOS Simulator and on Linux, the app build, the Python tools.
 
@@ -120,7 +120,7 @@ source ~/.local/share/swiftly/env.sh         # per shell
 cd ios/ToriKit && swift test
 ```
 
-The parity fixtures are found from the test sources' location. Set `TORI_FIXTURES=/path/to/spec/fixtures` to use
+The parity fixtures are found from the test sources' location. Set `TORI_FIXTURES=/path/to/fixtures` to use
 another checkout. On the simulator, pass it as `TEST_RUNNER_TORI_FIXTURES`.
 
 Fixture and dictionary tools have their own tests (CI: `tools.yml`):
@@ -213,6 +213,6 @@ dictionary work. It installs next to the full app under its own bundle ID, and X
 
 ## Specs and fixtures
 
-- Parity fixtures shared with Android: `spec/fixtures/`. See `spec/fixtures/README.md`. That covers normalization, IDs,
+- Parity fixtures shared with Android: `fixtures/`. See `fixtures/README.md`. That covers normalization, IDs,
   HLC, merge, capture, the scheduler and the multi-device `sync/` scenarios. `known-deviations.json` must be `[]`.
 - CI workflows: `.github/workflows/toriKit-linux.yml`, `tools.yml` and `ios.yml`.

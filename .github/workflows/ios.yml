@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "ios/**"
-      - "spec/fixtures/**"
+      - "fixtures/**"
       - "tools/dictionary/release.json"
       - "tools/dictionary/dictionary.sqlite.sha256"
       - "tools/dictionary/fetch.sh"
@@ -47,7 +47,7 @@ jobs:
         run: |
           # A PR checks out its merge commit: the diff against its first parent is exactly the PR's change.
           if [ "${{ github.event_name }}" != pull_request ] || git diff --name-only HEAD^1 HEAD | grep -qE \
-            '^(ios/|spec/fixtures/|tools/dictionary/(release\.json|dictionary\.sqlite\.sha256|fetch\.sh)$|\.github/workflows/ios\.yml$)'
+            '^(ios/|fixtures/|tools/dictionary/(release\.json|dictionary\.sqlite\.sha256|fetch\.sh)$|\.github/workflows/ios\.yml$)'
           then echo ios=true >> "$GITHUB_OUTPUT"; else echo ios=false >> "$GITHUB_OUTPUT"; fi
 
   # ToriKit tests run natively on macOS: booting an iOS Simulator on the runner took about 7 of the job's 9-10 minutes,
@@ -68,7 +68,7 @@ jobs:
       - name: swift test
         working-directory: ios/ToriKit
         env:
-          TORI_FIXTURES: ${{ github.workspace }}/spec/fixtures
+          TORI_FIXTURES: ${{ github.workspace }}/fixtures
         run: swift test
 
   app-build:

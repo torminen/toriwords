@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-FIXTURES = Path(__file__).resolve().parents[3] / "spec" / "fixtures"
+FIXTURES = Path(__file__).resolve().parents[3] / "fixtures"
 
 
 def load(rel: str) -> dict:

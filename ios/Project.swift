@@ -72,7 +72,7 @@ let project = Project(
             sources: ["App/**"],
             // The full dictionary when fetched (tools/dictionary/fetch.sh) and the committed sample; the app
             // installs the full file when present, else the sample (Debug/CI). Release fails without the full file.
-            // Assets.xcassets holds the app icon; its SVG sources in Resources/AppIcon are not bundled.
+            // Assets.xcassets holds the app icon.
             resources: ["App/**/*.xcstrings", "Resources/dictionary*.sqlite", "Resources/Assets.xcassets"],
             entitlements: appEntitlements,
             scripts: [

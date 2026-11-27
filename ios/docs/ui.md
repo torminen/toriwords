@@ -141,7 +141,7 @@ Behaviour: [Add a word by typing](product.md#51-add-a-word-by-typing), [Duplicat
 
 ### 4.3 Capture sheet
 
-Behaviour: [Capture via text selection and Share](product.md#52-capture-via-text-selection-and-share), [Duplicates](product.md#53-duplicates), [Phrases](product.md#55-phrases).
+Behaviour: [Capture via Share](product.md#52-capture-via-share), [Duplicates](product.md#53-duplicates), [Phrases](product.md#55-phrases).
 
 - **Entry point:** select text in any app → **Share** → **ToriWords**, or share text or a link from any app's share menu.
 - **Sheet:** the Share Extension's sheet over the other app: a form with the inline title "ToriWords", **Cancel** on the left and **Save** (bold) on the right. Sections in order:

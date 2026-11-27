@@ -438,7 +438,7 @@ Behaviour: [Reminders and widget](product.md#514-reminders-and-widget). The widg
 
 ## 4. Capture sheet strings
 
-Behaviour: [Capture via text selection and Share](product.md#52-capture-via-text-selection-and-share). The sheet's title is the product name, "ToriWords".
+Behaviour: [Capture via Share](product.md#52-capture-via-share). The sheet's title is the product name, "ToriWords".
 
 | English | Russian | Where / note |
 |---|---|---|

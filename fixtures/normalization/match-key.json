@@ -1,7 +1,7 @@
 {
   "kind": "text-key",
   "function": "matchKey",
-  "source": "Match key (steps 1–7); character lists in spec/fixtures/README.md",
+  "source": "Match key (steps 1–7); character lists in fixtures/README.md",
   "cases": [
     { "id": "mk-001", "input": "Run", "expected": "run" },
     { "id": "mk-002", "input": "  take   off  ", "expected": "take off" },

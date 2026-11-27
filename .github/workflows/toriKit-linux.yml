@@ -5,13 +5,13 @@ on:
     branches: [main]
     paths:
       - "ios/ToriKit/**"
-      - "spec/fixtures/**"
+      - "fixtures/**"
       - ".swift-version"
       - ".github/workflows/toriKit-linux.yml"
   pull_request:
     paths:
       - "ios/ToriKit/**"
-      - "spec/fixtures/**"
+      - "fixtures/**"
       - ".swift-version"
       - ".github/workflows/toriKit-linux.yml"
   workflow_dispatch:
@@ -56,5 +56,5 @@ jobs:
       - name: swift test
         working-directory: ios/ToriKit
         env:
-          TORI_FIXTURES: ${{ github.workspace }}/spec/fixtures
+          TORI_FIXTURES: ${{ github.workspace }}/fixtures
         run: swift test

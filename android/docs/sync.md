@@ -17,7 +17,7 @@ Optional sync uses the **Google Drive appDataFolder** of a Google account the us
 - [data-model.md](data-model.md): tables and columns.
 - [architecture.md](architecture.md): modules and process model.
 
-**Fixtures win:** `spec/fixtures/ids/`, `spec/fixtures/hlc/`, `spec/fixtures/merge/` and the multi-device scenarios in `spec/fixtures/sync/` are normative. Their format is in `spec/fixtures/README.md`. The scenarios use CloudKit vocabulary; [Drive fake for the fixtures](#drive-fake-for-the-fixtures) maps it to Drive, and [testing.md](testing.md) describes how the suites run.
+**Fixtures win:** `fixtures/ids/`, `fixtures/hlc/`, `fixtures/merge/` and the multi-device scenarios in `fixtures/sync/` are normative. Their format is in `fixtures/README.md`. The scenarios use CloudKit vocabulary; [Drive fake for the fixtures](#drive-fake-for-the-fixtures) maps it to Drive, and [testing.md](testing.md) describes how the suites run.
 
 ## Goals
 
@@ -134,7 +134,7 @@ All other records use UUIDv7:
 
 ### ID order
 
-IDs are 16-byte BLOBs. "Smallest ID" always means **unsigned** byte order: SQLite BLOB order, or an unsigned comparator in Kotlin, because Kotlin `Byte` is signed. Pinned by `spec/fixtures/ids/byte-order.json`.
+IDs are 16-byte BLOBs. "Smallest ID" always means **unsigned** byte order: SQLite BLOB order, or an unsigned comparator in Kotlin, because Kotlin `Byte` is signed. Pinned by `fixtures/ids/byte-order.json`.
 
 ## Hybrid logical clock
 
@@ -174,14 +174,14 @@ IDs are 16-byte BLOBs. "Smallest ID" always means **unsigned** byte order: SQLit
 
 ### Comparator
 
-The only conflict rule (`spec/fixtures/merge/field-comparator.json`):
+The only conflict rule (`fixtures/merge/field-comparator.json`):
 
 ```
 wins(a, b) = (a.u, a.c) > (b.u, b.c)        // rank first, then clock string
 merge(local, remote) = wins(remote, local) ? remote : local
 ```
 
-**Envelope merge** (`spec/fixtures/merge/envelope.json`):
+**Envelope merge** (`fixtures/merge/envelope.json`):
 - `deleted` = OR.
 - `mergedInto`: non-null beats null; the smaller ID beats the larger.
 - Fields are merged per field.
@@ -280,7 +280,7 @@ Pinned by the `sync/` fixtures.
 
 ### Natural keys
 
-Every key starts with NFC. The key functions are in `spec/fixtures/normalization/`.
+Every key starts with NFC. The key functions are in `fixtures/normalization/`.
 
 | Type | Natural key |
 |---|---|
@@ -756,7 +756,7 @@ The shared sync engine talks to a `CloudDatabase` interface (the iOS app impleme
 
 ### Drive fake for the fixtures
 
-The multi-device scenarios in `spec/fixtures/sync/` run against an in-memory Drive fake. The fake models:
+The multi-device scenarios in `fixtures/sync/` run against an in-memory Drive fake. The fake models:
 - fileIds and non-unique names;
 - `createdTime` and `modifiedTime` from the scenario clock;
 - `changes.list` paging with `removed` entries, and token invalidation;

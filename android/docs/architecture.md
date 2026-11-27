@@ -19,7 +19,7 @@ ToriWords is local-first. Each device keeps the user's whole vocabulary in a loc
 Principles:
 1. **Local-first.** Every feature except Drive sync and the one-time translation model download works offline. No screen waits for the network.
 2. **No account, no backend.** With Drive sync off, the app talks to no sync service. Network use is limited to Google Drive (only when sync is on), the ML Kit translation model download and ML Kit's own diagnostics (see [Observability](#13-observability-and-privacy)).
-3. **Domain logic runs on the device and is pinned by fixtures.** Text keys, IDs, clocks, merge, capture text rules, FSRS-6, the day model, the daily queue and the widget snapshot must behave exactly like iOS. The shared JSON fixtures in `spec/fixtures/` are normative ([testing.md](testing.md)).
+3. **Domain logic runs on the device and is pinned by fixtures.** Text keys, IDs, clocks, merge, capture text rules, FSRS-6, the day model, the daily queue and the widget snapshot must behave exactly like iOS. The shared JSON fixtures in `fixtures/` are normative ([testing.md](testing.md)).
 4. **Derived data is never synced.** Card scheduling state, due days, match keys, canonical IDs, search folds and all counts are recomputed locally.
 5. **One process.** Every Android entry point (main activity, capture sheet, widget, workers, alarm and system receivers) runs in the app process and shares one database instance. No `android:process` attribute is declared anywhere. iOS needs an inbox, a vocabulary index and a sticky-fields file only because its Share Extension is a separate process; Android has none of these.
 6. **Machine output only suggests.** Dictionary and ML Kit results are offered and stored only when the user accepts them. The one exception is the automatic fill of words saved without a translation ([capture-and-enrichment.md](capture-and-enrichment.md)).
@@ -326,7 +326,7 @@ android/
   enrichment/           ML Kit adapter, enrichment orchestrator, TTS
   designsystem/         Compose M3 theme, LogoMark, BrandHeader, Haptics
   baselineprofile/      Macrobenchmark + Baseline Profile generator
-spec/fixtures/          shared with iOS (not under android/)
+fixtures/               shared with iOS (not under android/)
 tools/dictionary/, tools/fixtures/   dev tools (Python), not app code
 ```
 
@@ -340,16 +340,16 @@ tools/dictionary/, tools/fixtures/   dev tools (Python), not app code
 **Build.** Gradle with the version catalog. Release: R8 full mode, resource shrinking, App Bundle, Play App Signing. All native libraries (bundled SQLite, ML Kit) must be **16 KB page-aligned**, as Play requires for current target SDKs; CI checks the alignment.
 
 **CI** (`.github/workflows/android.yml`, shaped like `ios.yml`):
-- Runs on **every pull request** and on pushes to `main`. A first job detects changed paths. The other jobs are skipped unless `android/**`, `spec/fixtures/**`, `tools/fixtures/**` or the workflow file changed, so the required check always reports.
+- Runs on **every pull request** and on pushes to `main`. A first job detects changed paths. The other jobs are skipped unless `android/**`, `fixtures/**`, `tools/fixtures/**` or the workflow file changed, so the required check always reports.
 - Every run (when not skipped):
-  - fixture JSON validation against `spec/fixtures/schema/` (the shared `tools.yml` job);
+  - fixture JSON validation against `fixtures/schema/` (the shared `tools.yml` job);
   - `core` JVM tests;
   - `store`/`sync` Robolectric tests;
   - lint;
   - debug assemble.
 - Gradle build cache and configuration cache, with the Gradle wrapper and dependency caches restored between runs.
 - The App Bundle release build runs only on `main`.
-- **Instrumented suites** on API 31 and API 37 emulators run before each release and on `spec/fixtures/**` changes, not on every PR ([testing.md](testing.md)).
+- **Instrumented suites** on API 31 and API 37 emulators run before each release and on `fixtures/**` changes, not on every PR ([testing.md](testing.md)).
 - `known-deviations.json` must be `[]` for a release build.
 
 **Release prerequisites** (Google Drive sync):

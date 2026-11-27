@@ -1,4 +1,4 @@
-"""Validates spec/fixtures: JSON Schema per fixture kind, unique case ids, and only code points
+"""Validates fixtures: JSON Schema per fixture kind, unique case ids, and only code points
 assigned in Unicode 13.0 (Android's floor). Exit code 1 on any problem.
 
     uv run python validate.py [fixtures-dir]
@@ -12,7 +12,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 
 HERE = Path(__file__).resolve().parent
-DEFAULT_ROOT = HERE.parents[1] / "spec" / "fixtures"
+DEFAULT_ROOT = HERE.parents[1] / "fixtures"
 ASSIGNED = HERE / "data" / "assigned-13.0.txt"
 
 

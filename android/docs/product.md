@@ -167,7 +167,7 @@ Both open a compact **capture sheet** over the current app, so the user stays in
 
 **Capture sheet**
 
-The exact text rules (word counting, sentence detection and splitting, markup cleanup, length limits, highlight positions) are shared with iOS and pinned by `spec/fixtures/capture` ([capture-and-enrichment.md](capture-and-enrichment.md)). What they mean for the user:
+The exact text rules (word counting, sentence detection and splitting, markup cleanup, length limits, highlight positions) are shared with iOS and pinned by `fixtures/capture` ([capture-and-enrichment.md](capture-and-enrichment.md)). What they mean for the user:
 
 1. **Short selection** (up to 6 words, not ending with sentence punctuation). The selection is the word or phrase to save. The sentence field is empty; the user can paste or type one. The sheet opens without the keyboard.
 2. **Longer selection** (more than 6 words, or ending with sentence punctuation). The selection is treated as the sentence, and its words show as chips under **"Tap the word to save"**. The user taps one word, or adjacent words for a phrase. The sentence is kept, with the chosen text highlighted.

@@ -101,7 +101,7 @@ Extension drops a file into the App Group inbox and the app imports it; the widg
   come from xcconfig files (Debug, Release, Personal).
 - **Tests:** Swift Testing, with parity fixtures shared with Android (`fixtures`).
 - **Tools:** Python with uv builds the dictionary from Wiktionary and validates the fixtures (`tools/`).
-- **CI:** GitHub Actions: ToriKit on the iOS Simulator and on Linux, the app build, the Python tools.
+- **CI:** GitHub Actions: ToriKit with `swift test` on macOS and on Linux, an unsigned simulator build of the app, the Python tools.
 
 ## ToriKit tests
 

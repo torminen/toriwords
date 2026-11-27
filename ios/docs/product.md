@@ -185,7 +185,7 @@ The exact text rules (word counting, sentence detection and splitting, markup cl
    - **No dictionary match:** "Not in the dictionary", a **"Translation (optional)"** field, and the footer "Without a translation the word is saved as \"Translation pending\"." If the user types nothing, the word is saved **pending enrichment**. The app fills the translation automatically later and flags it **Check translation** ([5.4](#54-saving-without-enrichment)).
 7. **Tags.** Collapsed by default (placeholder "work, travel"); the last used tags are offered for 30 minutes.
 8. **Save** shows a short **"Saved"** confirmation in the sheet, then closes it and returns to the source app. Target: two taps after the selection for a short selection, once ToriWords is at the front of the share row (ToriWords, then Save).
-9. **One-time tip.** On the user's first capture only, the sheet shows **"Tip: put ToriWords first"** — "In the share menu, scroll the app row to More → Edit and drag ToriWords to the top." It is never shown again.
+9. **One-time tip.** The first time the capture sheet opens (even if the user then cancels), it shows **"Tip: put ToriWords first"** — "In the share menu, scroll the app row to More → Edit and drag ToriWords to the top." It is never shown again.
 
 **Edge cases**
 - **Word already saved.** "Already in your vocabulary", with up to three existing translations, and "Save adds this sentence and source." ([5.3](#53-duplicates)).
@@ -361,6 +361,7 @@ Identical on iOS and Android. The full rules are in [domain.md](domain.md#normal
 - **Same card reviewed on two devices offline:** both answers count, and the due day is recomputed from all answers, identically on iOS and Android.
 - **Word deleted on another device while reviewed here:** after sync the word is gone, and the answer given here is dropped (delete wins).
 - **Time zone change:** "today" follows the device's current time zone; answers keep the zone they were given in.
+- **Screen left open across 04:00:** **Not yet implemented:** moving to the new day while a screen stays open. Until the app's data changes or the app comes back to the foreground, the screen keeps showing the previous day.
 - **Device clock wrong:** answers are still recorded.
 - **Long sentence or large text size:** the card scrolls, and the word stays highlighted.
 - **Word without translation:** no cards ([5.4](#54-saving-without-enrichment)).
@@ -403,7 +404,7 @@ Identical on iOS and Android. The full rules are in [domain.md](domain.md#normal
 **Entry screen**
 - **Read mode** shows:
   - the word with ▶ and IPA;
-  - a **Wiktionary** mark when data came from Wiktionary, linking to the attribution;
+  - a **Wiktionary** mark when data came from Wiktionary (**Partly implemented:** not yet a link to the attribution in About);
   - **Meanings** in order (translation, part of speech, definition). Meanings with the same definition and part of speech show as one row, with their translations comma-separated, each once; a meaning without a definition keeps its own row;
   - **Suggested meanings** (dictionary and machine variants not yet added), each with **Add**;
   - **Sentences**, each with its source; a web source opens the page;
@@ -546,7 +547,7 @@ Settings are short; the defaults are meant to be right. The review-day start (04
 **About**
 - **Version** (with the build number), and **Source code** (the GitHub repository).
 - **Licences:** dictionary data (Wiktionary, kaikki.org / wiktextract, CC BY-SA 4.0), the open-source libraries, and ToriWords' own licence (Apache 2.0), with a note that the ToriWords name, logo and app icon are not covered by it.
-- **Attribution:** "Dictionary data from Wiktionary, CC BY-SA", linking to the licence. Words with Wiktionary data show the **Wiktionary** mark on the entry screen, which links to the attribution.
+- **Attribution:** "Dictionary data from Wiktionary, CC BY-SA", linking to the licence. Words with Wiktionary data show the **Wiktionary** mark on the entry screen. **Partly implemented:** the Wiktionary mark is not yet a link to the attribution in About.
 - **Privacy.** "Your words are stored on this device and, if iCloud is on, in your private iCloud. Nobody else, including us, can read them. No analytics, tracking or crash-reporting SDKs; no usage data is collected. Only the crash and performance reports of iOS itself exist, if you allowed them in iOS Settings."
 
 **Edge cases**
@@ -711,7 +712,7 @@ Settings are short; the defaults are meant to be right. The review-day start (04
 - **Delivery.** One local notification per day at the chosen time.
 - **Content.** The notification reads **"12 to review"**, the same count as Home's Due today, including new words. A day with only new words also gets a reminder. Tapping it opens Review. While the app is open, no banner shows.
 - **When it does not appear.** No notification on a day with nothing due, or once everything due today is done. No push server.
-- **Planning ahead.** Reminders are planned for the coming week each time the app updates its counts (after reviews, sync, edits and on opening). If the app is not opened for more than a week, reminders stop until it is opened again.
+- **Planning ahead.** Reminders are planned for the coming week each time the app updates its counts (after reviews, sync, edits and on opening). If the app is neither opened nor refreshed in the background for more than a week, reminders stop until it runs again.
 
 **Widget**
 - **Sizes:** Home Screen small and medium, and Lock Screen circular and rectangular.
@@ -720,7 +721,7 @@ Settings are short; the defaults are meant to be right. The review-day start (04
   - the medium size adds **"Tap to start reviewing"**;
   - nothing due today: **"Next review: tomorrow"**, or the date ("Next review: Mon, 30 Nov"); never a time;
   - **"Open ToriWords"** when nothing is scheduled, when no word is reviewable or there are no words, when it was placed before the app was ever opened, or when it has not updated for 7 days.
-- Tapping it opens Review (or the app, for "Open ToriWords").
+- Tapping it always opens Review, also when it shows "Open ToriWords"; Review then shows its empty or nothing-due screen.
 - **Updates.** The count is the same as Home's. It updates after reviewing, after sync, and at each 04:00 day start for the coming week.
 - **Colours.** The fixed ToriWords palette (light and dark); the Lock Screen sizes follow the system's tinting.
 
@@ -772,7 +773,7 @@ Opened by tapping the Home **Due today** block. It is a pushed screen titled **"
 - **File names:** `ToriWords-backup-YYYY-MM-DD.json` and `ToriWords-YYYY-MM-DD.csv`.
 - **CSV** has one row per word: text, translations, definitions, first sentence, source, tags, stage and created date. It is readable and lossy; not a backup.
 - **JSON** holds the complete vocabulary: all meanings, sentences, sources, tags and the full review history, in the documented, versioned format shared with Android and with sync.
-- **Attribution.** A file that contains Wiktionary-derived text includes the Wiktionary attribution (CC BY-SA); a file without such text does not. The screen says: "Files with dictionary data include the Wiktionary attribution (CC BY-SA)."
+- **Attribution.** A backup (JSON) always includes the Wiktionary attribution (CC BY-SA). A spreadsheet (CSV) ends with it only when it contains Wiktionary-derived text. The screen says: "Files with dictionary data include the Wiktionary attribution (CC BY-SA)."
 - No iCloud needed.
 
 **Restore** (Settings → Data → **Restore from backup**)

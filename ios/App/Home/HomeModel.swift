@@ -25,7 +25,9 @@ struct HomeSnapshot: Equatable, Sendable {
         // ponytail: `words` reads every row to show five; add a LIMIT query if Home gets slow with large vocabularies.
         let recent = queue.homeState == .empty ? [] : Array(try r.words(WordsQuery(sort: .newest)).prefix(recentLimit))
         let needs = queue.homeState == .noneReviewable ? try r.words(WordsQuery(filter: .needsTranslation)).count : 0
-        return HomeSnapshot(state: queue.homeState, toReview: queue.toReviewCount, new: queue.newCount, catchUp: queue.catchUp,
+        // Cards can lag a translated Sense (sync order), so never show "0 words need a translation".
+        let state: HomeState = queue.homeState == .noneReviewable && needs == 0 ? .nothingDue : queue.homeState
+        return HomeSnapshot(state: state, toReview: queue.toReviewCount, new: queue.newCount, catchUp: queue.catchUp,
                             waiting: queue.waiting, nextDueInDays: next.map { $0 - today }, recent: recent, needsTranslation: needs)
     }
 }

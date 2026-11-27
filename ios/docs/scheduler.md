@@ -251,7 +251,7 @@ catchUp = load > 2 · normalLoad
 quota   = catchUp ? normalLoad + ceil((load − normalLoad) / 3) : ∞
 ```
 
-Catch-up spreads a backlog over several days. **Not yet implemented:** "Review all now" (open question, see [product.md](product.md#56-review)). `QueueExtensions.reviewAll` exists in `ToriCore` and lifts the quota, but no screen sets it.
+Catch-up spreads a backlog over several days. There is no "Review all now" control in v1 ([product.md](product.md#3-later-not-in-v1)). `QueueExtensions.reviewAll` exists in `ToriCore` and lifts the quota, but no screen sets it.
 
 ### Building today's queue
 

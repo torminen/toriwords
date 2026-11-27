@@ -214,7 +214,7 @@ Behaviour: [Words and the entry screen](product.md#57-words-and-the-entry-screen
   - **Delete** asks "Delete N words?" / "They are removed with their review history on all your devices." (Delete N words / Cancel), then shows the toast "N words deleted" with **Undo**.
   - **Tag** opens the "Add tags" sheet: the tag editor with the footer "Adds tags to N words. Tags they already have stay." and **Cancel** / **Add** (Add is disabled until a tag is chosen). It only adds tags.
 - **No results:** "No words match "…"" with a filled **Add "…"**, which opens Add with that text.
-- **Not yet implemented:** a source filter.
+- No source filter in v1 ([product.md](product.md#3-later-not-in-v1)).
 
 **Filter by tag sheet:** a sheet titled "Filter by tag" (medium and large detents). It has **Clear** on the left and **Done** on the right, a list of tags with round checkboxes and word counts, and a full-width filled **Show N words** at the bottom. Several checked tags match words with any of them. With no tags at all, the sheet shows "No tags yet. Add tags to words in Add or when editing a word."
 
@@ -282,7 +282,7 @@ Behaviour: [Progress](product.md#515-progress).
 - **Vocabulary:** drill-in rows New, Learning, Known well, Already known, Paused, each with its count. A tap opens Words with that filter.
 - **Activity:** a bar chart, "Reviews per day, last 30 days".
 - **Captured:** a bar chart, "Words added per week, last 8 weeks".
-- **Top sources:** rows with the source label and the number of words. *Partly implemented:* the rows can't be tapped (there is no source filter).
+- **Top sources:** rows with the source label and the number of words. The rows are display-only (no source filter in v1).
 - **Empty vocabulary** (the last word was deleted while the screen was open): "Build your vocabulary" with a filled **Add a word**.
 
 ### 4.10 Settings

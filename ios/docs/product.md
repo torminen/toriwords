@@ -82,6 +82,7 @@ This file contains no storage schemas, APIs or algorithms.
 | More language pairs | The data model is ready. |
 | In-app reader for pasted articles; subtitle file import | — |
 | Generated example sentences; curated word sets | The user's own sentence comes first. |
+| Filter Words by source; a "Review all now" control in catch-up | Owner decision: not in v1. Sources show in Progress → Top sources. |
 | Reviewing a single tag | One queue in v1. |
 | Typed answers, listening and multiple-choice exercises | — |
 | App Intents / Shortcuts; review inside the widget; Live Activities; Apple Watch | — |
@@ -93,8 +94,6 @@ This file contains no storage schemas, APIs or algorithms.
 | On-device LLM features | Not planned: no Russian support, device-limited, differs per OS. |
 | Recorded human audio | Not planned: licences, coverage, size. |
 | Streaks, XP, levels, leaderboards | Not planned. |
-
-Planned for v1 but not built yet (marked inline): filtering Words by source ([5.7](#57-words-and-the-entry-screen), [5.11](#511-tags)), tappable Top sources in Progress ([5.15](#515-progress)) and a "Review all now" control during catch-up ([5.6](#56-review)).
 
 ## 4. Navigation conventions
 
@@ -350,7 +349,7 @@ Identical on iOS and Android. The full rules are in [domain.md](domain.md#normal
   - the Due today block on Home shows **"Welcome back — N cards are waiting. We'll spread them over about a week."** under the counts;
   - each day shows a manageable, shrinking share of the backlog, most at-risk cards first;
   - new words pause until catch-up ends.
-- **Review all now.** **Not yet implemented.** Planned: a control during catch-up that shows the rest of the backlog in the current session only and stores nothing. Today there is no such control.
+- **No catch-up control.** There is no "Review all now" control; catch-up always spreads the backlog ([Later](#3-later-not-in-v1)).
 - **No cap** on due reviews on a normal day.
 - **Same numbers everywhere.** The numbers are defined once in [scheduler.md](scheduler.md), so Home, the widget, the reminder and Android show the same counts.
 - **Calm.** No guilt messages, no streaks.
@@ -380,7 +379,7 @@ Identical on iOS and Android. The full rules are in [domain.md](domain.md#normal
   - a stage marker: **New**, **Learning**, **Known well**, **Known**, **Paused** or **Needs translation**. The rule is in [domain.md](domain.md#entry).
 - **Search** ("Search words, translations, sentences"), plus a horizontally scrolling row of filter chips:
   - **All**, **Needs translation**, **Check translation**, **Phrases**, **New**, **Learning**, **Known well**, **Known**, **Paused**, **Tag**.
-- **Filter by source** ("all words from this article"). **Not yet implemented.** Planned; where it appears is open.
+- There is no source filter in v1 ([Later](#3-later-not-in-v1)); sources show in Progress → Top sources.
 - **Sort** (toolbar menu): **Newest**, **A–Z**, **Next due**.
 - **+** in the toolbar opens Add.
 - **Row swipe left:** **I already know this**, **Pause**, **Delete**. Paused and known rows offer **Resume learning** instead of the first two.
@@ -639,7 +638,7 @@ Settings are short; the defaults are meant to be right. The review-day start (04
   - checkable tags with counts, **Clear**, and **Show N words**;
   - with several tags selected, the filter shows words that have **any** of them;
   - the chip then reads "work" or "work +1".
-- **Filter by source.** **Not yet implemented** ([5.7](#57-words-and-the-entry-screen)).
+- There is no filter by source in v1 ([Later](#3-later-not-in-v1)).
 - **Settings → Data → Tags** lists tags alphabetically, with word counts:
   - tap → rename;
   - swipe to delete, which asks first: "Delete tag '<tag>'?" — "It is removed from N words. The words stay.";
@@ -751,7 +750,7 @@ Opened by tapping the Home **Due today** block. It is a pushed screen titled **"
 - **Vocabulary:** the number of words that are **New**, **Learning**, **Known well**, **Already known** and **Paused**. Tapping a row opens Words with that filter; ‹ Back returns to Progress.
 - **Activity:** reviews per day, last 30 days.
 - **Captured:** words added per week, last 8 weeks.
-- **Top sources:** the sources with the most words, with their counts. **Partly implemented:** the list is shown but its rows are not tappable; opening Words filtered by a source waits for the source filter ([5.7](#57-words-and-the-entry-screen)).
+- **Top sources:** the sources with the most words, with their counts. The rows are display-only (there is no source filter in v1).
 - No XP, levels, streaks or leaderboards.
 
 **Edge cases**
@@ -842,7 +841,5 @@ Opened by tapping the Home **Due today** block. It is a pushed screen titled **"
 
 ## 7. Open questions
 
-- **Filter by source:** where it appears in Words (a chip, a menu, or only from Progress → Top sources) is undecided.
-- **Review all now:** whether the planned catch-up control is still wanted, given the app has shipped without it.
 - **Undoable answer on a crash:** the app loses the one answer that was still undoable. Whether that is acceptable or the answer should be kept is not confirmed by the owner.
 - **Source of non-Safari shares:** iOS does not reveal the sharing app, so such sources show only the domain. The owner has not explicitly confirmed this.

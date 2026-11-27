@@ -26,7 +26,7 @@ This file lists every user-visible string in the Android app, in English and Rus
 | {n} new | Новых: {n} |  |
 | {n} new word a day \| {n} new words a day | {n} новое слово в день \| {n} новых слова в день \| {n} новых слов в день | plural |
 | {n} selected \| {n} selected | Выбрано: {n} \| Выбрано: {n} \| Выбрано: {n} | plural |
-| {n} to review | Повторить: {n} | Home, widget, and the reminder notification title |
+| {n} to review | Повторить: {n} | Home, widget, and the reminder notification text |
 | {n} to review · {m} new | Повторить: {n} · Новых: {m} |  |
 | {n} unsynced change will be lost. \| {n} unsynced changes will be lost. | {n} несинхронизированное изменение будет потеряно. \| {n} несинхронизированных изменения будут потеряны. \| {n} несинхронизированных изменений будут потеряны. | plural |
 | {n} word \| {n} words | {n} слово \| {n} слова \| {n} слов | plural |
@@ -376,7 +376,7 @@ The shared strings "Sync now", "Syncing…", "Synced {time ago}", "Waiting for n
 |---|---|---|
 | Usually arrives within a few minutes of this time. | Обычно приходит в течение нескольких минут после этого времени. | reminder offer sheet and the Time row; Android delivers the reminder around the chosen time |
 | Open system settings › | Открыть системные настройки › | under "Notifications are off for ToriWords" |
-| {n} to review | Повторить: {n} | notification title (shared string); there is no body |
+| {n} to review | Повторить: {n} | notification text (shared string); no title of its own, the system shows "ToriWords" in the header |
 | Daily reminder | Ежедневное напоминание | notification channel name in Android Settings (shared string) |
 | Only on days when cards are due. | Только в дни, когда есть карточки. | notification channel description |
 

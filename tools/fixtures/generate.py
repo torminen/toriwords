@@ -1,4 +1,4 @@
-"""Generates spec/fixtures/scheduler/*.json from torifix.scheduler (scheduler, day model, daily queue, widget snapshot).
+"""Generates fixtures/scheduler/*.json from torifix.scheduler (scheduler, day model, daily queue, widget snapshot).
 
 Deterministic: fixed inputs, no clock reads, stable JSON formatting. Run: `uv run python generate.py`.
 """
@@ -10,7 +10,7 @@ from torifix import ids
 from torifix.scheduler import (DESIRED_RETENTION, MAX_INTERVAL, W, CardState, Entry, Card, Log, build_queue,
                                day_number, replay, snapshot, step)
 
-OUT = Path(__file__).resolve().parents[2] / "spec" / "fixtures" / "scheduler"
+OUT = Path(__file__).resolve().parents[2] / "fixtures" / "scheduler"
 OFFSET = 180  # UTC+3
 T = 20774  # "today" in the queue fixtures (2026-11-17)
 PARAMS = {"w": W, "desiredRetention": DESIRED_RETENTION, "maximumInterval": MAX_INTERVAL}

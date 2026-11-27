@@ -5,12 +5,12 @@ on:
     branches: [main]
     paths:
       - "tools/**"
-      - "spec/fixtures/**"
+      - "fixtures/**"
       - ".github/workflows/tools.yml"
   pull_request:
     paths:
       - "tools/**"
-      - "spec/fixtures/**"
+      - "fixtures/**"
       - ".github/workflows/tools.yml"
   workflow_dispatch:
 
@@ -37,7 +37,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: tools/fixtures/uv.lock
       - run: uv sync --locked
-      - name: Validate spec/fixtures (schemas, case ids, Unicode ≤ 13)
+      - name: Validate fixtures (schemas, case ids, Unicode ≤ 13)
         run: uv run python validate.py
       - name: pytest (incl. generated scheduler fixtures are not stale)
         run: uv run pytest

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Finds the shared parity fixtures (`<repo>/spec/fixtures`) without copying them:
+/// Finds the shared parity fixtures (`<repo>/fixtures`) without copying them:
 /// env `TORI_FIXTURES` wins, otherwise the path is derived from this file's location in the repo.
 public enum FixtureLocator {
     public static var root: URL {
@@ -14,7 +14,7 @@ public enum FixtureLocator {
             .deletingLastPathComponent()  // ToriKit
             .deletingLastPathComponent()  // ios
             .deletingLastPathComponent()
-        return repo.appendingPathComponent("spec/fixtures", isDirectory: true)
+        return repo.appendingPathComponent("fixtures", isDirectory: true)
     }
 
     public static func url(_ relativePath: String) -> URL {

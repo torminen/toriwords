@@ -1,8 +1,8 @@
 """Text rules for the dictionary build.
 
 `match_key` and `search_fold` are a port of the shared text rules (same explicit character lists as
-spec/fixtures/README.md and tools/fixtures/torifix/text.py); tests run them against
-spec/fixtures/normalization/*.json.
+fixtures/README.md and tools/fixtures/torifix/text.py); tests run them against
+fixtures/normalization/*.json.
 """
 
 import re

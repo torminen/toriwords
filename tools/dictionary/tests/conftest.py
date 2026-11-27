@@ -6,7 +6,7 @@ import pytest
 from toridict import build, parse
 
 HERE = Path(__file__).resolve().parent
-FIXTURES = HERE.parents[2] / "spec" / "fixtures"
+FIXTURES = HERE.parents[2] / "fixtures"
 DATA = HERE / "data"
 FREQ = {"run": 300, "run out": 9000, "sprint": 150_000, "color": 900, "moscow": 5000}
 

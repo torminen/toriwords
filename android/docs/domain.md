@@ -17,7 +17,7 @@ User-facing behaviour is in [product.md](product.md).
 - **recall**: Russian shown, produce the English;
 - **cloze**: the English sentence shown with the word blanked.
 
-**Derived** values are computed on each device from other data and are never synced. Android and iOS must compute them identically; the shared fixtures in `spec/fixtures/` pin this.
+**Derived** values are computed on each device from other data and are never synced. Android and iOS must compute them identically; the shared fixtures in `fixtures/` pin this.
 
 **Timestamps.** "Created at" and "updated at" exist for display and sorting only. Conflicts between devices are never resolved by device timestamps; ordering uses the sync clock ([sync.md](sync.md)).
 
@@ -301,7 +301,7 @@ The same item can be created more than once:
 | Tag | tag key |
 | Entry ↔ Tag membership | Entry + Tag |
 
-**Text keys.** Every key is computed after Unicode NFC normalisation. The exact rules are fixed by the shared fixtures in `spec/fixtures/` ([capture-and-enrichment.md](capture-and-enrichment.md)). Text is always displayed as written; keys are used only for comparison.
+**Text keys.** Every key is computed after Unicode NFC normalisation. The exact rules are fixed by the shared fixtures in `fixtures/` ([capture-and-enrichment.md](capture-and-enrichment.md)). Text is always displayed as written; keys are used only for comparison.
 
 1. **Match key** (Entry text, Source title).
    - Ignores: letter case; leading and trailing whitespace and punctuation; repeated inner spaces; typographic variants of apostrophes, quotes and dashes. `ё` = `е`.
@@ -344,7 +344,7 @@ What any sync must guarantee, at product level. The Android mechanism (Google Dr
 7. **Data created while sync was off** uploads and merges when sync is turned on, without asking.
 8. **Out-of-order arrival.** An item that arrives before what it refers to (for example a ReviewLog before its Card) is kept, but hidden from the user and from review until the referenced item arrives. The result is the same as if everything had arrived at once.
 9. **Forward compatibility.** A device running an older app version keeps syncing. Fields it does not know are kept unchanged.
-10. **One format.** Android and iOS share one data format and one set of merge rules, pinned by the same fixtures (`spec/fixtures/merge`, `spec/fixtures/hlc`, `spec/fixtures/ids`). The JSON backup uses the same format, so a backup made on either platform restores on the other.
+10. **One format.** Android and iOS share one data format and one set of merge rules, pinned by the same fixtures (`fixtures/merge`, `fixtures/hlc`, `fixtures/ids`). The JSON backup uses the same format, so a backup made on either platform restores on the other.
 
 ## Future import (after v1)
 

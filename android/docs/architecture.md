@@ -146,7 +146,7 @@ All paths are app-private.
 
 SQLite settings for `user.sqlite`: `encoding = 'UTF-8'` (asserted at open), `journal_mode = WAL`, `synchronous = NORMAL`, `foreign_keys = ON`. When the app goes to the background (`ProcessLifecycleOwner` `ON_STOP`) it runs `PRAGMA wal_checkpoint(TRUNCATE)`, so a backup copy is consistent and small.
 
-The dictionary asset is stored compressed in the APK (about 25 MB) and copied once to `no_backup/dictionary/` (about 58 MB), because SQLite cannot open a file inside the APK. iOS reads its copy in place from the app bundle; this two-copy cost is forced by the platform.
+The dictionary asset is stored compressed in the APK (about 25 MB) and copied once to `no_backup/dictionary/` (about 60 MB), because SQLite cannot open a file inside the APK. iOS reads its copy in place from the app bundle; this two-copy cost is forced by the platform.
 
 ## 7. Start-up, first run, restore and reinstall
 

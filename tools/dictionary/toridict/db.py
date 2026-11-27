@@ -22,7 +22,8 @@ CREATE TABLE form (form_key TEXT NOT NULL, headword_id INTEGER NOT NULL REFERENC
 CREATE TABLE example (sense_id INTEGER NOT NULL REFERENCES sense(id), text_en TEXT NOT NULL);
 CREATE TABLE related (
   headword_id INTEGER NOT NULL REFERENCES headword(id), related_headword_id INTEGER NOT NULL REFERENCES headword(id),
-  kind TEXT NOT NULL CHECK (kind IN ('synonym', 'related', 'derived', 'phrase')));
+  kind TEXT NOT NULL CHECK (kind IN ('synonym', 'related', 'derived', 'phrase')),
+  PRIMARY KEY (headword_id, related_headword_id)) WITHOUT ROWID;
 """
 
 INDEXES = """
@@ -31,7 +32,6 @@ CREATE INDEX sense_headword ON sense(headword_id, ordinal);
 CREATE INDEX translation_ru_headword ON translation_ru(headword_id, rank);
 CREATE INDEX form_key ON form(form_key);
 CREATE INDEX example_sense ON example(sense_id);
-CREATE INDEX related_headword ON related(headword_id);
 CREATE VIRTUAL TABLE ru_fts USING fts5(
   text_folded, content='translation_ru', content_rowid='id', tokenize='unicode61 remove_diacritics 0', columnsize=0);
 INSERT INTO ru_fts(ru_fts) VALUES ('rebuild');

@@ -38,8 +38,8 @@ def test_layout_ids_forms_related(lexicon):
     assert ("ran", run_v, "past") in rows.form and ("colour", color, "British") in rows.form
     assert ("runs", run_v, "present singular third-person") in rows.form
     assert not any(f[0] == "run" for f in rows.form)
-    assert sorted((r[1], r[2]) for r in rows.related if r[0] == run_v) == sorted(
-        [(ids[("sprint", "verb")], "synonym"), (ids[("run out", "verb")], "phrase")])
+    # "sprint" (synonym) has no Russian translation, so it is not offered; "runner" is not a headword.
+    assert [(r[1], r[2]) for r in rows.related if r[0] == run_v] == [(ids[("run out", "verb")], "phrase")]
     sense_of = {r[0]: (r[1], r[2]) for r in rows.sense}
     run_tr = [r for r in rows.translation_ru if r[1] == run_v]
     assert [(r[3], r[6], sense_of[r[2]][1] if r[2] else None) for r in run_tr] == [
@@ -49,11 +49,36 @@ def test_layout_ids_forms_related(lexicon):
 
 
 def test_prune_ladder(lexicon):
-    assert not build.lay_out(lexicon, "examples").example
-    rows = build.lay_out(lexicon, "related")
-    assert not rows.related and not rows.example
+    assert build.PRUNE_STEPS == ["none", "examples", "rare-untranslated", "untranslated-50k", "untranslated-20k",
+                                 "untranslated-10k", "related"]
+    rows = build.lay_out(lexicon, "examples")
+    assert not rows.example and rows.related
     texts = {r[1] for r in build.lay_out(lexicon, "rare-untranslated").headword}
     assert "sprint" not in texts and "thee" not in texts and {"run", "color", "follow up"} <= texts
+    rows = build.lay_out(lexicon, "untranslated-10k")
+    assert rows.related and not rows.example  # related rows outlive headword pruning
+    last = build.lay_out(lexicon, "related")
+    assert not last.related and not last.example and last.headword == rows.headword  # cumulative: keeps the 10k cut
+
+
+def _tr(text):
+    return build.Translation(text, None, "enwikt")
+
+
+def test_related_capped_to_app_order_and_needs_translated_targets():
+    words = {f"w{i}": i * 10 for i in range(1, 12)}  # w1 most frequent
+    src = build.Headword("base", "base", "noun", None, translations=[_tr("база")], freq_rank=5)
+    src.related = [(w, "derived") for w in words] + [("rare", "synonym"), ("bare", "synonym"), ("w11", "synonym")]
+    targets = [build.Headword(w, w, "noun", None, translations=[_tr("x")], freq_rank=r) for w, r in words.items()]
+    targets += [build.Headword("rare", "rare", "noun", None, translations=[_tr("редкий")]),  # freq_rank NULL
+                build.Headword("bare", "bare", "noun", None, freq_rank=1)]  # no RU translation: never offered
+    rows = build.lay_out(build.Lexicon([src, *targets], []))
+    ids = {r[1]: r[0] for r in rows.headword}
+    got = {r[1]: r[2] for r in rows.related if r[0] == ids["base"]}
+    # synonyms first (w11 by freq, then rare with NULL rank), then derived by freq_rank; 8 in total
+    assert got == {ids["w11"]: "synonym", ids["rare"]: "synonym", **{ids[f"w{i}"]: "derived" for i in range(1, 7)}}
+    assert [r[1] for r in rows.related if r[0] == ids["base"]] == sorted(got)  # insert order: (headword_id, target id)
+    assert build.RELATED_LIMIT == 8
 
 
 def test_keep_keys_selects_a_subset(lexicon):

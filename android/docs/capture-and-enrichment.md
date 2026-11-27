@@ -242,7 +242,7 @@ An offline English→Russian dictionary built from Wiktionary.
 - It is built by `tools/dictionary/` (see `tools/dictionary/README.md`) and published as a GitHub Release asset.
 - Release builds fetch it with `tools/dictionary/fetch.sh`, which checks the committed SHA-256.
 - Same inputs give the same bytes.
-- Size budget: ≤ 60 MB uncompressed, ≤ 25 MB compressed in the app package.
+- Size budget: ≤ 61 MiB uncompressed, ≤ 25.5 MB compressed in the app package.
 
 ### Delivery: copied out of the APK
 
@@ -292,10 +292,10 @@ SQLite cannot open a file inside the APK, so Android keeps a compressed copy in 
 | `translation_ru` | `id`, `headword_id`, `sense_id` (NULL = not tied to a sense), `text`, `text_folded`, `origin` (`enwikt` / `ruwikt`), `rank` |
 | `form` | `form_key`, `headword_id`, `form_tags` |
 | `example` | `sense_id`, `text_en` |
-| `related` | `headword_id`, `related_headword_id`, `kind` (`synonym` / `related` / `derived` / `phrase`) |
+| `related` | `headword_id`, `related_headword_id`, `kind` (`synonym` / `related` / `derived` / `phrase`); `WITHOUT ROWID`, primary key `(headword_id, related_headword_id)`; at most 8 per headword (the first 8 in the query order below), targets with ≥ 1 Russian translation |
 | `ru_fts` | FTS5 over `translation_ru.text_folded` (lowercased, `ё`→`е`), tokenizer `unicode61 remove_diacritics 0` |
 
-**Pruned builds:** a build may prune `example` and `related` to fit the size budget. Build 2026.11.1 has neither. When `related` is empty, the related-words section is hidden.
+**Pruned builds:** a build may prune `example` and, as the last resort, `related` to fit the size budget. Build 2026.11.2 has no examples and keeps related rows. When a word has no `related` rows, the related-words section is hidden.
 
 **No dictionary row IDs in user data:** provenance is `(dict_version, dict_headword_key, dict_sense_ordinal)` plus a copy of the text, so a new build cannot break user data.
 
@@ -551,5 +551,5 @@ This covers no engine, an init error, or no offline English voice.
 
 ## Open questions
 
-1. **First-capture delay on a fresh install.** The one-time dictionary copy (~58 MB) on a mid-range device is not measured yet. If it exceeds the 2 s capture target, ship the asset uncompressed (see [Delivery](#delivery-copied-out-of-the-apk)).
+1. **First-capture delay on a fresh install.** The one-time dictionary copy (~60 MB) on a mid-range device is not measured yet. If it exceeds the 2 s capture target, ship the asset uncompressed (see [Delivery](#delivery-copied-out-of-the-apk)).
 2. **Default-voice quality.** TTS engines differ in the quality of `defaultVoice`. The default-voice rule needs checking on at least a Pixel (Google TTS) and a Samsung (Samsung TTS) device.

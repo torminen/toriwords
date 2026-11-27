@@ -132,7 +132,7 @@ cd tools/dictionary && uv run pytest
 
 ## Dictionary
 
-The offline EN→RU dictionary `dictionary.sqlite` (about 60 MiB, CC BY-SA 4.0) is **not** in git.
+The offline EN→RU dictionary `dictionary.sqlite` (about 61 MiB, CC BY-SA 4.0) is **not** in git.
 
 - **Sample:** `ios/Resources/dictionary-sample.sqlite` is committed. It is a few hundred headwords from the same build,
   with the same schema. Debug builds, tests and CI work with it.

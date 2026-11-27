@@ -36,6 +36,10 @@ def test_schema_matches_doc_36_8_2(lexicon, tmp_path):
     assert con.execute("PRAGMA encoding").fetchone()[0] == "UTF-8"
     assert con.execute("PRAGMA page_size").fetchone()[0] == 4096
     assert "headword_key" in [r[1] for r in con.execute("PRAGMA index_list(headword)")]
+    # related: WITHOUT ROWID, primary key (headword_id, related_headword_id) serves the app's lookup by headword_id
+    assert [r[2] for r in con.execute("PRAGMA index_info(sqlite_autoindex_related_1)")][:2] == ["headword_id", "related_headword_id"]
+    assert "WITHOUT ROWID" in con.execute("SELECT sql FROM sqlite_master WHERE name = 'related'").fetchone()[0]
+    assert con.execute("SELECT count(*) FROM related").fetchone()[0] > 0
     assert dict(con.execute("SELECT key, value FROM meta")) == META
 
 

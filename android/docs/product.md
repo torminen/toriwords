@@ -41,7 +41,7 @@ This file contains no storage schemas, APIs or algorithms.
 - **Daily load.** 10 new words a day by default (0–50; counts words, not cards). There is no cap on due reviews. The review day starts at 04:00. After a break the app spreads the backlog over about a week.
 - **Organisation.** Flat tags; one review queue; no decks.
 - **Pronunciation.** The system text-to-speech voice (US by default, UK as a setting) plus Wiktionary IPA. No recorded audio.
-- **Related words.** Up to 8, from bundled dictionary data. The same word gives the same suggestions on Android and iOS. The current dictionary build carries no relation data, so the section stays hidden until a build does ([5.13](#513-related-words)).
+- **Related words.** Up to 8, from bundled dictionary data. The same word gives the same suggestions on Android and iOS. Hidden for words without relations ([5.13](#513-related-words)).
 - **Reminders.** One opt-in daily local reminder, only on days with cards, offered after the first finished session. A home-screen widget.
 - **Progress.** Minimal stats: today, vocabulary by stage, 30-day activity, captures.
 - **Deletion.** A confirmation, then a short Undo; the deletion takes effect when the Undo closes. Deletion is terminal and wins over concurrent edits and reviews. There is no trash.
@@ -705,7 +705,7 @@ Settings are short; the defaults are meant to be right. The review-day start (04
 
 **Edge cases**
 - **No relations known** (common for slang and phrases): the section is hidden.
-- **Dictionary build without relation data.** A dictionary build may leave relations out to fit its size budget. The current build (2026.11.1) has none, so the section is hidden for every word, on Android and on iOS, until a build includes relations ([capture-and-enrichment.md](capture-and-enrichment.md)).
+- **No relations for a word.** Wiktionary has no relations for many rare words, slang and phrases, and a build may drop relations as a last resort to fit its size budget. Then the section is hidden for that word. Build 2026.11.2 carries relations for about 40,000 words ([capture-and-enrichment.md](capture-and-enrichment.md)).
 - **All suggestions already saved:** "You have all related words".
 - **Quality.** Wiktionary relations are narrower than real topics ("down payment" is not offered for "mortgage"). Accepted.
 

@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parents[1]
 CACHE = ROOT / "cache"
 SOURCES = ROOT / "sources.json"
-SIZE_BUDGET = 60 * 1024 * 1024
+SIZE_BUDGET = 61 * 1024 * 1024
 RELEASE_URL = "https://github.com/torminen/toriwords/releases/download/dictionary-{v}/dictionary.sqlite"
 LICENCE_TEXT = ("Dictionary data from Wiktionary (en.wiktionary.org, ru.wiktionary.org), Wiktionary contributors, "
                 "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), extracted with wiktextract "

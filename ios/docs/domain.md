@@ -74,7 +74,6 @@ User-facing behaviour is in [product.md](product.md).
 | enrichment status | `pending`, `done` or `unavailable` (see [Enrichment](#enrichment)). |
 | needs check | True when the app filled a translation automatically without the user choosing it. Cleared when the user opens the Entry or reviews it once. Raised again if the app auto-fills again. Drives the **Check translation** filter. |
 | origin | How it was created: `typed` (Add) or `shared` (the share extension); later `imported`. Android also writes `text selection` for its text-selection menu; iOS never does, because every capture comes through Share. |
-| import ref | Optional. Reserved for future imports: source collection + source item id. |
 | created at / updated at | Display timestamps. |
 
 **States**
@@ -95,11 +94,13 @@ active / excluded → deleted (terminal)
   - A short Undo comes before the deletion. The deletion takes effect only when the Undo window closes.
 
 **Word stage** (the marker shown in Words, the stage filters and Progress). **Derived**, checked in this order:
-1. No Sense with a translation → **Needs translation**.
-2. Excluded as already known → **Known**. Excluded as paused → **Paused**.
+1. Excluded as already known → **Known**. Excluded as paused → **Paused**.
+2. No Sense with a translation → **Needs translation**.
 3. Every Card is `new` (or the Entry has no Cards yet) → **New**.
 4. Every Card is `known well` → **Known well**.
 5. Otherwise → **Learning**.
+
+The **Needs translation** filter lists every live Entry without a translation, so it also includes excluded Entries that have none, even though their stage is Known or Paused.
 
 **Translation state** of an Entry without a translation (the second line in lists):
 - **Translation pending**: enrichment status `pending`.
@@ -149,7 +150,7 @@ active / excluded → deleted (terminal)
 A source-only Context always has a Source and never has a highlight.
 
 **Invariants**
-- A sentence is at most 500 characters. Longer captures are cut around the word.
+- A sentence is at most 500 Unicode code points. Longer captures are cut around the word.
 - An Entry may have any number of Contexts, including none.
 - A highlight lies inside the sentence and never splits a character.
 - Review and cloze use only Contexts that have a sentence. Recall and cloze use only Contexts that also have a highlight.
@@ -209,7 +210,7 @@ Only id, entry, direction, created at and import ref are synced. Cards are creat
 | rating | Grade 1–4. ToriWords' two buttons produce 1 (**Forgot**) or 3 (**Remembered**). Future imports keep 1–4 as they are. Empty only for imported rows that are not answers. |
 | answer duration | How long the user took. |
 | device | The Device the answer was given on. |
-| import fields | Optional, imported logs only: the original kind, rating and interval. Informational; not used for scheduling. |
+| import fields | Optional, imported logs only: the original rating and import ref. Informational; not used for scheduling. **Not yet implemented:** keeping the original kind and interval (added with the import). |
 | review type | **Derived:** `first study`, `review` or `relearning`, found by replaying the Card's merged log. |
 | elapsed since previous review | **Derived.** |
 
@@ -355,7 +356,7 @@ The model must take an Anki import later without changes:
 |---|---|
 | Note | Entry. The user maps fields: text, translation (Sense), optionally example (Context) and definition. Other fields go to the note. |
 | Card | Card. "Front → back" of the mapped fields = recognition; "back → front" = recall; a cloze note = cloze. Unmappable card types are skipped; their notes still import. |
-| Review entry | ReviewLog with its timestamp, rating 1–4 (kept one to one) and duration. The original kind, rating and interval are kept as import fields. Manual or rescheduled rows import with an empty rating and are ignored by the scheduler. |
+| Review entry | ReviewLog with its timestamp, rating 1–4 (kept one to one) and duration. The original rating and import ref are kept as import fields. **Not yet implemented:** keeping the original kind and interval (added with the import). Manual or rescheduled rows import with an empty rating and are ignored by the scheduler. |
 | Deck | Tag with the deck name. |
 | Note tags | Tags. |
 | Suspended card | The Entry becomes excluded / paused when all its cards are suspended. |

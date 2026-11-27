@@ -348,7 +348,7 @@ The Google account picker and consent, the share sheet, the file pickers, the ti
   - Back, a swipe down or a tap outside counts as Not now. On Android 13 and later, Turn on reminder shows the system notification permission dialog.
 - **Notification:**
   - small icon: the monochrome mark;
-  - title: "12 to review", with no body text;
+  - text: "12 to review", with no title of its own; the system shows "ToriWords" in the notification header;
   - channel: "Daily reminder";
   - a tap opens Review.
   - The notification is removed when today's queue is finished in the app.
@@ -369,7 +369,7 @@ The Google account picker and consent, the share sheet, the file pickers, the ti
 
 ## 5. Motion and haptics
 
-This section describes what the user sees and feels, with timings. The mechanism (vibration APIs, the `VIBRATE` permission, fallbacks per API level) is in [architecture.md](architecture.md).
+This section describes what the user sees and feels, with timings. The mechanism is in [architecture.md](architecture.md#9-haptics).
 
 ### 5.1 Launch
 
@@ -383,7 +383,7 @@ This section describes what the user sees and feels, with timings. The mechanism
 | 0.85–1.4 | the branch unfurls both ways from the stem top | growth curve |
 | 1.25–1.7 | the leaf unfolds from its base on the branch end: from 10 % of its size, turning from 45° to 0° | growth curve |
 
-- **Haptic:** a short rolling vibration of seven soft ticks that swell and fade over 0.3 s. Its last tick lands as the leaf has visibly opened, at about 1.57 s. It plays on every launch. On phones that can't play the rolling pattern, a single predefined click plays at that moment instead.
+- **Haptic:** a short rolling vibration of seven soft ticks that swell and fade over 0.3 s. Its last tick lands as the leaf has visibly opened, at about 1.57 s. It plays each time the app starts from scratch (cold start). Returning to an app that is still running shows Home directly, without the animation or the haptic. On phones that can't play the rolling pattern, a single predefined click plays at that moment instead.
 - **Hold:** the finished mark holds for **400 ms**, even when the data is already loaded.
 - **Still loading** after that: a band at 40 % opacity sweeps across the mark (1.1 s pass, 0.5 s pause) until the data is ready.
 - **Exit:** the view fades out over 0.3 s (strong ease-out) and Home appears.
